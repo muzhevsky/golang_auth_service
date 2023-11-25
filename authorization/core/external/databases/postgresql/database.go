@@ -1,32 +1,38 @@
 package postgresql
 
 import (
-	"authorization/utils/errorsAndPanics"
 	"database/sql"
 	_ "github.com/lib/pq"
 )
 
-type database struct {
-	config         *config
-	repositoryCore *RepositoryCore
+type db struct {
+	connection *sql.DB
+	config     *config
 }
 
-func NewPostgresClient(config *config) *database {
-	return &database{config, nil}
+func NewDatabase(config *config) *db {
+	result := &db{nil, config}
+	return result
 }
 
-func (db *database) RepositoryCore() *RepositoryCore {
-	return db.repositoryCore
-}
-
-func (db *database) Connect() error {
+func (db *db) Connect() error {
 	postgresClient, err := sql.Open("postgres", db.config.ConnectionString())
-	errorsAndPanics.HandleError(err)
-	errorsAndPanics.HandleError(postgresClient.Ping())
-	db.repositoryCore = &RepositoryCore{postgresClient}
-	return nil
+	if err != nil {
+		return err
+	}
+	db.connection = postgresClient
+	err = postgresClient.Ping()
+	return err
 }
 
-func (db *database) Disconnect() error {
-	return nil
+func (db *db) GetConnection() *sql.DB {
+	return db.connection
+}
+
+func (db *db) Disconnect() error {
+	var err error
+	if db.connection != nil {
+		err = db.connection.Close()
+	}
+	return err
 }
