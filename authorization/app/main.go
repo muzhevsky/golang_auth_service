@@ -1,7 +1,7 @@
 package main
 
 import (
-	src "authorization/core"
+	src "authorization/core/infrastructure"
 )
 
 func main() {

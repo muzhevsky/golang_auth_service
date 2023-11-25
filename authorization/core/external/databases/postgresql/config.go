@@ -1,12 +1,17 @@
 package postgresql
 
 import (
-	"authorization/utils/errorsAndPanics"
+	"authorization/utils/errorHandling"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 type config struct {
+	Connection connectionConfig `yaml:"connection"`
+	Tables     []tableConfig    `yaml:"tables"`
+}
+
+type connectionConfig struct {
 	Hostname     string `yaml:"hostname"`
 	Port         string `yaml:"port"`
 	User         string `yaml:"user"`
@@ -14,17 +19,29 @@ type config struct {
 	DatabaseName string `yaml:"databaseName"`
 }
 
+type tableConfig struct { //TODO make start-up table creation if necessary Tables doesn't exist
+	Name   string        `yaml:"name"`
+	Fields []fieldConfig `yaml:"fields"`
+}
+
+type fieldConfig struct {
+	Name string `yaml:"name"`
+	Type string `yaml:"type"`
+}
+
 func NewConfig() *config {
-	reader, err := os.ReadFile("E:\\Projects\\goLang\\translations\\authorization\\config\\databaseConfig.yaml")
-	errorsAndPanics.HandleError(err)
+	userDirectory, err := os.UserConfigDir()
+	reader, err := os.Open(userDirectory + "\\my_go_apps\\translations\\configs\\databaseConnection.yaml")
+	errorHandling.LogError(err)
 
 	result := &config{}
-	err = yaml.Unmarshal(reader, result)
-	errorsAndPanics.HandleError(err)
+	decoder := yaml.NewDecoder(reader)
+	err = decoder.Decode(result)
+	errorHandling.LogError(err)
 	return result
 }
 
 func (config *config) ConnectionString() string {
-	return "postgres://" + config.User + ":" + config.Password + "@" + config.Hostname + ":" + config.Port +
-		"/" + config.DatabaseName + "?sslmode=disable"
+	cfg := &config.Connection
+	return "postgres://" + cfg.User + ":" + cfg.Password + "@" + cfg.Hostname + ":" + cfg.Port + "/" + cfg.DatabaseName + "?sslmode=disable"
 }
