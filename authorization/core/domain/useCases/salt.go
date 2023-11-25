@@ -1,15 +1,26 @@
 package useCases
 
 import (
-	"authorization/utils/errorsAndPanics"
+	"authorization/utils/errorHandling"
 	"crypto/rand"
 	"encoding/hex"
 )
 
-func GenerateSalt(password string) string {
+type SaltGenerationService interface {
+	GenerateSalt() string
+}
+
+type basicSaltGenerationService struct {
+}
+
+func NewSaltService() *basicSaltGenerationService {
+	return &basicSaltGenerationService{}
+}
+
+func (saltGenerationService *basicSaltGenerationService) GenerateSalt() string {
 	size := 8
 	bytes := make([]byte, size)
 	_, err := rand.Read(bytes)
-	errorsAndPanics.HandleError(err)
+	errorHandling.LogError(err)
 	return hex.EncodeToString(bytes)
 }
