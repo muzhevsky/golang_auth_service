@@ -1,13 +1,10 @@
 sudo apt update
+sudo apt install postgresql-client
 
-// Docker installation
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+#git clone git@github.com:muzhevsky/simple-golang-app
 
-// getting images 
-sudo docker pull mongo
-sudo docker pull golang
+#cd simple-golang-app
 
-// running container
+sudo docker compose up -d --build
 
-sudo docker run -d -p 27017:27017 --name mongoDB mongo
-sudo docker run -d -p 8080:8080 --name golang-app docker-golang-simple-crud
+psql -h 127.0.0.1 -U postgres -f ./authorization/migrations/000001_create_user_table.up.sql

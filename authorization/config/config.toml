@@ -1,0 +1,23 @@
+[app]
+name = "translations"
+version = "0.0.1"
+
+[http]
+addr = "0.0.0.0"
+port = "8080"
+
+[logger]
+level = "debug"
+
+[pg]
+url = "postgres://postgres:passssap@postgres:5432/postgres"
+pool_max = 2
+
+[jwt]
+signing_string = "sfd$dsvk@sd!dsh"
+
+[smtp]
+username = ""
+password = ""
+host = "smtp.yandex.ru"
+port = "25"
