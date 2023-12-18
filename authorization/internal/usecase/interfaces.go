@@ -8,7 +8,7 @@ import (
 type (
 	IUser interface {
 		CreateUser(context context.Context, user *entities.User) (*entities.User, error)
-		SignIn(context context.Context, user *entities.User) (bool, error)
+		SignIn(context context.Context, user *entities.User) (*entities.User, error)
 	}
 
 	IPasswordHashProvider interface {
@@ -35,15 +35,14 @@ type (
 	}
 
 	ISession interface {
-		CreateAccessToken(claims map[string]interface{}) (string, error)
 		VerifyAccessToken(token string) (bool, error)
-		CreateTokens(claims map[string]interface{}) (*entities.Session, error)
+		CreateTokens(user *entities.User) (*entities.Session, error)
 		UpdateAccessToken(accessToken, refreshToken string) (*entities.Session, error)
-		AuthenticateUser(login, password string) (*entities.Session, error)
 	}
 
-	ITokenGenerator interface {
+	ITokenManager interface {
 		GenerateToken(claims map[string]interface{}) (string, error)
+		ParseToken(token string) (map[string]interface{}, error)
 	}
 
 	ISessionRepo interface {
@@ -53,7 +52,7 @@ type (
 	}
 
 	IMailer interface {
-		SendMail(receiver string, subject string, body entities.EmailBody)
+		SendMail(receiver string, subject string, body string)
 	}
 
 	IUserDataRepo interface {

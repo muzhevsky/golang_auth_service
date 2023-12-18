@@ -82,16 +82,19 @@ func validateFields(user *entities.User) error {
 	return nil
 }
 
-func (u *userUseCase) SignIn(context context.Context, userRequest *entities.User) (result bool, err error) {
+func (u *userUseCase) SignIn(context context.Context, userRequest *entities.User) (*entities.User, error) {
 	userRecord, err := u.userRepo.FindOne(context, userRequest)
 	if err != nil {
-		return false, err
+		return nil, nil
 	}
 
 	if !userRecord.IsVerified {
-		return false, entities.UserIsNotVerified
+		return nil, entities.UserIsNotVerified
 	}
 
 	passwordMatched := u.hashProvider.CompareStringAndHash(userRequest.Password, userRecord.Password)
-	return passwordMatched, nil
+	if !passwordMatched {
+		return nil, entities.WrongPassword
+	}
+	return userRecord, nil
 }

@@ -8,19 +8,24 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewRouter(handler *gin.Engine, l logger.ILogger, u usecase.IUser, v usecase.IVerification, s usecase.ISession) { // todo явно надо роутеры по-другому создавать
+func InitServiceMiddleware(handler *gin.Engine) {
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
 
 	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER_HTTP_HANDLER")
 	handler.GET("/swagger/*any", swaggerHandler)
+}
 
+func NewAuthorizationRouter(handler *gin.Engine, u usecase.IUser, l logger.ILogger, s usecase.ISession) {
+	h := handler.Group("/auth")
+
+	newSignInRouter(h, u, s, l)
+}
+
+func NewAuthenticationRouter(handler *gin.Engine, l logger.ILogger, u usecase.IUser, s usecase.ISession, v usecase.IVerification) {
 	h := handler.Group("/user")
-	{
-		newUserRoutes(h, u, v, l)
-	}
-	h = handler.Group("/session")
-	{
-		newSessionRoutes(h, s, l)
-	}
+
+	newVerificationRoute(h, v, s, l)
+	newSignUpRouter(h, u, v, l)
+
 }

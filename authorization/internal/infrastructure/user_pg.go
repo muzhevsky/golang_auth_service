@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 )
 
 type userRepo struct {
@@ -35,9 +36,10 @@ func (u *userRepo) Create(context context.Context, user *entities.User) (id int,
 }
 
 func (u *userRepo) FindOne(context context.Context, user *entities.User) (result *entities.User, err error) {
+	// todo подумать, оставить ли один метод или искать отдельно по id, login и email
 	sql, _, err := u.pg.Builder.Select("id", "login", "password", "nickname", "email", "registration_date", "is_verified").
 		From("users").
-		Where(sq.Or{sq.Eq{"login": user.Login}, sq.Eq{"email": user.EMail}}).
+		Where(sq.Or{sq.Or{sq.Eq{"login": user.Login}, sq.Eq{"email": user.EMail}}}).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -46,8 +48,8 @@ func (u *userRepo) FindOne(context context.Context, user *entities.User) (result
 	result = &entities.User{}
 	err = u.pg.Pool.QueryRow(context, sql, user.Login, user.EMail).
 		Scan(&result.Id, &result.Login, &result.Password, &result.Nickname, &result.EMail, &result.CreationTime, &result.IsVerified)
-	if err != nil {
-		return nil, err
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, entities.UserNotFound
 	}
 	return result, nil
 }

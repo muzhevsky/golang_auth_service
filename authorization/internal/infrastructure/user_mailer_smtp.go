@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"authorization/internal/entities"
 	"authorization/pkg/smtp"
 )
 
@@ -13,9 +12,9 @@ func NewSmtpMailer(smtp *smtp.SMTP) *smtpMailer {
 	return &smtpMailer{smtp: smtp}
 }
 
-func (mailer *smtpMailer) SendMail(receiver string, subject string, body entities.EmailBody) {
+func (mailer *smtpMailer) SendMail(receiver string, subject string, body string) {
 	mailer.smtp.SendMail(
 		receiver,
 		subject,
-		body.Body)
+		body)
 }

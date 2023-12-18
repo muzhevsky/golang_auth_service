@@ -5,11 +5,6 @@ import (
 	"net/smtp"
 )
 
-const (
-	defaultSender = "smartri.app@ya.ru"
-	defaultPort   = "25"
-)
-
 type SMTP struct {
 	auth     smtp.Auth
 	host     string
@@ -18,12 +13,12 @@ type SMTP struct {
 	port     string
 }
 
-func New(username, password, host string, opts ...Option) *SMTP {
+func New(username, sender, password, host, port string, opts ...Option) *SMTP {
 
 	s := &SMTP{
 		auth:     smtp.PlainAuth("", username, password, host),
-		sender:   defaultSender,
-		port:     defaultPort,
+		sender:   sender,
+		port:     port,
 		host:     host,
 		username: username,
 	}
@@ -45,6 +40,6 @@ func (s *SMTP) SendMail(to, subject, body string) {
 	err := smtp.SendMail(addr, s.auth, s.sender, []string{to}, msg)
 	log.Printf(to + " " + subject + " " + body + " " + s.username + " " + s.host + " " + s.port)
 	if err != nil {
-		log.Printf(err.Error())
+		log.Fatal(err.Error())
 	}
 }

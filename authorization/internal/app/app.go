@@ -6,6 +6,7 @@ import (
 	"authorization/internal/infrastructure"
 	"authorization/internal/usecase"
 	"authorization/pkg/http"
+	"authorization/pkg/jwt"
 	"authorization/pkg/logger"
 	"authorization/pkg/postgres"
 	"authorization/pkg/smtp"
@@ -22,7 +23,7 @@ func Run() {
 
 	log := logger.New(cfg.Level)
 
-	jwtGenerator := &infrastructure.JWTGenerator{}
+	jwtGenerator := infrastructure.NewJwtProvider(jwt.New(cfg.SigningString))
 
 	// Repository
 	pg, err := postgres.New(cfg.PG.Url, postgres.MaxPoolSize(cfg.PG.PoolMax))
@@ -32,13 +33,13 @@ func Run() {
 	defer pg.Close()
 
 	userRepo := infrastructure.NewUserRepo(pg)
-	userDataRepo := infrastructure.NewBcryptHashProvider(10) // TODO вынести в конфиг (посоветоваться)
+	userDataRepo := infrastructure.NewBcryptHashProvider() // TODO вынести в конфиг (подумать)
 	verificationRepo := infrastructure.NewVerificationRepo(pg)
 	sessionRepo := infrastructure.NewSessionRepo(pg)
 
 	// Other infrastructure
 
-	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host)
+	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
 	smtpMailer := infrastructure.NewSmtpMailer(smtpClient)
 
 	userUseCase := usecase.NewUser(
@@ -52,10 +53,12 @@ func Run() {
 		verificationRepo,
 		smtpMailer,
 	)
-	sessionUseCase := usecase.NewSessionUseCase(jwtGenerator, sessionRepo)
+	sessionUseCase := usecase.NewSessionUseCase(jwtGenerator, jwtGenerator, sessionRepo)
 
 	router := gin.New()
-	v1.NewRouter(router, log, userUseCase, verificationUseCase, sessionUseCase)
+	v1.InitServiceMiddleware(router)
+	v1.NewAuthenticationRouter(router, log, userUseCase, sessionUseCase, verificationUseCase)
+	v1.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)
 	httpServer := http.New(
 		router,
 		http.FullAddress(cfg.Addr, cfg.HTTP.Port))
