@@ -32,6 +32,6 @@ func (v *Verification) VerifyUser(verification *Verification) bool {
 	return strings.ToLower(verification.Code) == v.Code
 }
 
-func (v *Verification) GenerateEmailBody() EmailBody {
-	return EmailBody{fmt.Sprintf("Код верификации: %s", v.Code)}
+func (v *Verification) GenerateEmailBody() string {
+	return fmt.Sprintf("Код верификации: %s", v.Code)
 }

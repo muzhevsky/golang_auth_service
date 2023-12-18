@@ -24,3 +24,12 @@ func (j *JWT) NewToken(claim map[string]interface{}) (string, error) {
 	}
 	return tokenString, nil
 }
+
+func (j *JWT) ParseToken(token string) (map[string]interface{}, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(j.signingString), nil
+	})
+
+	return claims, err
+}
