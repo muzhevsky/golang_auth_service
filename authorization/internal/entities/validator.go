@@ -14,7 +14,6 @@ const (
 	maxEmailLen    = 254
 	minNicknameLen = 3
 	maxNicknameLen = 16
-	hashCost       = 10
 )
 
 type UserValidator struct {
@@ -99,7 +98,7 @@ func (v *UserValidator) ValidateNickname(nickname string) error {
 	if !v.validateNicknameLength(nickname) {
 		return fmt.Errorf("%w. nickname length can't be less than  %d OR more %d", ValidationError, minNicknameLen, maxNicknameLen)
 	}
-	if !v.validateProhibitedCharacters(nickname) {
+	if !v.validateProhibitedCharacters(nickname) { // todo другие правила валидации
 		return fmt.Errorf("%w. nickname can contain Latin alphabet characters, numbers, underscores and hyphens", ValidationError)
 	}
 	return nil

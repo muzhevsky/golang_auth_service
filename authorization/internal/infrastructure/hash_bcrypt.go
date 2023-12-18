@@ -2,11 +2,15 @@ package infrastructure
 
 import "golang.org/x/crypto/bcrypt"
 
+const (
+	hashCost = 10
+)
+
 type bcryptHashProvider struct {
 	hashCost int
 }
 
-func NewBcryptHashProvider(hashCost int) *bcryptHashProvider {
+func NewBcryptHashProvider() *bcryptHashProvider {
 	return &bcryptHashProvider{hashCost: hashCost}
 }
 
@@ -19,7 +23,6 @@ func (p *bcryptHashProvider) GenerateHashPassword(stringToHash string) ([]byte, 
 }
 
 func (p *bcryptHashProvider) CompareStringAndHash(stringToCompare string, hashedString string) bool {
-
 	passwordMatched := bcrypt.CompareHashAndPassword([]byte(hashedString), []byte(stringToCompare))
 	if passwordMatched != nil {
 		return false

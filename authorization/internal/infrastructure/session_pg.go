@@ -14,8 +14,8 @@ type sessionRepo struct {
 
 func (s sessionRepo) Create(ctx context.Context, session *entities.Session) error {
 	sql, args, err := s.pg.Builder.Insert("sessions").
-		Columns("user_id", "access_token", "refresh_token", "expire_at").
-		Values(session.Id, session.AccessToken, session.RefreshToken, session.ExpireAt).
+		Columns("access_token", "refresh_token", "expire_at").
+		Values(session, session.AccessToken, session.RefreshToken, session.ExpireAt).
 		ToSql()
 	if err != nil {
 		return err
