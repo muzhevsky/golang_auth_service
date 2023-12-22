@@ -40,6 +40,6 @@ func (s *SMTP) SendMail(to, subject, body string) {
 	err := smtp.SendMail(addr, s.auth, s.sender, []string{to}, msg)
 	log.Printf(to + " " + subject + " " + body + " " + s.username + " " + s.host + " " + s.port)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Printf("smtp error")
 	}
 }
