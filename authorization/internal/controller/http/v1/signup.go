@@ -71,7 +71,7 @@ func (u *signUpRouter) signUp(c *gin.Context) {
 		}
 	}
 
-	err = u.verification.CreateVerification(user)
+	err = u.verification.CreateVerification(c, user)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, err.Error(), DefaultErrorCode)
 	}

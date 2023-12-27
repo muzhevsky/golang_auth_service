@@ -53,7 +53,7 @@ func Run() {
 		verificationRepo,
 		smtpMailer,
 	)
-	sessionUseCase := usecase.NewSessionUseCase(jwtGenerator, jwtGenerator, sessionRepo)
+	sessionUseCase := usecase.NewSessionUseCase(jwtGenerator, jwtGenerator, sessionRepo, userRepo)
 
 	router := gin.New()
 	v1.InitServiceMiddleware(router)
