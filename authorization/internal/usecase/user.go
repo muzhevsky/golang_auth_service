@@ -3,6 +3,7 @@ package usecase
 import (
 	"authorization/internal/entities"
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -83,8 +84,14 @@ func validateFields(user *entities.User) error {
 }
 
 func (u *userUseCase) SignIn(context context.Context, userRequest *entities.User) (*entities.User, error) {
-	userRecord, err := u.userRepo.FindOne(context, userRequest)
-	if err != nil {
+	var userRecord *entities.User
+	userRecord, err := u.userRepo.FindByLogin(context, userRequest.Login)
+	if errors.Is(err, entities.UserNotFound) {
+		userRecord, err = u.userRepo.FindByEmail(context, userRequest.Login)
+		if err != nil {
+			return nil, nil
+		}
+	} else if err != nil {
 		return nil, nil
 	}
 
