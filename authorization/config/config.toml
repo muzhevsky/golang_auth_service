@@ -10,14 +10,14 @@ port = "8080"
 level = "debug"
 
 [pg]
-url = "postgres://postgres:passssap@postgres:5432/postgres"
+url = "postgres://postgres:Iam123@80.76.42.18:5432/smartri?sslmode=disable"
 pool_max = 2
 
 [jwt]
 signing_string = "sfd$dsvk@sd!dsh"
 
 [smtp]
-username = ""
-password = ""
+username = "smartri.app@ya.ru"
+password = "bqyghustpytdocdg"
 host = "smtp.yandex.ru"
 port = "587"

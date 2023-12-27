@@ -51,7 +51,7 @@ func (router *signInRouter) signIn(c *gin.Context) {
 			return
 		}
 
-		session, err := router.auth.CreateTokens(user)
+		session, err := router.auth.CreateTokens(c, user)
 		if err != nil {
 			errorResponse(c, http.StatusInternalServerError, "unexpected error", DefaultErrorCode)
 			return

@@ -16,9 +16,9 @@ func NewVerificationUseCase(userRepo IUserRepo, verificationRepo IVerificationRe
 	return &verificationUseCase{userRepo, verificationRepo, mailer}
 }
 
-func (v *verificationUseCase) CreateVerification(user *entities.User) error {
+func (v *verificationUseCase) CreateVerification(context context.Context, user *entities.User) error {
 	verification := entities.GenerateVerification(user.Id, time.Now().Add(time.Minute*time.Duration(10)))
-	err := v.verificationRepo.Create(verification)
+	err := v.verificationRepo.Create(context, verification)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (v *verificationUseCase) CreateVerification(user *entities.User) error {
 }
 
 func (v *verificationUseCase) Verify(context context.Context, verification *entities.Verification) (result bool, err error) {
-	existingVerification, err := v.verificationRepo.FindOne(verification.UserId)
+	existingVerification, err := v.verificationRepo.FindOne(context, verification.UserId)
 	if err != nil {
 		return false, err
 	}

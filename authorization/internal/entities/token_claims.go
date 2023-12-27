@@ -14,7 +14,8 @@ type TokenClaims struct {
 	ExpireAt time.Time
 }
 
-func NewClaims(userId int, expireAt time.Time) *TokenClaims {
+func NewClaims(userId int, duration time.Duration) *TokenClaims {
+	expireAt := time.Now().Add(duration)
 	return &TokenClaims{UserId: userId, ExpireAt: expireAt}
 }
 

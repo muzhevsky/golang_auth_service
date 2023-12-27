@@ -35,18 +35,29 @@ func (u *userRepo) Create(context context.Context, user *entities.User) (id int,
 	return id, nil
 }
 
-func (u *userRepo) FindOne(context context.Context, user *entities.User) (result *entities.User, err error) {
-	// todo подумать, оставить ли один метод или искать отдельно по id, login и email
+func (u *userRepo) FindById(context context.Context, id int) (*entities.User, error) {
+	return u.findOne(context, "id", id)
+}
+
+func (u *userRepo) FindByLogin(context context.Context, login string) (*entities.User, error) {
+	return u.findOne(context, "login", login)
+}
+
+func (u *userRepo) FindByEmail(context context.Context, email string) (*entities.User, error) {
+	return u.findOne(context, "email", email)
+}
+
+func (u *userRepo) findOne(context context.Context, columnName string, value interface{}) (result *entities.User, err error) {
 	sql, _, err := u.pg.Builder.Select("id", "login", "password", "nickname", "email", "registration_date", "is_verified").
 		From("users").
-		Where(sq.Or{sq.Or{sq.Eq{"login": user.Login}, sq.Eq{"email": user.EMail}}}).
+		Where(sq.Eq{columnName: value}).
 		ToSql()
 	if err != nil {
 		return nil, err
 	}
 
 	result = &entities.User{}
-	err = u.pg.Pool.QueryRow(context, sql, user.Login, user.EMail).
+	err = u.pg.Pool.QueryRow(context, sql, value).
 		Scan(&result.Id, &result.Login, &result.Password, &result.Nickname, &result.EMail, &result.CreationTime, &result.IsVerified)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, entities.UserNotFound
