@@ -36,17 +36,17 @@ func NewSessionUseCase(
 	return useCase
 }
 
-func (s *SessionUseCase) VerifyAccessToken(context context.Context, token string) (bool, error) {
+func (s *SessionUseCase) VerifyAccessToken(context context.Context, token string) (*entities.TokenClaims, error) {
 	claimsMap, err := s.accessTokenManager.ParseToken(token)
 	if err != nil {
-		return false, entities.NotAValidToken
+		return nil, entities.NotAValidToken
 	}
 	claims := entities.NewClaimsFromMap(claimsMap)
 	if claims.ExpireAt.Before(time.Now()) {
-		return false, entities.TokenExpired
+		return nil, entities.TokenExpired
 	}
 
-	return true, nil
+	return claims, nil
 }
 
 func (s *SessionUseCase) CreateTokens(context context.Context, user *entities.User) (*entities.Session, error) {

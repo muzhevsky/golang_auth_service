@@ -37,7 +37,7 @@ type (
 	}
 
 	ISession interface {
-		VerifyAccessToken(context context.Context, token string) (bool, error)
+		VerifyAccessToken(context context.Context, token string) (*entities.TokenClaims, error)
 		CreateTokens(context context.Context, user *entities.User) (*entities.Session, error)
 		UpdateAccessToken(context context.Context, accessToken, refreshToken string) (*entities.Session, error)
 	}
@@ -53,6 +53,15 @@ type (
 		Delete(ctx context.Context, session *entities.Session) error
 		FindByAccess(ctx context.Context, token string) (*entities.Session, error)
 	}
+
+	ISecurity interface {
+		CheckAccess(ctx context.Context, route string, userId int) (bool, error)
+	}
+
+	//IRoleRepo interface {
+	//	GetRoles(ctx context.Context, userId int) ([]entities.Role, error)
+	//	SetRoles(ctx context.Context, userId int, roles []entities.Role) error
+	//}
 
 	IMailer interface {
 		SendMail(receiver string, subject string, body string)

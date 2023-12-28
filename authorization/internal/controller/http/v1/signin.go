@@ -66,8 +66,13 @@ func (router *signInRouter) signIn(c *gin.Context) {
 		return
 	}
 
-	if errors.Is(err, entities.UserIsNotVerified) {
+	if errors.Is(err, entities.UserNotFound) {
 		errorResponse(c, http.StatusBadRequest, "user doesn't exist", DefaultErrorCode)
+		return
+	}
+
+	if errors.Is(err, entities.WrongPassword) {
+		errorResponse(c, http.StatusBadRequest, "wrong password", DefaultErrorCode)
 		return
 	}
 

@@ -8,6 +8,11 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+func InitSecurityMiddleware(handler *gin.Engine, authUseCase usecase.ISession, authRequiredRoutes []string) {
+	security := newSecurity(authUseCase, authRequiredRoutes)
+	handler.Use(security.handle)
+}
+
 func InitServiceMiddleware(handler *gin.Engine) {
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -27,5 +32,4 @@ func NewAuthenticationRouter(handler *gin.Engine, l logger.ILogger, u usecase.IU
 
 	newVerificationRoute(h, v, s, l)
 	newSignUpRouter(h, u, v, l)
-
 }

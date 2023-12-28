@@ -7,12 +7,13 @@ import (
 
 type (
 	Config struct {
-		App    `toml:"app"`
-		HTTP   `toml:"http"`
-		Logger `toml:"logger"`
-		PG     `toml:"pg"`
-		JWT    `toml:"jwt"`
-		SMTP   `toml:"smtp"`
+		App      `toml:"app"`
+		HTTP     `toml:"http"`
+		Logger   `toml:"logger"`
+		PG       `toml:"pg"`
+		JWT      `toml:"jwt"`
+		SMTP     `toml:"smtp"`
+		Security `toml:"security"`
 	}
 
 	App struct {
@@ -41,6 +42,10 @@ type (
 		Password string `toml:"password"`
 		Host     string `toml:"host"`
 		Port     string `toml:"port"`
+	}
+	Security struct {
+		SecurityRoleRequiredMap            map[string][]string `toml:"roleRequiredRoutes"`
+		SecurityVerificationRequiredRoutes []string            `toml:"verificationRequiredRoutes"`
 	}
 )
 

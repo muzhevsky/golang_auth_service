@@ -33,7 +33,8 @@ func Run() {
 	defer pg.Close()
 
 	userRepo := infrastructure.NewUserRepo(pg)
-	userDataRepo := infrastructure.NewBcryptHashProvider() // TODO вынести в конфиг (подумать)
+	//roleRepo := infrastructure.NewRoleRepo(pg)
+	userDataRepo := infrastructure.NewBcryptHashProvider()
 	verificationRepo := infrastructure.NewVerificationRepo(pg)
 	sessionRepo := infrastructure.NewSessionRepo(pg)
 
@@ -41,6 +42,8 @@ func Run() {
 
 	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
 	smtpMailer := infrastructure.NewSmtpMailer(smtpClient)
+
+	// UseCases
 
 	userUseCase := usecase.NewUser(
 		userRepo,
@@ -54,8 +57,14 @@ func Run() {
 		smtpMailer,
 	)
 	sessionUseCase := usecase.NewSessionUseCase(jwtGenerator, jwtGenerator, sessionRepo, userRepo)
+	//
+	//securityRoleUseCase := usecase.NewSecurityUseCase(userRepo, roleRepo, cfg.SecurityRoleRequiredMap)
+	//securityVerificationUseCase := usecase.NewSecurity(userRepo, config.securityVerificationMap)
+
+	// Controllers
 
 	router := gin.New()
+	v1.InitSecurityMiddleware(router, sessionUseCase, []string{"/test"})
 	v1.InitServiceMiddleware(router)
 	v1.NewAuthenticationRouter(router, log, userUseCase, sessionUseCase, verificationUseCase)
 	v1.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)

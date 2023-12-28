@@ -9,6 +9,7 @@ var UserNotFound = errors.New("there's no user with such email or login")
 var TokenExpired = errors.New("token is expired")
 var WrongPassword = errors.New("wrong password")
 var NotAValidToken = errors.New("invalid token")
+var NoSuchRole = errors.New("invalid role")
 
 // // verification
 var ExpiredCode = errors.New("the verification code is already expired")
