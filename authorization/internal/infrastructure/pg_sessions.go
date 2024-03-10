@@ -19,7 +19,7 @@ func (s *sessionRepo) Delete(ctx context.Context, session *entities.Session) err
 		return err
 	}
 
-	err = s.pg.Pool.QueryRow(ctx, sql, args).Scan(&squirrel.Row{})
+	_, err = s.pg.Pool.Exec(ctx, sql, args...)
 	return err
 }
 
@@ -32,7 +32,7 @@ func (s *sessionRepo) Create(ctx context.Context, session *entities.Session) err
 		return err
 	}
 
-	s.pg.Pool.QueryRow(ctx, sql, args...) // todo посмотреть другие методы
+	_, err = s.pg.Pool.Exec(ctx, sql, args...)
 	return err
 }
 
@@ -43,16 +43,17 @@ func (s *sessionRepo) Update(ctx context.Context, session *entities.Session) err
 
 func (s *sessionRepo) FindByAccess(ctx context.Context, token string) (*entities.Session, error) {
 	sql, args, err := s.pg.Builder.Select("access_token", "refresh_token", "expire_at").
-		From("users").
+		From("sessions").
 		Where(squirrel.Eq{"access_token": token}).
 		Limit(1).
 		ToSql()
+
 	if err != nil {
 		return nil, err
 	}
 
-	var result *entities.Session
-	err = s.pg.Pool.QueryRow(ctx, sql, args).Scan(result)
+	result := &entities.Session{}
+	err = s.pg.Pool.QueryRow(ctx, sql, args...).Scan(&result.AccessToken, &result.RefreshToken, &result.ExpireAt)
 
 	return result, err
 }

@@ -47,7 +47,6 @@ func New(level string) *Logger {
 
 func (l *Logger) Debug(args ...interface{}) {
 	l.logger.Debug(args...)
-
 }
 func (l *Logger) Info(args ...interface{}) {
 	l.logger.Info(args...)

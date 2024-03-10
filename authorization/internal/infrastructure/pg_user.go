@@ -57,10 +57,13 @@ func (u *userRepo) findOne(context context.Context, columnName string, value int
 	}
 
 	result = &entities.User{}
-	err = u.pg.Pool.QueryRow(context, sql, value).
-		Scan(&result.Id, &result.Login, &result.Password, &result.Nickname, &result.EMail, &result.CreationTime, &result.IsVerified)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.UserNotFound
+	row := u.pg.Pool.QueryRow(context, sql, value)
+	err = row.Scan(&result.Id, &result.Login, &result.Password, &result.Nickname, &result.EMail, &result.CreationTime, &result.IsVerified)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, entities.UserNotFound
+		}
+		return nil, err
 	}
 	return result, nil
 }
@@ -95,7 +98,7 @@ func (u *userRepo) CheckEmailExist(context context.Context, email string) (bool,
 
 	err = u.pg.Pool.QueryRow(context, sql, args...).Scan(&email)
 	if err != nil {
-		if err == u.pg.ErrNoRows {
+		if errors.Is(err, u.pg.ErrNoRows) {
 			return false, nil
 		}
 		return false, err
@@ -110,6 +113,6 @@ func (u *userRepo) Verify(context context.Context, id int) error {
 		return err
 	}
 
-	_, err = u.pg.Pool.Query(context, request, args...)
+	_, err = u.pg.Pool.Exec(context, request, args...)
 	return err
 }

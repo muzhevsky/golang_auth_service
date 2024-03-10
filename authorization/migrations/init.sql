@@ -1,6 +1,8 @@
 set search_path to public;
 
-drop table users;
+SELECT 'CREATE DATABASE auth' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'auth');
+
+drop table if exists users;
 create table users
 (
     id                serial
@@ -13,7 +15,7 @@ create table users
     is_verified       boolean default false not null
 );
 
-drop table verification_codes;
+drop table if exists verification_codes;
 create table verification_codes
 (
     user_id           integer,
@@ -42,10 +44,11 @@ $$;
 
 alter function add_verification_code(integer, char, timestamp) owner to postgres;
 
-
-drop table sessions;
+drop table if exists sessions;
 create table sessions(
     access_token varchar(128) primary key ,
     refresh_token varchar(128),
+    user_id int,
+    device_description varchar(128),
     expire_at date
 )

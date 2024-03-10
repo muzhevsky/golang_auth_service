@@ -13,27 +13,34 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"strconv"
 )
 
 func Run() {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		logrus.Error(fmt.Errorf("app - Run - NewConfig: %w", err))
+		logrus.Error(fmt.Errorf("app - Run: %w", err))
 	}
 
-	log := logger.New(cfg.Level)
+	log := logger.New("error")
 
-	jwtGenerator := infrastructure.NewJwtProvider(jwt.New(cfg.SigningString))
+	jwt := jwt.New(cfg.SigningString)
 
 	// Repository
-	pg, err := postgres.New(cfg.PG.Url, postgres.MaxPoolSize(cfg.PG.PoolMax))
+	size, err := strconv.Atoi(cfg.PG.PoolMax)
 	if err != nil {
-		log.Fatal(fmt.Errorf("app - Run - postgres.NewUser: %w", err))
+		log.Fatal(fmt.Errorf("app - Run: %w", err))
+	}
+	pg, err := postgres.New(cfg.PG, postgres.MaxPoolSize(size))
+	if err != nil {
+		log.Fatal(fmt.Errorf("app - Run: %w", err))
 	}
 	defer pg.Close()
 
 	userRepo := infrastructure.NewUserRepo(pg)
-	userDataRepo := infrastructure.NewBcryptHashProvider() // TODO вынести в конфиг (подумать)
+	bcryptHashProvider := infrastructure.NewBcryptHashProvider()
+	accessTokenProvider := infrastructure.NewJwtProvider(jwt)
+	refreshTokenGenerator := infrastructure.NewHashRefreshTokenGenerator(bcryptHashProvider)
 	verificationRepo := infrastructure.NewVerificationRepo(pg)
 	sessionRepo := infrastructure.NewSessionRepo(pg)
 
@@ -42,10 +49,12 @@ func Run() {
 	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
 	smtpMailer := infrastructure.NewSmtpMailer(smtpClient)
 
+	// UseCases
+
 	userUseCase := usecase.NewUser(
 		userRepo,
 		verificationRepo,
-		userDataRepo,
+		bcryptHashProvider,
 	)
 
 	verificationUseCase := usecase.NewVerificationUseCase(
@@ -53,23 +62,14 @@ func Run() {
 		verificationRepo,
 		smtpMailer,
 	)
-	sessionUseCase := usecase.NewSessionUseCase(jwtGenerator, jwtGenerator, sessionRepo, userRepo)
+	sessionUseCase := usecase.NewSessionUseCase(accessTokenProvider, refreshTokenGenerator, sessionRepo, bcryptHashProvider)
+
+	// Controllers
 
 	router := gin.New()
 	v1.InitServiceMiddleware(router)
 	v1.NewAuthenticationRouter(router, log, userUseCase, sessionUseCase, verificationUseCase)
 	v1.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)
-	httpServer := http.New(
-		router,
-		http.FullAddress(cfg.Addr, cfg.HTTP.Port))
 
-	select {
-	case err := <-httpServer.Notify():
-		log.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
-	}
-
-	err = httpServer.Shutdown()
-	if err != nil {
-		log.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
-	}
+	http.Start(router, cfg.HTTP)
 }

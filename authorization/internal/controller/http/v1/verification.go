@@ -30,18 +30,23 @@ func (u *verificationRoute) verifyUser(c *gin.Context) {
 	var request userVerificationRequest
 	if err := c.ShouldBind(&request); err != nil {
 		u.l.Error(err, "http - v1 - verifyUser")
-		errorResponse(c, http.StatusBadRequest, "invalid request body", DefaultErrorCode)
+		errorResponse(c, http.StatusBadRequest, "invalid request body", DataBindErrorCode)
 		return
 	}
 
-	success, err := u.verification.Verify(c,
+	err := u.verification.Verify(c,
 		&entities.Verification{
 			UserId: request.UserId,
 			Code:   request.Code,
 		})
+
 	if err != nil {
+		if errors.Is(err, entities.WrongVerificationCode) {
+			errorResponse(c, http.StatusBadRequest, "invalid verification code", WrongVerificationErrorCode)
+			return
+		}
 		if errors.Is(err, entities.ExpiredCode) {
-			errorResponse(c, http.StatusBadRequest, "code is outdated", DefaultErrorCode)
+			errorResponse(c, http.StatusBadRequest, "code is outdated", VerificationExpiredErrorCode)
 			return
 		} else {
 			u.l.Error(err, "http - v1 - verifyUser")
@@ -49,11 +54,5 @@ func (u *verificationRoute) verifyUser(c *gin.Context) {
 			return
 		}
 	}
-
-	if !success {
-		errorResponse(c, http.StatusBadRequest, "invalid verification code", DefaultErrorCode)
-		return
-	}
-
 	c.JSON(http.StatusOK, "")
 }

@@ -14,7 +14,7 @@ func NewBcryptHashProvider() *bcryptHashProvider {
 	return &bcryptHashProvider{hashCost: hashCost}
 }
 
-func (p *bcryptHashProvider) GenerateHashPassword(stringToHash string) ([]byte, error) {
+func (p *bcryptHashProvider) GenerateHash(stringToHash string) ([]byte, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(stringToHash), p.hashCost)
 	if err != nil {
 		return nil, err
