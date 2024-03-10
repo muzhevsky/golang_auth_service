@@ -6,6 +6,6 @@ COPY . .
 
 RUN go build ./cmd/app/main.go
 
-EXPOSE 8080
+EXPOSE ${AUTH_PORT}
 
 CMD ["./main"]

@@ -10,20 +10,28 @@ import (
 
 type userUseCase struct {
 	userRepo         IUserRepo
-	hashProvider     IPasswordHashProvider
+	hashProvider     IHashProvider
 	verificationRepo IVerificationRepo
 }
 
 func NewUser(
 	userRepo IUserRepo,
 	verificationRepo IVerificationRepo,
-	hashProvider IPasswordHashProvider) *userUseCase {
+	hashProvider IHashProvider) *userUseCase {
 	return &userUseCase{
 		userRepo:         userRepo,
 		verificationRepo: verificationRepo,
 		hashProvider:     hashProvider,
 	}
 }
+
+// CreateUser - creates new record in database with user's data
+// returns objects including user's data
+// possible errors:
+//   - validation errors
+//   - non-unique login
+//   - non-unique email
+//   - errors of password hash and user repository
 func (u *userUseCase) CreateUser(context context.Context, user *entities.User) (*entities.User, error) {
 	err := validateFields(user)
 	if err != nil {
@@ -35,7 +43,7 @@ func (u *userUseCase) CreateUser(context context.Context, user *entities.User) (
 		return nil, err
 	}
 	if result {
-		return nil, fmt.Errorf("%w. login already exists", RecordAlreadyExists)
+		return nil, fmt.Errorf("%w. Login already exists", RecordAlreadyExists)
 	}
 
 	result, err = u.userRepo.CheckEmailExist(context, user.EMail)
@@ -43,10 +51,10 @@ func (u *userUseCase) CreateUser(context context.Context, user *entities.User) (
 		return nil, err
 	}
 	if result {
-		return nil, fmt.Errorf("%w. email already exists", RecordAlreadyExists)
+		return nil, fmt.Errorf("%w. Email already exists", RecordAlreadyExists)
 	}
 
-	hashedPassword, err := u.hashProvider.GenerateHashPassword(user.Password)
+	hashedPassword, err := u.hashProvider.GenerateHash(user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -86,13 +94,15 @@ func validateFields(user *entities.User) error {
 func (u *userUseCase) SignIn(context context.Context, userRequest *entities.User) (*entities.User, error) {
 	var userRecord *entities.User
 	userRecord, err := u.userRepo.FindByLogin(context, userRequest.Login)
-	if errors.Is(err, entities.UserNotFound) {
-		userRecord, err = u.userRepo.FindByEmail(context, userRequest.Login)
-		if err != nil {
-			return nil, nil
+	if err != nil {
+		if errors.Is(err, entities.UserNotFound) {
+			userRecord, err = u.userRepo.FindByEmail(context, userRequest.Login)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
 		}
-	} else if err != nil {
-		return nil, nil
 	}
 
 	if !userRecord.IsVerified {

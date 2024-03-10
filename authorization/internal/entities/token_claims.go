@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	UserId   = "userId"
-	ExpireAt = "expireAt"
+	UserIdClaimName = "userId"
+	ExpireAt        = "expireAt"
 )
 
 type TokenClaims struct {
@@ -20,15 +20,22 @@ func NewClaims(userId int, duration time.Duration) *TokenClaims {
 }
 
 func NewClaimsFromMap(claimsMap map[string]interface{}) *TokenClaims {
-	userId := claimsMap[UserId].(int)
-	expireAt := claimsMap[ExpireAt].(int64)
-	return &TokenClaims{userId, time.Unix(expireAt, 0)}
+	userId, exists := claimsMap[UserIdClaimName].(float64)
+	if !exists {
+		return nil
+	}
+	expireAt, exists := claimsMap[ExpireAt].(float64)
+	if !exists {
+		return nil
+	}
+
+	return &TokenClaims{int(userId), time.Unix(int64(expireAt), 0)}
 }
 
 func (claims *TokenClaims) MapFromClaims() map[string]interface{} {
 	result := make(map[string]interface{})
-	result[UserId] = claims.UserId
-	result[ExpireAt] = claims.ExpireAt
+	result[UserIdClaimName] = claims.UserId
+	result[ExpireAt] = claims.ExpireAt.Unix()
 
 	return result
 }

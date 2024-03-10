@@ -24,29 +24,19 @@ func newSignUpRouter(handler *gin.RouterGroup, user usecase.IUser, verification 
 type createUserRequest struct {
 	Login    string `json:"login" binding:"required" example:"TopPlayer123"`
 	Password string `json:"password" binding:"required" example:"123superPassword"`
-	EMail    string `json:"e-mail" binding:"required" example:"shilo@milo.psih"`
+	EMail    string `json:"e-mail" binding:"required" example:"andrew123@qwerty.kom"`
 	Nickname string `json:"nickname" binding:"required" example:"Looser1123"`
 }
 type createUserResponse struct {
 	Id int `json:"id" example:"2"`
 }
 
-// @Summary     Create user
-// @ID          history
-// @Accept      json
-// @Produce     json
-// @Param		request body createUserRequest true "Data for registration"
-// @Success     200 {object} createUserResponse
-// @Failure     400 {object} response
-// @Failure     500 {object} response
-// @Failure     409 {object} response
-// @Router      /user/ [post]
 func (u *signUpRouter) signUp(c *gin.Context) {
 	var userRequest createUserRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		u.logger.Error(err, "http - v1 - createUser")
-		errorResponse(c, http.StatusBadRequest, "invalid request body", DefaultErrorCode)
+		errorResponse(c, http.StatusBadRequest, "invalid request body", DataBindErrorCode)
 		return
 	}
 
@@ -58,15 +48,15 @@ func (u *signUpRouter) signUp(c *gin.Context) {
 	})
 
 	if err != nil {
-		u.logger.Error(err, "http - v1 - createUser")
 		if errors.Is(err, entities.ValidationError) {
-			errorResponse(c, http.StatusBadRequest, err.Error(), ValidationErrorCode)
+			errorResponse(c, http.StatusBadRequest, err.Error(), LoginValidationErrorCode)
 			return
 		} else if errors.Is(err, usecase.RecordAlreadyExists) {
 			errorResponse(c, http.StatusConflict, err.Error(), RecordExistErrorCode)
 			return
 		} else {
-			errorResponse(c, http.StatusInternalServerError, err.Error(), DefaultErrorCode)
+			u.logger.Error(err, "http - v1 - createUser")
+			errorResponse(c, http.StatusInternalServerError, "Internal server error", DefaultErrorCode)
 			return
 		}
 	}

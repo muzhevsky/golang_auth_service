@@ -11,8 +11,8 @@ type (
 		SignIn(context context.Context, user *entities.User) (*entities.User, error)
 	}
 
-	IPasswordHashProvider interface {
-		GenerateHashPassword(stringToHash string) ([]byte, error)
+	IHashProvider interface {
+		GenerateHash(stringToHash string) ([]byte, error)
 		CompareStringAndHash(stringToCompare string, hashedString string) bool
 	}
 
@@ -28,23 +28,30 @@ type (
 
 	IVerification interface {
 		CreateVerification(context context.Context, user *entities.User) error
-		Verify(context context.Context, verification *entities.Verification) (bool, error)
+		Verify(context context.Context, verification *entities.Verification) error
 	}
 
 	IVerificationRepo interface {
 		Create(context context.Context, verification *entities.Verification) error
 		FindOne(context context.Context, userId int) (*entities.Verification, error)
+		Clear(context context.Context, userId int) error
 	}
 
 	ISession interface {
 		VerifyAccessToken(context context.Context, token string) (bool, error)
-		CreateTokens(context context.Context, user *entities.User) (*entities.Session, error)
-		UpdateAccessToken(context context.Context, accessToken, refreshToken string) (*entities.Session, error)
+		GetClaimsFromAccessToken(token string) (*entities.TokenClaims, error)
+		GetSession(context context.Context, token string) (*entities.Session, error)
+		CreateSession(context context.Context, user *entities.User) (*entities.Session, error)
+		UpdateSession(context context.Context, session *entities.Session) (*entities.Session, error)
 	}
 
-	ITokenManager interface {
+	IAccessTokenManager interface {
 		GenerateToken(claims map[string]interface{}) (string, error)
 		ParseToken(token string) (map[string]interface{}, error)
+	}
+
+	IRefreshTokenGenerator interface {
+		GenerateToken(userId int) (string, error)
 	}
 
 	ISessionRepo interface {
@@ -52,6 +59,10 @@ type (
 		Update(ctx context.Context, session *entities.Session) error
 		Delete(ctx context.Context, session *entities.Session) error
 		FindByAccess(ctx context.Context, token string) (*entities.Session, error)
+	}
+
+	ISecurity interface {
+		CheckAccess(ctx context.Context, route string, userId int) (bool, error)
 	}
 
 	IMailer interface {

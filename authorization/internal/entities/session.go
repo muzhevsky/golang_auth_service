@@ -5,7 +5,9 @@ import (
 )
 
 type Session struct {
-	AccessToken  string
-	RefreshToken string
-	ExpireAt     time.Time
+	UserId            int
+	DeviceDescription string
+	AccessToken       string
+	RefreshToken      string
+	ExpireAt          time.Time
 }

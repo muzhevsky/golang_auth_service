@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"authorization/config"
 	"context"
 	"fmt"
 	"github.com/Masterminds/squirrel"
@@ -26,7 +27,7 @@ type Postgres struct {
 	ErrNoRows error
 }
 
-func New(url string, opts ...Option) (*Postgres, error) {
+func New(config config.PG, opts ...Option) (*Postgres, error) {
 	pg := &Postgres{
 		maxPoolSize:  _defaultMaxPoolSize,
 		connAttempts: _defaultConnAttempts,
@@ -36,10 +37,17 @@ func New(url string, opts ...Option) (*Postgres, error) {
 	for _, opt := range opts {
 		opt(pg)
 	}
+
 	pg.ErrNoRows = pgx.ErrNoRows
 	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	poolConfig, err := pgxpool.ParseConfig(url)
+	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		config.User,
+		config.Password,
+		config.Host,
+		config.Port,
+		config.Database)
+	poolConfig, err := pgxpool.ParseConfig(connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
 	}
@@ -48,11 +56,13 @@ func New(url string, opts ...Option) (*Postgres, error) {
 	for pg.connAttempts > 0 {
 		pg.Pool, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
 		if err == nil {
-			break
+			err = pg.Pool.Ping(context.TODO())
+			if err == nil {
+				break
+			}
 		}
 
 		log.Printf("Postgres is trying to connect, attempts left: %d", pg.connAttempts)
-
 		time.Sleep(pg.connTimeout)
 
 		pg.connAttempts--
@@ -61,10 +71,7 @@ func New(url string, opts ...Option) (*Postgres, error) {
 	if err != nil {
 		return nil, fmt.Errorf("postgres - NewPostgres - connAttempts == 0: %w", err)
 	}
-	err = pg.Pool.Ping(context.TODO())
-	if err != nil {
-		fmt.Println(err)
-	}
+
 	return pg, nil
 }
 

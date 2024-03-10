@@ -13,7 +13,7 @@ func NewJwtProvider(jwt *jwt.JWT) *jwtProvider {
 }
 
 func (provider *jwtProvider) GenerateToken(claims map[string]interface{}) (string, error) {
-	return (&jwt.JWT{}).NewToken(claims)
+	return provider.jwt.NewToken(claims)
 }
 
 func (provider *jwtProvider) ParseToken(token string) (map[string]interface{}, error) {

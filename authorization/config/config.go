@@ -7,12 +7,11 @@ import (
 
 type (
 	Config struct {
-		App    `toml:"app"`
-		HTTP   `toml:"http"`
-		Logger `toml:"logger"`
-		PG     `toml:"pg"`
-		JWT    `toml:"jwt"`
-		SMTP   `toml:"smtp"`
+		App  `toml:"app"`
+		HTTP `toml:"http"`
+		PG   `toml:"pg"`
+		JWT  `toml:"jwt"`
+		SMTP `toml:"smtp"`
 	}
 
 	App struct {
@@ -22,23 +21,23 @@ type (
 
 	HTTP struct {
 		Addr string `toml:"addr"`
-		Port string `toml:"port"`
-	}
-
-	Logger struct {
-		Level string `toml:"level"`
+		Port string `toml:"port" env:"AUTH_PORT"`
 	}
 
 	PG struct {
-		PoolMax int    `toml:"pool_max"`
-		Url     string `toml:"url"`
+		PoolMax  string `toml:"pool_max"`
+		User     string `toml:"user" env:"POSTGRES_USER"`
+		Password string `toml:"password" env:"POSTGRES_PASSWORD"`
+		Host     string `toml:"host" env:"POSTGRES_HOST"`
+		Port     string `toml:"host" env:"POSTGRES_PORT"`
+		Database string `toml:"host" env:"POSTGRES_DATABASE"`
 	}
 	JWT struct {
-		SigningString string `toml:"signing_string"`
+		SigningString string `toml:"signing_key" env:"AUTH_JWT_SIGNING_KEY"`
 	}
 	SMTP struct {
-		Username string `toml:"username"`
-		Password string `toml:"password"`
+		Username string `toml:"username" env:"AUTH_SMTP_USERNAME"`
+		Password string `toml:"password" env:"AUTH_SMTP_PASSWORD"`
 		Host     string `toml:"host"`
 		Port     string `toml:"port"`
 	}
