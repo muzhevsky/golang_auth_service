@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"authorization/internal/entities"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"authorization/pkg/postgres"
 	"context"
 	"github.com/Masterminds/squirrel"
@@ -58,6 +58,6 @@ func (s *sessionRepo) FindByAccess(ctx context.Context, token string) (*entities
 	return result, err
 }
 
-func NewSessionRepo(pg *postgres.Postgres) usecase.ISessionRepo {
+func NewSessionRepo(pg *postgres.Postgres) usecases.ISessionRepo {
 	return &sessionRepo{pg}
 }

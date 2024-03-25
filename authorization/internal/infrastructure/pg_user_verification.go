@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"authorization/internal/entities"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"authorization/pkg/postgres"
 	"context"
 	sq "github.com/Masterminds/squirrel"
@@ -13,7 +13,7 @@ type verificationRepo struct {
 	pg *postgres.Postgres
 }
 
-func NewVerificationRepo(pg *postgres.Postgres) usecase.IVerificationRepo {
+func NewVerificationRepo(pg *postgres.Postgres) usecases.IVerificationRepo {
 	return &verificationRepo{pg}
 }
 

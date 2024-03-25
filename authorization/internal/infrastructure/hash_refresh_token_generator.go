@@ -1,16 +1,16 @@
 package infrastructure
 
 import (
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"math/big"
 	"math/rand"
 )
 
 type hashRefreshTokenGenerator struct {
-	hashProvider usecase.IHashProvider
+	hashProvider usecases.IHashProvider
 }
 
-func NewHashRefreshTokenGenerator(hashProvider usecase.IHashProvider) *hashRefreshTokenGenerator {
+func NewHashRefreshTokenGenerator(hashProvider usecases.IHashProvider) *hashRefreshTokenGenerator {
 	tokenGenerator := &hashRefreshTokenGenerator{hashProvider: hashProvider}
 	return tokenGenerator
 }
