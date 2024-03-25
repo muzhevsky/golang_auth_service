@@ -6,6 +6,8 @@ services:
     env_file:
       - ./authorization/.env
     build: ./authorization/migrations
+    volumes:
+      - database:/var/lib/postgresql/data
   auth:
     env_file:
       - ./authorization/.env
@@ -14,3 +16,5 @@ services:
       - postgres
     ports:
       - "8080:8080"
+volumes:
+  database:

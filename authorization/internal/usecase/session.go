@@ -43,25 +43,25 @@ func NewSessionUseCase(
 	return useCase
 }
 
-func (s *SessionUseCase) VerifyAccessToken(context context.Context, token string) (bool, error) {
+func (s *SessionUseCase) VerifyAccessToken(context context.Context, token string) error {
 	_, err := s.sessionRepo.FindByAccess(context, token)
 
 	if err != nil {
-		return false, entities.NotAValidAccessToken
+		return entities.NotAValidAccessToken
 	}
 	claimsMap, err := s.accessTokenManager.ParseToken(token)
 	if err != nil {
-		return false, entities.NotAValidAccessToken
+		return entities.NotAValidAccessToken
 	}
 	claims := entities.NewClaimsFromMap(claimsMap)
 	if claims == nil {
-		return false, entities.NotAValidAccessToken
+		return entities.NotAValidAccessToken
 	}
 	if claims.ExpireAt.Before(time.Now()) {
-		return false, entities.AccessTokenExpired
+		return entities.AccessTokenExpired
 	}
 
-	return true, nil
+	return nil
 }
 
 func (s *SessionUseCase) GetSession(context context.Context, token string) (*entities.Session, error) {
@@ -70,15 +70,6 @@ func (s *SessionUseCase) GetSession(context context.Context, token string) (*ent
 		return nil, entities.NotAValidAccessToken
 	}
 	return session, nil
-}
-
-func (s *SessionUseCase) GetClaimsFromAccessToken(token string) (*entities.TokenClaims, error) {
-	claimsMap, err := s.accessTokenManager.ParseToken(token)
-	if err != nil {
-		return nil, entities.NotAValidAccessToken
-	}
-	result := entities.NewClaimsFromMap(claimsMap)
-	return result, nil
 }
 
 func (s *SessionUseCase) CreateSession(context context.Context, user *entities.User) (*entities.Session, error) {
@@ -109,7 +100,7 @@ func (s *SessionUseCase) CreateSession(context context.Context, user *entities.U
 func (s *SessionUseCase) UpdateSession(context context.Context, session *entities.Session) (*entities.Session, error) {
 	accessToken := session.AccessToken
 	refreshToken := session.RefreshToken
-	_, err := s.VerifyAccessToken(context, session.AccessToken)
+	err := s.VerifyAccessToken(context, session.AccessToken)
 	if err != nil && !errors.Is(err, entities.AccessTokenExpired) {
 		return nil, err
 	}

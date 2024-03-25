@@ -38,8 +38,7 @@ type (
 	}
 
 	ISession interface {
-		VerifyAccessToken(context context.Context, token string) (bool, error)
-		GetClaimsFromAccessToken(token string) (*entities.TokenClaims, error)
+		VerifyAccessToken(context context.Context, token string) error
 		GetSession(context context.Context, token string) (*entities.Session, error)
 		CreateSession(context context.Context, user *entities.User) (*entities.Session, error)
 		UpdateSession(context context.Context, session *entities.Session) (*entities.Session, error)
