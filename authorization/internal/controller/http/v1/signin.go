@@ -5,7 +5,6 @@ import (
 	"authorization/internal/usecase"
 	"authorization/pkg/logger"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -52,7 +51,7 @@ func (router *signInRouter) signIn(c *gin.Context) {
 			errorResponse(c, http.StatusInternalServerError, "unexpected error", DefaultErrorCode)
 			return
 		}
-		fmt.Println(session.AccessToken)
+
 		c.JSON(http.StatusOK, userSignInResponse{AccessToken: session.AccessToken, RefreshToken: session.RefreshToken})
 		return
 	}

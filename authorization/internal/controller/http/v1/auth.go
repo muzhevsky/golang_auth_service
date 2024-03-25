@@ -27,6 +27,12 @@ type authRequest struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type authResponse struct {
+	UserId       int    `json:"userId"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 func (r *authRouter) authorize(c *gin.Context) {
 	request := authRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -34,14 +40,16 @@ func (r *authRouter) authorize(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "invalid request body", DataBindErrorCode)
 		return
 	}
-	response := authRequest{}
-	_, err := r.auth.VerifyAccessToken(c, request.AccessToken)
+	response := authResponse{}
+	err := r.auth.VerifyAccessToken(c, request.AccessToken)
 	if err != nil {
 		if errors.Is(err, entities.AccessTokenExpired) {
 			updatedSession, updateErr := r.auth.UpdateSession(c, &entities.Session{0, "", request.AccessToken, request.RefreshToken, time.Now()})
 			if updateErr == nil {
 				response.AccessToken = updatedSession.AccessToken
 				response.RefreshToken = updatedSession.RefreshToken
+				response.UserId = updatedSession.UserId
+				c.JSON(http.StatusOK, response)
 			}
 			err = updateErr
 		}
@@ -57,6 +65,12 @@ func (r *authRouter) authorize(c *gin.Context) {
 			errorResponse(c, http.StatusUnauthorized, "unexpected error", DefaultErrorCode)
 			return
 		}
+		return
 	}
+
+	session, _ := r.auth.GetSession(c, request.AccessToken)
+	response.AccessToken = session.AccessToken
+	response.RefreshToken = session.RefreshToken
+	response.UserId = session.UserId
 	c.JSON(http.StatusOK, response)
 }

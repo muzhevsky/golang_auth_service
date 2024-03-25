@@ -4,16 +4,11 @@ import (
 	"authorization/internal/usecase"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func InitServiceMiddleware(handler *gin.Engine) {
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
-
-	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER_HTTP_HANDLER")
-	handler.GET("/swagger/*any", swaggerHandler)
 }
 
 func NewAuthorizationRouter(handler *gin.Engine, u usecase.IUser, l logger.ILogger, s usecase.ISession) {
