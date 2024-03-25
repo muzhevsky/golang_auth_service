@@ -2,7 +2,7 @@ package v1
 
 import (
 	"authorization/internal/entities"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"authorization/pkg/logger"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -10,8 +10,8 @@ import (
 )
 
 type signInRouter struct {
-	user usecase.IUser
-	auth usecase.ISession
+	user usecases.IUser
+	auth usecases.ISession
 	l    logger.ILogger
 }
 
@@ -25,7 +25,7 @@ type userSignInResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-func newSignInRouter(handler *gin.RouterGroup, user usecase.IUser, auth usecase.ISession, l logger.ILogger) {
+func newSignInRouter(handler *gin.RouterGroup, user usecases.IUser, auth usecases.ISession, l logger.ILogger) {
 	u := &signInRouter{user, auth, l}
 
 	handler.POST("/signin", u.signIn)

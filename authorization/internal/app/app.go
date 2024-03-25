@@ -2,9 +2,9 @@ package app
 
 import (
 	"authorization/config"
-	"authorization/internal/controller/http/v1"
+	"authorization/internal/controllers/http/v1"
 	"authorization/internal/infrastructure"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"authorization/pkg/http"
 	"authorization/pkg/jwt"
 	"authorization/pkg/logger"
@@ -51,18 +51,18 @@ func Run() {
 
 	// UseCases
 
-	userUseCase := usecase.NewUser(
+	userUseCase := usecases.NewUser(
 		userRepo,
 		verificationRepo,
 		bcryptHashProvider,
 	)
 
-	verificationUseCase := usecase.NewVerificationUseCase(
+	verificationUseCase := usecases.NewVerificationUseCase(
 		userRepo,
 		verificationRepo,
 		smtpMailer,
 	)
-	sessionUseCase := usecase.NewSessionUseCase(accessTokenProvider, refreshTokenGenerator, sessionRepo, bcryptHashProvider)
+	sessionUseCase := usecases.NewSessionUseCase(accessTokenProvider, refreshTokenGenerator, sessionRepo, bcryptHashProvider)
 
 	// Controllers
 
