@@ -2,7 +2,7 @@ package v1
 
 import (
 	"authorization/internal/entities"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"authorization/pkg/logger"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -11,12 +11,12 @@ import (
 )
 
 type authRouter struct {
-	user usecase.IUser
-	auth usecase.ISession
+	user usecases.IUser
+	auth usecases.ISession
 	l    logger.ILogger
 }
 
-func newAuthRouter(handler *gin.RouterGroup, user usecase.IUser, auth usecase.ISession, l logger.ILogger) {
+func newAuthRouter(handler *gin.RouterGroup, user usecases.IUser, auth usecases.ISession, l logger.ILogger) {
 	u := &authRouter{user, auth, l}
 
 	handler.POST("/auth", u.authorize)
@@ -44,7 +44,12 @@ func (r *authRouter) authorize(c *gin.Context) {
 	err := r.auth.VerifyAccessToken(c, request.AccessToken)
 	if err != nil {
 		if errors.Is(err, entities.AccessTokenExpired) {
-			updatedSession, updateErr := r.auth.UpdateSession(c, &entities.Session{0, "", request.AccessToken, request.RefreshToken, time.Now()})
+			session := entities.Session{
+				AccessToken:  request.AccessToken,
+				RefreshToken: request.RefreshToken,
+				ExpireAt:     time.Now(),
+			}
+			updatedSession, updateErr := r.auth.UpdateSession(c, &session)
 			if updateErr == nil {
 				response.AccessToken = updatedSession.AccessToken
 				response.RefreshToken = updatedSession.RefreshToken

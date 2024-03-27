@@ -2,7 +2,7 @@ package v1
 
 import (
 	"authorization/internal/entities"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
 	"authorization/pkg/logger"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -10,12 +10,12 @@ import (
 )
 
 type verificationRoute struct {
-	verification usecase.IVerification
-	auth         usecase.ISession
+	verification usecases.IVerification
+	auth         usecases.ISession
 	l            logger.ILogger
 }
 
-func newVerificationRoute(handler *gin.RouterGroup, verification usecase.IVerification, auth usecase.ISession, l logger.ILogger) {
+func newVerificationRoute(handler *gin.RouterGroup, verification usecases.IVerification, auth usecases.ISession, l logger.ILogger) {
 	u := &verificationRoute{verification, auth, l}
 
 	handler.POST("/verify", u.verifyUser)

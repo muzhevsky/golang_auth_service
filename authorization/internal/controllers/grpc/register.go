@@ -1,38 +1,28 @@
-package v1
+package grpc
 
 import (
+	"authorization/internal/controllers/requests"
 	"authorization/internal/entities"
-	"authorization/internal/usecase"
+	"authorization/internal/usecases"
+	"authorization/pkg/grpc/proto"
 	"authorization/pkg/logger"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-type signUpRouter struct {
-	user         usecase.IUser
-	verification usecase.IVerification
+type registerController struct {
+	user         usecases.IUser
+	verification usecases.IVerification
 	logger       logger.ILogger
 }
 
-func newSignUpRouter(handler *gin.RouterGroup, user usecase.IUser, verification usecase.IVerification, logger logger.ILogger) {
-	u := &signUpRouter{user, verification, logger}
-
-	handler.POST("/", u.signUp)
+func newRegisterController(server *proto.AuthServer, user usecases.IUser, verification usecases.IVerification, logger logger.ILogger) *registerController {
+	return &registerController{user, verification, logger}
 }
 
-type createUserRequest struct {
-	Login    string `json:"login" binding:"required" example:"TopPlayer123"`
-	Password string `json:"password" binding:"required" example:"123superPassword"`
-	EMail    string `json:"e-mail" binding:"required" example:"andrew123@qwerty.kom"`
-	Nickname string `json:"nickname" binding:"required" example:"Looser1123"`
-}
-type createUserResponse struct {
-	Id int `json:"id" example:"2"`
-}
-
-func (u *signUpRouter) signUp(c *gin.Context) {
-	var userRequest createUserRequest
+func (u *registerController) register(c *gin.Context) {
+	var userRequest requests.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		u.logger.Error(err, "http - v1 - createUser")
@@ -51,7 +41,7 @@ func (u *signUpRouter) signUp(c *gin.Context) {
 		if errors.Is(err, entities.ValidationError) {
 			errorResponse(c, http.StatusBadRequest, err.Error(), LoginValidationErrorCode)
 			return
-		} else if errors.Is(err, usecase.RecordAlreadyExists) {
+		} else if errors.Is(err, usecases.RecordAlreadyExists) {
 			errorResponse(c, http.StatusConflict, err.Error(), RecordExistErrorCode)
 			return
 		} else {
@@ -66,6 +56,6 @@ func (u *signUpRouter) signUp(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, err.Error(), DefaultErrorCode)
 	}
 
-	c.JSON(http.StatusOK, createUserResponse{user.Id})
+	c.JSON(http.StatusOK, requests.CreateUserResponse{user.Id})
 	return
 }
