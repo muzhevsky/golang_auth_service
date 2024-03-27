@@ -1,26 +1,20 @@
 package main
 
-import (
-	ssov1 "authorization/pkg/grpc"
-	"authorization/pkg/grpc/proto"
-	"google.golang.org/grpc"
-	"log"
-	"net"
-)
-
-//func main() {
-//	app.Run()
-//}
+import "authorization/internal/app"
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatal(err)
-	}
-	s := grpc.NewServer()
-	proto.RegisterAuthServer(s, &ssov1.Server{})
-	err = s.Serve(lis)
-	if err != nil {
-		log.Fatal(err)
-	}
+	app.Run()
 }
+
+//func main() {
+//	lis, err := net.Listen("tcp", ":50051")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	s := grpc.NewServer()
+//	proto.RegisterAuthServer(s, &ssov1.Server{})
+//	err = s.Serve(lis)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//}

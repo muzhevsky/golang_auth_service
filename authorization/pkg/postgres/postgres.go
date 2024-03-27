@@ -47,6 +47,7 @@ func New(config config.PG, opts ...Option) (*Postgres, error) {
 		config.Host,
 		config.Port,
 		config.Database)
+	fmt.Println(connectionString)
 	poolConfig, err := pgxpool.ParseConfig(connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
