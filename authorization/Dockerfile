@@ -8,4 +8,4 @@ RUN go build ./cmd/app/main.go
 
 EXPOSE ${AUTH_PORT}
 
-CMD ["./main"]
+ENTRYPOINT ["./main"]
