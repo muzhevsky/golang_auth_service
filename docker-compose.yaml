@@ -5,7 +5,7 @@ services:
     container_name: "postgres"
     env_file:
       - ./authorization/.env
-    build: ./authorization/migrations
+    build: ./authorization/database
     volumes:
       - database:/var/lib/postgresql/data
   auth:
