@@ -1,11 +1,18 @@
-FROM golang:1.21.4
+FROM golang:1.21.4 as builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go build ./cmd/app/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/app/main.go
 
 EXPOSE ${AUTH_PORT}
 
-CMD ["./main"]
+FROM alpine:latest
+
+WORKDIR /root
+
+COPY --from=builder /app/main .
+COPY --from=builder /app/config/config.toml ./config/
+
+ENTRYPOINT ["./main"]

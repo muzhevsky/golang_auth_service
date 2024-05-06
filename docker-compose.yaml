@@ -9,6 +9,7 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
   auth:
+    container_name: "auth"
     env_file:
       - ./authorization/.env
     build: ./authorization
