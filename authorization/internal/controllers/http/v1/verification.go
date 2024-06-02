@@ -1,58 +1,36 @@
 package v1
 
 import (
-	"authorization/internal/entities"
-	"authorization/internal/usecases"
+	"authorization/internal"
+	"authorization/internal/controllers/requests"
 	"authorization/pkg/logger"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type verificationRoute struct {
-	verification usecases.IVerification
-	auth         usecases.ISession
-	l            logger.ILogger
+	verification internal.IVerification
+	logger       logger.ILogger
 }
 
-func newVerificationRoute(handler *gin.RouterGroup, verification usecases.IVerification, auth usecases.ISession, l logger.ILogger) {
-	u := &verificationRoute{verification, auth, l}
+func NewVerificationRouter(handler *gin.Engine, verification internal.IVerification, l logger.ILogger) {
+	u := &verificationRoute{verification, l}
 
 	handler.POST("/verify", u.verifyUser)
 }
 
-type userVerificationRequest struct {
-	UserId int    `json:"userId" binding:"required"`
-	Code   string `json:"code" binding:"required"`
-}
-
 func (u *verificationRoute) verifyUser(c *gin.Context) {
-	var request userVerificationRequest
+	var request requests.VerificationRequest
 	if err := c.ShouldBind(&request); err != nil {
-		u.l.Error(err, "http - v1 - verifyUser")
-		errorResponse(c, http.StatusBadRequest, "invalid request body", DataBindErrorCode)
+		AddGinError(c, err)
 		return
 	}
 
-	err := u.verification.Verify(c,
-		&entities.Verification{
-			UserId: request.UserId,
-			Code:   request.Code,
-		})
+	err := u.verification.Verify(c, &request)
 
 	if err != nil {
-		if errors.Is(err, entities.WrongVerificationCode) {
-			errorResponse(c, http.StatusBadRequest, "invalid verification code", WrongVerificationErrorCode)
-			return
-		}
-		if errors.Is(err, entities.ExpiredCode) {
-			errorResponse(c, http.StatusBadRequest, "code is outdated", VerificationExpiredErrorCode)
-			return
-		} else {
-			u.l.Error(err, "http - v1 - verifyUser")
-			errorResponse(c, http.StatusInternalServerError, "verification failed due to server couldn't handle the request", DefaultErrorCode)
-			return
-		}
+		AddGinError(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, "")
 }

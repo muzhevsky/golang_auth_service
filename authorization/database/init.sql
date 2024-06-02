@@ -1,8 +1,8 @@
-set search_path to public;
+DROP DATABASE IF EXISTS smartri;
+CREATE DATABASE smartri;
 
--- SELECT 'CREATE DATABASE auth' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'auth');
+\c smartri;
 
-CREATE DATABASE auth;
 -- drop table if exists users;
 create table users
 (
@@ -15,41 +15,22 @@ create table users
     registration_date date                  not null,
     is_verified       boolean default false not null
 );
---
+
 -- drop table if exists verification_codes;
--- create table verification_codes
--- (
---     user_id           integer,
---     verification_code varchar(8),
---     expiration_time   timestamp
--- );
---
--- create function add_verification_code(id integer, code character, e_time timestamp without time zone) returns void
---     language plpgsql
--- as
--- $$
--- declare
---     count int;
--- begin
---     select count(*) from verification_codes where user_id = id into count;
---     if count > 0 then
---         update verification_codes
---         set verification_code = code and expiration_time = e_time
---         where user_id = id;
---     else
---         insert into verification_codes (user_id, verification_code, expiration_time)
---         values (id, code, e_time);
---     end if;
--- end;
--- $$;
---
--- alter function add_verification_code(integer, char, timestamp) owner to postgres;
---
+create table verification_codes
+(
+    id serial primary key,
+    user_id           integer,
+    code varchar(8),
+    expiration_time   timestamp
+);
+
 -- drop table if exists sessions;
--- create table sessions(
---     access_token varchar(128) primary key ,
---     refresh_token varchar(128),
---     user_id int,
---     device_description varchar(128),
---     expire_at date
--- )
+create table sessions(
+    id serial primary key,
+    access_token varchar(256) not null ,
+    refresh_token varchar(256) not null ,
+    user_id int not null ,
+    device_identity varchar(128),
+    expire_at date not null
+)

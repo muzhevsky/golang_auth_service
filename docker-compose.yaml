@@ -6,8 +6,8 @@ services:
     env_file:
       - ./authorization/.env
     build: ./authorization/database
-    volumes:
-      - database:/var/lib/postgresql/data
+#    volumes:
+#      - database:/var/lib/postgresql/data
   auth:
     env_file:
       - ./authorization/.env
