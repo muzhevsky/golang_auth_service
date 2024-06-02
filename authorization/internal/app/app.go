@@ -2,8 +2,13 @@ package app
 
 import (
 	"authorization/config"
+	http2 "authorization/internal/controllers/http"
 	"authorization/internal/controllers/http/v1"
-	"authorization/internal/infrastructure"
+	pg2 "authorization/internal/infrastructure/datasources/pg"
+	"authorization/internal/infrastructure/services/hash"
+	mailers2 "authorization/internal/infrastructure/services/mailers"
+	tokens2 "authorization/internal/infrastructure/services/tokens"
+	"authorization/internal/repositories"
 	"authorization/internal/usecases"
 	"authorization/pkg/http"
 	"authorization/pkg/jwt"
@@ -14,6 +19,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"strconv"
+	"time"
 )
 
 func Run() {
@@ -37,39 +43,62 @@ func Run() {
 	}
 	defer pg.Close()
 
-	userRepo := infrastructure.NewUserRepo(pg)
-	bcryptHashProvider := infrastructure.NewBcryptHashProvider()
-	accessTokenProvider := infrastructure.NewJwtProvider(jwt)
-	refreshTokenGenerator := infrastructure.NewHashRefreshTokenGenerator(bcryptHashProvider)
-	verificationRepo := infrastructure.NewVerificationRepo(pg)
-	sessionRepo := infrastructure.NewSessionRepo(pg)
+	userDS := pg2.NewPgUserDatasource(pg)
+	sessionDS := pg2.NewSessionRepo(pg)
+	verificationDS := pg2.NewPgVerificationDatasource(pg)
+
+	bcryptHashProvider := hash.NewBcryptHashProvider()
+	accessTokenProvider := tokens2.NewJwtProvider(jwt)
+	refreshTokenGenerator := tokens2.NewHashRefreshTokenGenerator(bcryptHashProvider)
+
+	userRepository := repositories.NewUserRepo(userDS)
+	verificationRepo := repositories.NewVerificationRepo(verificationDS)
+	sessionRepository := repositories.NewSessionRepository(sessionDS)
 
 	// Other infrastructure
 
 	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
-	smtpMailer := infrastructure.NewSmtpMailer(smtpClient)
+	smtpMailer := mailers2.NewSmtpMailer(smtpClient)
+	verificationMailer := mailers2.NewVerificationMailer(smtpMailer)
+	sessionManager := tokens2.NewTokenManager(
+		tokens2.TokenConfiguration{
+			AccessTokenDuration:  time.Minute * 30,
+			RefreshTokenDuration: time.Hour * 24 * 30,
+			Issuer:               "TODO",
+		},
+		accessTokenProvider,
+		refreshTokenGenerator)
 
 	// UseCases
 
-	userUseCase := usecases.NewUser(
-		userRepo,
+	userUseCase := usecases.NewCreateUserUseCase(
+		userRepository,
 		verificationRepo,
 		bcryptHashProvider,
+		verificationMailer,
 	)
 
 	verificationUseCase := usecases.NewVerificationUseCase(
-		userRepo,
+		userRepository,
 		verificationRepo,
-		smtpMailer,
+		verificationMailer,
 	)
-	sessionUseCase := usecases.NewSessionUseCase(accessTokenProvider, refreshTokenGenerator, sessionRepo, bcryptHashProvider)
+
+	signInUseCase := usecases.NewSignInUseCase(
+		userRepository,
+		sessionRepository,
+		bcryptHashProvider,
+		sessionManager,
+	)
 
 	// Controllers
 
 	router := gin.New()
-	v1.InitServiceMiddleware(router)
-	v1.NewAuthenticationRouter(router, log, userUseCase, sessionUseCase, verificationUseCase)
-	v1.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)
+	http2.InitServiceMiddleware(router)
+	v1.NewSignUpRouter(router, userUseCase, verificationUseCase, log)
+	v1.NewVerificationRouter(router, verificationUseCase, log)
+	v1.NewSignInRouter(router, signInUseCase, log)
+	//http2.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)
 
 	http.Start(router, cfg.HTTP)
 }

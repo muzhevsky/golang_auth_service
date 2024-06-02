@@ -1,75 +1,38 @@
 package v1
 
 import (
-	"authorization/internal/entities"
-	"authorization/internal/usecases"
+	"authorization/internal"
+	"authorization/internal/controllers/requests"
 	"authorization/pkg/logger"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type signInRouter struct {
-	user usecases.IUser
-	auth usecases.ISession
-	l    logger.ILogger
+	user   internal.ISignInUseCase
+	logger logger.ILogger
 }
 
-type userSignInRequest struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
-
-type userSignInResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-}
-
-func newSignInRouter(handler *gin.RouterGroup, user usecases.IUser, auth usecases.ISession, l logger.ILogger) {
-	u := &signInRouter{user, auth, l}
+func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logger logger.ILogger) {
+	u := &signInRouter{useCase, logger}
 
 	handler.POST("/signin", u.signIn)
 }
 
 func (router *signInRouter) signIn(c *gin.Context) {
-	var request userSignInRequest
+	var request requests.SignInRequest
 	if err := c.ShouldBind(&request); err != nil {
-		router.l.Error(err, "http - v1 - signIn")
-		errorResponse(c, http.StatusBadRequest, "invalid request body", DataBindErrorCode)
+		AddGinError(c, err)
 		return
 	}
 
-	user, err := router.user.SignIn(c, &entities.User{
-		Login:    request.Login,
-		EMail:    request.Login,
-		Password: request.Password,
-	})
+	session, err := router.user.SignIn(c, &request)
 
-	if err == nil {
-		session, err := router.auth.CreateSession(c, user)
-		if err != nil {
-			errorResponse(c, http.StatusInternalServerError, "unexpected error", DefaultErrorCode)
-			return
-		}
-
-		c.JSON(http.StatusOK, userSignInResponse{AccessToken: session.AccessToken, RefreshToken: session.RefreshToken})
+	if err != nil {
+		AddGinError(c, err)
 		return
 	}
 
-	if errors.Is(err, entities.UserIsNotVerified) {
-		errorResponse(c, http.StatusUnauthorized, "user hasn't been verified yet", UserIsNotVerifiedErrorCode)
-		return
-	}
-
-	if errors.Is(err, entities.UserNotFound) {
-		errorResponse(c, http.StatusBadRequest, "user doesn't exist", DefaultErrorCode)
-		return
-	}
-
-	if errors.Is(err, entities.WrongPassword) {
-		errorResponse(c, http.StatusBadRequest, "wrong password", DefaultErrorCode)
-		return
-	}
-
-	errorResponse(c, http.StatusInternalServerError, "unexpected error", DefaultErrorCode)
+	c.JSON(http.StatusOK, session)
+	return
 }

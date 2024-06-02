@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -13,25 +12,22 @@ const (
 )
 
 type Verification struct {
-	UserId      int
-	Code        string
-	ExpiredTime time.Time
+	Id             int
+	UserId         int
+	Code           string
+	ExpirationTime time.Time
 }
 
-func GenerateVerification(userId int, expiredTime time.Time) *Verification {
+func GenerateVerification(userId int) *Verification {
 	code := make([]uint8, verificationCodeSize)
 	for i := 0; i < verificationCodeSize; i++ {
 		randNum := rand.Int31n(int32(len(verificationCodeRunes)))
 		code[i] = verificationCodeRunes[randNum]
 	}
 
-	return &Verification{userId, string(code), expiredTime}
+	return &Verification{0, userId, string(code), time.Now().Add(time.Minute * time.Duration(10))}
 }
 
-func (v *Verification) VerifyUser(verification *Verification) bool {
+func (v *Verification) ValidateVerification(verification *Verification) bool {
 	return strings.ToLower(verification.Code) == v.Code
-}
-
-func (v *Verification) GenerateEmailBody() string {
-	return fmt.Sprintf("Код верификации: %s", v.Code)
 }
