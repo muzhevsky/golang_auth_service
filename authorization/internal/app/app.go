@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"strconv"
 	"time"
 )
@@ -91,13 +93,21 @@ func Run() {
 		sessionManager,
 	)
 
+	refreshSessionUseCase := usecases.NewRefreshSessionUseCase(
+		userRepository,
+		sessionRepository,
+		sessionManager,
+	)
 	// Controllers
 
 	router := gin.New()
+	router.HandleMethodNotAllowed = true
 	http2.InitServiceMiddleware(router)
 	v1.NewSignUpRouter(router, userUseCase, verificationUseCase, log)
 	v1.NewVerificationRouter(router, verificationUseCase, log)
 	v1.NewSignInRouter(router, signInUseCase, log)
+	v1.NewRefreshSessionRouter(router, refreshSessionUseCase, log)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//http2.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)
 
 	http.Start(router, cfg.HTTP)

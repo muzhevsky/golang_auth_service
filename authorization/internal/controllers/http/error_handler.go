@@ -33,7 +33,7 @@ func ErrorHandler(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, errs.UserNotFound) {
-			response(c, http.StatusBadRequest, err.Error(), v1.InternalServerErrorErrorCode) // todo сделать код ошибки
+			response(c, http.StatusBadRequest, err.Error(), v1.UserNotFoundErrorCode) // todo сделать код ошибки
 			return
 		}
 

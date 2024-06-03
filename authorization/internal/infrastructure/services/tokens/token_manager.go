@@ -20,7 +20,7 @@ func (t *tokenManager) CreateSession(user *entities.User) (*entities.Session, er
 	expiresAt := time.Now().Add(t.config.AccessTokenDuration)
 	claims["iss"] = t.config.Issuer
 	claims["userId"] = user.Id
-	claims["expiresAt"] = expiresAt
+	claims["expiresAt"] = expiresAt.Unix()
 
 	access, err := t.access.CreateToken(claims)
 	if err != nil {

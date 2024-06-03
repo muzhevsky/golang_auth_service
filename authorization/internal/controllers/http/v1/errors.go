@@ -3,6 +3,7 @@ package v1
 const InternalServerErrorErrorCode = "Unexpected"
 
 const DataBindErrorCode = "Client-0001"
+const UserNotFoundErrorCode = "Client-0002"
 
 const LoginValidationErrorCode = "Validation-0001"
 const EmailValidationErrorCode = "Validation-0002"

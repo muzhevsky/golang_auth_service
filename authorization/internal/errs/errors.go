@@ -22,4 +22,4 @@ var UserIsNotVerified = errors.New("the user is not verified")
 
 var RecordAlreadyExists = errors.New("record already exists")
 
-var DataBindError = errors.New("wrong repositories format")
+var DataBindError = errors.New("wrong data format")

@@ -5,6 +5,7 @@ import (
 )
 
 type Session struct {
+	Id             int
 	UserId         int
 	DeviceIdentity string
 	AccessToken    string

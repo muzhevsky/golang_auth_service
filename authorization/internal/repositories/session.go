@@ -21,3 +21,11 @@ func (s *sessionRepository) Create(context context.Context, session *entities.Se
 func (s *sessionRepository) FindByAccessToken(context context.Context, token string) (*entities.Session, error) {
 	return s.ds.SelectByAccess(context, token)
 }
+
+func (s *sessionRepository) Update(context context.Context, sessionToUpdate *entities.Session, updateFunc func(session *entities.Session)) (*entities.Session, error) {
+	id := sessionToUpdate.Id
+	updateFunc(sessionToUpdate)
+	err := s.ds.UpdateById(context, id, sessionToUpdate)
+
+	return sessionToUpdate, err
+}

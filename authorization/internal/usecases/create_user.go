@@ -13,15 +13,15 @@ import (
 )
 
 type userUseCase struct {
-	userRepo         internal.IUserRepo
+	userRepo         internal.IUserRepository
 	hashProvider     tokens.IHashProvider
-	verificationRepo internal.IVerificationRepo
+	verificationRepo internal.IVerificationRepository
 	mailer           mailers.IVerificationMailer
 }
 
 func NewCreateUserUseCase(
-	userRepo internal.IUserRepo,
-	verificationRepo internal.IVerificationRepo,
+	userRepo internal.IUserRepository,
+	verificationRepo internal.IVerificationRepository,
 	hashProvider tokens.IHashProvider,
 	mailer mailers.IVerificationMailer) *userUseCase {
 	return &userUseCase{
