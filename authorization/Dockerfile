@@ -1,11 +1,21 @@
-FROM golang:1.21.4
+FROM golang:1.21.4 as builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go build ./cmd/app/main.go
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init -g cmd/app/main.go -o ./docs
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/app/main.go
 
 EXPOSE ${AUTH_PORT}
+
+FROM alpine:latest
+
+WORKDIR /root
+
+COPY --from=builder /app/main .
+COPY --from=builder /app/docs .
+COPY --from=builder /app/config/config.toml ./config/
 
 ENTRYPOINT ["./main"]

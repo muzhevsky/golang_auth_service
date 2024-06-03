@@ -19,18 +19,19 @@ create table users
 -- drop table if exists verification_codes;
 create table verification_codes
 (
-    id serial primary key,
-    user_id           integer,
-    code varchar(8),
-    expiration_time   timestamp
+    id              serial primary key,
+    user_id         integer,
+    code            varchar(8),
+    expiration_time timestamp
 );
 
 -- drop table if exists sessions;
-create table sessions(
-    id serial primary key,
-    access_token varchar(256) not null ,
-    refresh_token varchar(256) not null ,
-    user_id int not null ,
+create table sessions
+(
+    id              serial primary key,
+    access_token    varchar(256) not null,
+    refresh_token   varchar(256) not null,
+    user_id         int          not null,
     device_identity varchar(128),
-    expire_at date not null
+    expire_at       date         not null
 )

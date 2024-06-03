@@ -1,0 +1,156 @@
+basePath: /
+definitions:
+  requests.CreateUserRequest:
+    properties:
+      e-mail:
+        example: andrew123@qwerty.kom
+        type: string
+      login:
+        example: TopPlayer123
+        type: string
+      nickname:
+        example: Looser1123
+        type: string
+      password:
+        example: 123superPassword
+        type: string
+    required:
+    - e-mail
+    - login
+    - nickname
+    - password
+    type: object
+  requests.CreateUserResponse:
+    properties:
+      id:
+        example: 2
+        type: integer
+    type: object
+  requests.RefreshSessionRequest:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  requests.RefreshSessionResponse:
+    properties:
+      accessToken:
+        type: string
+      expireAt:
+        type: integer
+      refreshToken:
+        type: string
+    type: object
+  requests.SignInRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  requests.SignInResponse:
+    properties:
+      accessToken:
+        type: string
+      expireAt:
+        type: integer
+      refreshToken:
+        type: string
+    type: object
+  requests.VerificationRequest:
+    properties:
+      code:
+        type: string
+      userId:
+        type: integer
+    required:
+    - code
+    - userId
+    type: object
+host: 202.49.176.191:8080
+info:
+  contact: {}
+  description: I hate this app.
+  title: Smartri Backend
+  version: 1.3.3.7
+paths:
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: sign in
+      parameters:
+      - description: request format
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/requests.SignInResponse'
+      summary: sign in
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: creates user
+      parameters:
+      - description: request format
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/requests.CreateUserResponse'
+      summary: creates user
+  /auth/token/update:
+    post:
+      consumes:
+      - application/json
+      description: refreshes current session with token pair (access + refresh)
+      parameters:
+      - description: request format
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RefreshSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/requests.RefreshSessionResponse'
+      summary: refreshes session
+  /user/verify:
+    post:
+      consumes:
+      - application/json
+      description: verifies user
+      parameters:
+      - description: request format
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.VerificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+      summary: verifies user
+swagger: "2.0"

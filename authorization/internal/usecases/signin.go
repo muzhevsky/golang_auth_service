@@ -10,13 +10,13 @@ import (
 )
 
 type signInUseCase struct {
-	userRepo       internal.IUserRepo
-	sessionRepo    internal.ISessionRepo
+	userRepo       internal.IUserRepository
+	sessionRepo    internal.ISessionRepository
 	hashProvider   tokens2.IHashProvider
 	sessionManager tokens2.ISessionManager
 }
 
-func NewSignInUseCase(userRepo internal.IUserRepo, sessionRepo internal.ISessionRepo, hashProvider tokens2.IHashProvider, sessionManager tokens2.ISessionManager) *signInUseCase {
+func NewSignInUseCase(userRepo internal.IUserRepository, sessionRepo internal.ISessionRepository, hashProvider tokens2.IHashProvider, sessionManager tokens2.ISessionManager) *signInUseCase {
 	return &signInUseCase{userRepo: userRepo, sessionRepo: sessionRepo, hashProvider: hashProvider, sessionManager: sessionManager}
 }
 
@@ -31,7 +31,8 @@ func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.Si
 		userRecord, err = u.userRepo.FindByEmail(context, userRequest.Login)
 		if err != nil {
 			return nil, err
-		} else {
+		}
+		if userRecord == nil {
 			return nil, errors2.UserNotFound
 		}
 	}

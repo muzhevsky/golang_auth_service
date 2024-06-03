@@ -91,7 +91,6 @@ func (ds *pgUserDatasource) UpdateById(context context.Context, id int, updateFu
 		Where(sq.Eq{"id": user.Id}).ToSql()
 
 	_, err = ds.pg.Pool.Exec(context, sql, args...)
-	fmt.Println(err == nil)
 	return err
 }
 

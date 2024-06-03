@@ -8,4 +8,5 @@ type SignInRequest struct {
 type SignInResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+	ExpireAt     int64  `json:"expireAt"`
 }

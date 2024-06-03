@@ -11,7 +11,7 @@ type verificationRepo struct {
 	ds datasources.IVerificationDataSource
 }
 
-func NewVerificationRepo(ds datasources.IVerificationDataSource) internal.IVerificationRepo {
+func NewVerificationRepo(ds datasources.IVerificationDataSource) internal.IVerificationRepository {
 	return &verificationRepo{ds}
 }
 

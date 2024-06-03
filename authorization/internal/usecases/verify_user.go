@@ -12,12 +12,12 @@ import (
 )
 
 type verificationUseCase struct {
-	userRepo         internal.IUserRepo
-	verificationRepo internal.IVerificationRepo
+	userRepo         internal.IUserRepository
+	verificationRepo internal.IVerificationRepository
 	mailer           mailers.IVerificationMailer
 }
 
-func NewVerificationUseCase(userRepo internal.IUserRepo, verificationRepo internal.IVerificationRepo, mailer mailers.IVerificationMailer) internal.IVerification {
+func NewVerificationUseCase(userRepo internal.IUserRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) internal.IVerifyUserUseCase {
 	return &verificationUseCase{userRepo, verificationRepo, mailer}
 }
 
