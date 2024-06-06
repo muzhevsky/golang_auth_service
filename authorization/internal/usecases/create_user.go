@@ -13,22 +13,25 @@ import (
 )
 
 type userUseCase struct {
-	userRepo         internal.IUserRepository
-	hashProvider     tokens.IHashProvider
-	verificationRepo internal.IVerificationRepository
-	mailer           mailers.IVerificationMailer
+	userRepo       internal.IUserRepository
+	hashProvider   tokens.IHashProvider
+	sessionRepo    internal.ISessionRepository
+	sessionManager tokens.ISessionManager
+	mailer         mailers.IVerificationMailer
 }
 
 func NewCreateUserUseCase(
 	userRepo internal.IUserRepository,
-	verificationRepo internal.IVerificationRepository,
+	sessionRepo internal.ISessionRepository,
+	sessionManager tokens.ISessionManager,
 	hashProvider tokens.IHashProvider,
 	mailer mailers.IVerificationMailer) *userUseCase {
 	return &userUseCase{
-		userRepo:         userRepo,
-		verificationRepo: verificationRepo,
-		hashProvider:     hashProvider,
-		mailer:           mailer,
+		userRepo:       userRepo,
+		sessionManager: sessionManager,
+		sessionRepo:    sessionRepo,
+		hashProvider:   hashProvider,
+		mailer:         mailer,
 	}
 }
 
@@ -39,7 +42,7 @@ func NewCreateUserUseCase(
 //   - non-unique login
 //   - non-unique email
 //   - errors of password hash and user repository
-func (u *userUseCase) CreateUser(context context.Context, request *requests.CreateUserRequest) (*entities.User, error) {
+func (u *userUseCase) CreateUser(context context.Context, request *requests.CreateUserRequest) (*requests.CreateUserResponse, error) {
 	user := &entities.User{
 		Login:    request.Login,
 		Password: request.Password,
@@ -81,15 +84,24 @@ func (u *userUseCase) CreateUser(context context.Context, request *requests.Crea
 		return nil, err
 	}
 
-	verification := entities.GenerateVerification(user.Id)
-	_, err = u.verificationRepo.Create(context, verification)
+	session, err := u.sessionManager.CreateSession(user)
 	if err != nil {
 		return nil, err
 	}
 
-	u.mailer.SendMail(user.EMail, verification.Code)
+	_, err = u.sessionRepo.Create(context, session)
+	if err != nil {
+		return nil, err
+	}
 
-	return user, nil
+	return &requests.CreateUserResponse{
+		Id: user.Id,
+		Session: requests.RefreshSessionResponse{
+			AccessToken:  session.AccessToken,
+			RefreshToken: session.RefreshToken,
+			ExpiresAt:    session.ExpiresAt.Unix(),
+		},
+	}, nil
 }
 
 func validateFields(user *entities.User) error {

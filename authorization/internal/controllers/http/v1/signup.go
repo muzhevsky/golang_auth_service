@@ -23,12 +23,15 @@ func NewSignUpRouter(handler *gin.Engine, user internal.ICreateUserUseCase, veri
 }
 
 // SignUp godoc
-// @Summary      creates user
-// @Description  creates user
+// @Summary      регистрация нового пользователя
+// @Description  регистрация нового пользователя
 // @Accept       json
 // @Produce      json
-// @Param request body requests.CreateUserRequest true "request format"
+// @Param request body requests.CreateUserRequest true "структура запрос"
 // @Success      200  {object}  requests.CreateUserResponse
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 409 {object} middleware.ErrorResponse "пользователь уже существует"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /auth/signup [post]
 func (u *registerRouter) register(c *gin.Context) {
 	var userRequest requests.CreateUserRequest
@@ -38,12 +41,12 @@ func (u *registerRouter) register(c *gin.Context) {
 		return
 	}
 
-	user, err := u.user.CreateUser(c, &userRequest)
+	response, err := u.user.CreateUser(c, &userRequest)
 
 	if err != nil {
 		AddGinError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, requests.CreateUserResponse{user.Id})
+	c.JSON(http.StatusOK, response)
 }

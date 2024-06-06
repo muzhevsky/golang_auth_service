@@ -2,13 +2,14 @@ version: '3.8'
 
 services:
   postgres:
-    container_name: "postgres"
+    container_name: "smartri_db"
     env_file:
       - ./authorization/.env
     build: ./authorization/database
 #    volumes:
 #      - database:/var/lib/postgresql/data
   auth:
+    container_name: "smartri_backend"
     env_file:
       - ./authorization/.env
     build: ./authorization

@@ -2,12 +2,10 @@ package usecases
 
 import (
 	"authorization/internal"
-	"authorization/internal/controllers/requests"
 	"authorization/internal/entities"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -24,12 +22,12 @@ func NewVerificationUseCase(userRepo internal.IUserRepository, verificationRepo 
 // Verify - serves verification process, checking if there's any verification records in repository by provided userId
 // within verification object.
 // returns:
-//   - ExpiredCode error if there are no active verification codes
+//   - ExpiredVerificationCode error if there are no active verification codes
 //   - WrongVerificationCode error if code is wrong
-func (v *verificationUseCase) Verify(context context.Context, request *requests.VerificationRequest) error {
+func (v *verificationUseCase) Verify(context context.Context, userId int, code string) error {
 	verification := &entities.Verification{
-		UserId: request.UserId,
-		Code:   request.Code,
+		UserId: userId,
+		Code:   code,
 	}
 
 	existingVerifications, err := v.verificationRepo.FindByUserId(context, verification.UserId)
@@ -39,8 +37,7 @@ func (v *verificationUseCase) Verify(context context.Context, request *requests.
 
 	var existingVerification *entities.Verification
 	for _, verification := range existingVerifications {
-		fmt.Println(verification.Code)
-		if verification.Code == request.Code {
+		if verification.Code == code {
 			existingVerification = verification
 		}
 	}
@@ -50,7 +47,7 @@ func (v *verificationUseCase) Verify(context context.Context, request *requests.
 	}
 
 	if existingVerification.ExpirationTime.Before(time.Now()) {
-		return errs.ExpiredCode
+		return errs.ExpiredVerificationCode
 	}
 
 	result := existingVerification.ValidateVerification(verification)
@@ -58,7 +55,19 @@ func (v *verificationUseCase) Verify(context context.Context, request *requests.
 		return errs.WrongVerificationCode
 	}
 
-	err = v.userRepo.Verify(context, verification.UserId) // todo перенести метод в entity, а в репозитории сделать Update()
+	user, err := v.userRepo.FindById(context, userId)
+	if err != nil {
+		return err
+	}
+
+	user.Verify()
+
+	err = v.userRepo.Update(context, user)
+	if err != nil {
+		return err
+	}
+
+	err = v.verificationRepo.Clear(context, userId)
 	if err != nil {
 		return err
 	}

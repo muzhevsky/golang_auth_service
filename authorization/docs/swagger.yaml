@@ -25,6 +25,8 @@ definitions:
       id:
         example: 2
         type: integer
+      session:
+        $ref: '#/definitions/requests.RefreshSessionResponse'
     type: object
   requests.RefreshSessionRequest:
     properties:
@@ -37,7 +39,7 @@ definitions:
     properties:
       accessToken:
         type: string
-      expireAt:
+      expiresAt:
         type: integer
       refreshToken:
         type: string
@@ -53,7 +55,7 @@ definitions:
     properties:
       accessToken:
         type: string
-      expireAt:
+      expiresAt:
         type: integer
       refreshToken:
         type: string
@@ -62,13 +64,10 @@ definitions:
     properties:
       code:
         type: string
-      userId:
-        type: integer
     required:
     - code
-    - userId
     type: object
-host: 202.49.176.191:8080
+host: localhost:8080
 info:
   contact: {}
   description: I hate this app.
@@ -99,7 +98,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: creates user
+      description: регистрация нового пользователя
       parameters:
       - description: request format
         in: body
@@ -114,7 +113,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/requests.CreateUserResponse'
-      summary: creates user
+      summary: регистрация нового пользователя
   /auth/token/update:
     post:
       consumes:
@@ -139,7 +138,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: verifies user
+      description: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa
       parameters:
       - description: request format
         in: body

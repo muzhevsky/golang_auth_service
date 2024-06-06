@@ -1,6 +1,5 @@
 package requests
 
 type VerificationRequest struct {
-	UserId int    `json:"userId" binding:"required"`
-	Code   string `json:"code" binding:"required"`
+	Code string `json:"code" binding:"required" example:"a1b2c"`
 }

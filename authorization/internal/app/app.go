@@ -3,6 +3,7 @@ package app
 import (
 	"authorization/config"
 	http2 "authorization/internal/controllers/http"
+	"authorization/internal/controllers/http/middleware"
 	"authorization/internal/controllers/http/v1"
 	pg2 "authorization/internal/infrastructure/datasources/pg"
 	"authorization/internal/infrastructure/services/hash"
@@ -27,7 +28,7 @@ import (
 func Run() {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		logrus.Error(fmt.Errorf("app - Run: %w", err))
+		logrus.Error(fmt.Errorf("app - Run 1 : %w", err))
 	}
 
 	log := logger.New("error")
@@ -36,17 +37,18 @@ func Run() {
 
 	// Repository
 	size, err := strconv.Atoi(cfg.PG.PoolMax)
+	fmt.Println(cfg.PG.PoolMax)
 	if err != nil {
-		log.Fatal(fmt.Errorf("app - Run: %w", err))
+		log.Fatal(fmt.Errorf("app - Run 2: %w", err))
 	}
 	pg, err := postgres.New(cfg.PG, postgres.MaxPoolSize(size))
 	if err != nil {
-		log.Fatal(fmt.Errorf("app - Run: %w", err))
+		log.Fatal(fmt.Errorf("app - Run 3: %w", err))
 	}
 	defer pg.Close()
 
 	userDS := pg2.NewPgUserDatasource(pg)
-	sessionDS := pg2.NewSessionRepo(pg)
+	sessionDS := pg2.NewSessionDatasource(pg)
 	verificationDS := pg2.NewPgVerificationDatasource(pg)
 
 	bcryptHashProvider := hash.NewBcryptHashProvider()
@@ -73,9 +75,10 @@ func Run() {
 
 	// UseCases
 
-	userUseCase := usecases.NewCreateUserUseCase(
+	createUserUseCase := usecases.NewCreateUserUseCase(
 		userRepository,
-		verificationRepo,
+		sessionRepository,
+		sessionManager,
 		bcryptHashProvider,
 		verificationMailer,
 	)
@@ -98,17 +101,26 @@ func Run() {
 		sessionRepository,
 		sessionManager,
 	)
+
+	requestVerificationUseCase := usecases.NewRequestVerificationRequest(
+		userRepository,
+		verificationRepo,
+		verificationMailer,
+	)
 	// Controllers
 
 	router := gin.New()
 	router.HandleMethodNotAllowed = true
+	router.Use(middleware.NewAuthenticationHandler(sessionRepository, sessionManager).HandleAuth)
+
 	http2.InitServiceMiddleware(router)
-	v1.NewSignUpRouter(router, userUseCase, verificationUseCase, log)
+	v1.NewSignUpRouter(router, createUserUseCase, verificationUseCase, log)
 	v1.NewVerificationRouter(router, verificationUseCase, log)
 	v1.NewSignInRouter(router, signInUseCase, log)
 	v1.NewRefreshSessionRouter(router, refreshSessionUseCase, log)
+	v1.NewRequestVerificationRouter(router, createUserUseCase, requestVerificationUseCase, log)
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	//http2.NewAuthorizationRouter(router, userUseCase, log, sessionUseCase)
 
 	http.Start(router, cfg.HTTP)
 }

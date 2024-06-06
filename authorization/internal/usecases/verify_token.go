@@ -29,7 +29,7 @@ func (s *verifyTokenUseCase) VerifyAccessToken(context context.Context, token st
 		return errors2.NotAValidAccessToken
 	}
 	claims := entities.NewClaimsFromMap(claimsMap)
-	if claims.ExpireAt.Before(time.Now()) {
+	if claims.ExpiresAt.Before(time.Now()) {
 		return errors2.AccessTokenExpired
 	}
 

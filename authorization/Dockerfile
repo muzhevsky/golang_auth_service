@@ -12,10 +12,10 @@ EXPOSE ${AUTH_PORT}
 
 FROM alpine:latest
 
-WORKDIR /root
+WORKDIR /smartri_app
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/docs .
-COPY --from=builder /app/config/config.toml ./config/
+COPY --from=builder /app/docs ./docs
+COPY --from=builder /app/config/config.yaml ./config/config.yaml
 
 ENTRYPOINT ["./main"]

@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5"
 )
 
 const verificationTableName = "verification_codes"
@@ -50,7 +49,7 @@ func (ds *pgVerificationDatasource) SelectById(context context.Context, id int) 
 	row := ds.pg.Pool.QueryRow(context, sql, args...)
 	err = row.Scan(&result.Id, &result.UserId, &result.Code, &result.ExpirationTime)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, ds.pg.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err
@@ -85,11 +84,11 @@ func (ds *pgVerificationDatasource) SelectByUserId(context context.Context, user
 }
 
 func (ds *pgVerificationDatasource) DeleteById(context context.Context, id int) error {
-	sql, _, err := ds.pg.Builder.Delete(verificationTableName).Where(sq.Eq{"id": id}).ToSql()
+	sql, args, err := ds.pg.Builder.Delete(verificationTableName).Where(sq.Eq{"id": id}).ToSql()
 	if err != nil {
 		return err
 	}
 
-	_, err = ds.pg.Pool.Exec(context, sql)
+	_, err = ds.pg.Pool.Exec(context, sql, args...)
 	return err
 }

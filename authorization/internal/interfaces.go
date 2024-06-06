@@ -8,7 +8,7 @@ import (
 
 type (
 	ICreateUserUseCase interface {
-		CreateUser(context context.Context, user *requests.CreateUserRequest) (*entities.User, error)
+		CreateUser(context context.Context, user *requests.CreateUserRequest) (*requests.CreateUserResponse, error)
 	}
 
 	ISignInUseCase interface {
@@ -16,7 +16,11 @@ type (
 	}
 
 	IVerifyUserUseCase interface {
-		Verify(context context.Context, verification *requests.VerificationRequest) error
+		Verify(context context.Context, userId int, code string) error
+	}
+
+	IRequestVerificationUseCase interface {
+		RequestVerification(context context.Context, userId int) (string, error) // todo убрать код)
 	}
 
 	IRefreshSessionUseCase interface {
@@ -30,7 +34,7 @@ type (
 		FindByEmail(context context.Context, email string) (*entities.User, error)
 		CheckLoginExist(context context.Context, login string) (bool, error)
 		CheckEmailExist(context context.Context, email string) (bool, error)
-		Verify(context context.Context, id int) error
+		Update(context context.Context, user *entities.User) error
 	}
 
 	IVerificationRepository interface {

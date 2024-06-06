@@ -5,21 +5,22 @@ import (
 	"authorization/internal/infrastructure/datasources"
 	"authorization/pkg/postgres"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Masterminds/squirrel"
 )
 
-type sessionRepo struct {
+type sessionDatasource struct {
 	pg *postgres.Postgres
 }
 
 const sessionsTableName = "sessions"
 
-func NewSessionRepo(pg *postgres.Postgres) datasources.ISessionDataSource {
-	return &sessionRepo{pg}
+func NewSessionDatasource(pg *postgres.Postgres) datasources.ISessionDatasource {
+	return &sessionDatasource{pg}
 }
 
-func (s *sessionRepo) Delete(ctx context.Context, session *entities.Session) error {
+func (s *sessionDatasource) Delete(ctx context.Context, session *entities.Session) error {
 	sql, args, err := s.pg.Builder.Delete(sessionsTableName).
 		Where(squirrel.And{squirrel.Eq{"access_token": session.AccessToken}, squirrel.Eq{"refresh_token": session.RefreshToken}}).ToSql()
 	if err != nil {
@@ -30,12 +31,12 @@ func (s *sessionRepo) Delete(ctx context.Context, session *entities.Session) err
 	return err
 }
 
-func (s *sessionRepo) Create(ctx context.Context, session *entities.Session) (int, error) {
+func (s *sessionDatasource) Create(ctx context.Context, session *entities.Session) (int, error) {
 	fmt.Printf("%v ,%v ,%v ,%v ,%v ",
-		session.AccessToken, session.RefreshToken, session.UserId, session.DeviceIdentity, session.ExpireAt)
+		session.AccessToken, session.RefreshToken, session.UserId, session.DeviceIdentity, session.ExpiresAt)
 	sql, args, err := s.pg.Builder.Insert(sessionsTableName).
 		Columns("access_token", "refresh_token", "user_id", "device_identity", "expire_at").
-		Values(session.AccessToken, session.RefreshToken, session.UserId, session.DeviceIdentity, session.ExpireAt).
+		Values(session.AccessToken, session.RefreshToken, session.UserId, session.DeviceIdentity, session.ExpiresAt).
 		Suffix("RETURNING \"id\"").
 		ToSql()
 	if err != nil {
@@ -47,33 +48,33 @@ func (s *sessionRepo) Create(ctx context.Context, session *entities.Session) (in
 	return id, err
 }
 
-func (s *sessionRepo) SelectByAccess(ctx context.Context, token string) (*entities.Session, error) {
+func (s *sessionDatasource) SelectByAccess(ctx context.Context, token string) (*entities.Session, error) {
 	sql, args, err := s.pg.Builder.Select("access_token", "refresh_token", "user_id", "device_identity", "expire_at").
 		From(sessionsTableName).
 		Where(squirrel.Eq{"access_token": token}).
 		Limit(1).
 		ToSql()
 
-	fmt.Println(token)
-	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &entities.Session{}
-	err = s.pg.Pool.QueryRow(ctx, sql, args...).Scan(&result.AccessToken, &result.RefreshToken, &result.UserId, &result.DeviceIdentity, &result.ExpireAt)
+	err = s.pg.Pool.QueryRow(ctx, sql, args...).Scan(&result.AccessToken, &result.RefreshToken, &result.UserId, &result.DeviceIdentity, &result.ExpiresAt)
 
-	fmt.Println(result.AccessToken, err)
+	if errors.Is(err, s.pg.ErrNoRows) {
+		return nil, nil
+	}
 	return result, err
 }
 
-func (s *sessionRepo) UpdateById(ctx context.Context, id int, session *entities.Session) error {
+func (s *sessionDatasource) UpdateById(ctx context.Context, id int, session *entities.Session) error {
 	sql, args, err := s.pg.Builder.Update(sessionsTableName).
 		Set("access_token", session.AccessToken).
 		Set("refresh_token", session.RefreshToken).
 		Set("user_id", session.UserId).
 		Set("device_identity", session.DeviceIdentity).
-		Set("expire_at", session.ExpireAt).ToSql()
+		Set("expire_at", session.ExpiresAt).ToSql()
 	if err != nil {
 		return err
 	}
@@ -82,7 +83,7 @@ func (s *sessionRepo) UpdateById(ctx context.Context, id int, session *entities.
 	return err
 }
 
-func (s *sessionRepo) SelectByUserId(ctx context.Context, userId int) ([]*entities.Session, error) {
+func (s *sessionDatasource) SelectByUserId(ctx context.Context, userId int) ([]*entities.Session, error) {
 	panic("implement me")
 	return nil, nil
 }

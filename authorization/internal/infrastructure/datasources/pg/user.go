@@ -4,11 +4,8 @@ import (
 	"authorization/internal/entities"
 	"authorization/pkg/postgres"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5"
 )
 
 const userTableName = "users"
@@ -64,7 +61,7 @@ func (ds *pgUserDatasource) findOne(context context.Context, columnName string, 
 	row := ds.pg.Pool.QueryRow(context, sql, value)
 	err = row.Scan(&result.Id, &result.Login, &result.Password, &result.Nickname, &result.EMail, &result.CreationTime, &result.IsVerified)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, ds.pg.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err
@@ -79,8 +76,7 @@ func (ds *pgUserDatasource) UpdateById(context context.Context, id int, updateFu
 	}
 
 	updateFunc(user)
-	encoder, _ := json.Marshal(user)
-	fmt.Println(string(encoder))
+
 	sql, args, err := ds.pg.Builder.Update(userTableName).
 		Set("login", user.Login).
 		Set("email", user.EMail).

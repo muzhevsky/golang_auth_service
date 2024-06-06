@@ -48,14 +48,14 @@ const docTemplate = `{
         },
         "/auth/signup": {
             "post": {
-                "description": "creates user",
+                "description": "регистрация нового пользователя",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "creates user",
+                "summary": "регистрация нового пользователя",
                 "parameters": [
                     {
                         "description": "request format",
@@ -110,7 +110,7 @@ const docTemplate = `{
         },
         "/user/verify": {
             "post": {
-                "description": "verifies user",
+                "description": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa",
                 "consumes": [
                     "application/json"
                 ],
@@ -171,6 +171,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 2
+                },
+                "session": {
+                    "$ref": "#/definitions/requests.RefreshSessionResponse"
                 }
             }
         },
@@ -191,7 +194,7 @@ const docTemplate = `{
                 "accessToken": {
                     "type": "string"
                 },
-                "expireAt": {
+                "expiresAt": {
                     "type": "integer"
                 },
                 "refreshToken": {
@@ -216,7 +219,7 @@ const docTemplate = `{
                 "accessToken": {
                     "type": "string"
                 },
-                "expireAt": {
+                "expiresAt": {
                     "type": "integer"
                 },
                 "refreshToken": {
@@ -227,15 +230,11 @@ const docTemplate = `{
         "requests.VerificationRequest": {
             "type": "object",
             "required": [
-                "code",
-                "userId"
+                "code"
             ],
             "properties": {
                 "code": {
                     "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
                 }
             }
         }
@@ -245,7 +244,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.3.3.7",
-	Host:             "202.49.176.191:8080",
+	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Smartri Backend",
