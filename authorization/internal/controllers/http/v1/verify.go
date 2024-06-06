@@ -21,13 +21,16 @@ func NewVerificationRouter(handler *gin.Engine, verification internal.IVerifyUse
 	handler.POST("/user/verify", u.verifyUser)
 }
 
-// Verify godoc
-// @Summary      verifies user
-// @Description  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa
+// Update godoc
+// @Summary      верификация пользователя
+// @Description верификация пользователя с использованием токена, переданного в заголовке "Authorization"
 // @Accept       json
 // @Produce      json
 // @Param request body requests.VerificationRequest true "request format"
 // @Success      200  "Ok"
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /user/verify [post]
 func (u *verificationRoute) verifyUser(c *gin.Context) {
 	var request requests.VerificationRequest
@@ -36,7 +39,14 @@ func (u *verificationRoute) verifyUser(c *gin.Context) {
 		return
 	}
 
-	err := u.verification.Verify(c, &request)
+	userId, exists := c.Get("userId")
+	if !exists {
+		err, _ := c.Get("authError")
+		AddGinError(c, err.(error))
+		return
+	}
+
+	err := u.verification.Verify(c, userId.(int), request.Code)
 
 	if err != nil {
 		AddGinError(c, err)

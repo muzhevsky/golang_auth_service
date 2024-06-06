@@ -50,10 +50,12 @@ func (u *userRepo) CheckEmailExist(context context.Context, email string) (bool,
 	return user != nil, nil
 }
 
-func (u *userRepo) Verify(context context.Context, id int) error {
-	err := u.userDS.UpdateById(context, id, func(user *entities.User) {
-		user.IsVerified = true
+func (u *userRepo) Update(context context.Context, user *entities.User) error {
+	return u.userDS.UpdateById(context, user.Id, func(u *entities.User) {
+		u.Login = user.Login
+		u.EMail = user.EMail
+		u.Password = user.Password
+		u.IsVerified = user.IsVerified
+		u.Nickname = user.Nickname
 	})
-
-	return err
 }

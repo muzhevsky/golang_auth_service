@@ -48,7 +48,7 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 	}
 
 	result, err := s.sessionRepo.Update(context, storedSession, func(session *entities.Session) {
-		session.ExpireAt = newSession.ExpireAt
+		session.ExpiresAt = newSession.ExpiresAt
 		session.AccessToken = newSession.AccessToken
 		session.RefreshToken = newSession.RefreshToken
 	})

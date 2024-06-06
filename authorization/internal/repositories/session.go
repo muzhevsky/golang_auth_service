@@ -7,10 +7,10 @@ import (
 )
 
 type sessionRepository struct {
-	ds datasources.ISessionDataSource
+	ds datasources.ISessionDatasource
 }
 
-func NewSessionRepository(ds datasources.ISessionDataSource) *sessionRepository {
+func NewSessionRepository(ds datasources.ISessionDatasource) *sessionRepository {
 	return &sessionRepository{ds: ds}
 }
 

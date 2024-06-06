@@ -37,7 +37,7 @@ func (t *tokenManager) CreateSession(user *entities.User) (*entities.Session, er
 		DeviceIdentity: "TODO",
 		AccessToken:    access,
 		RefreshToken:   refresh,
-		ExpireAt:       expiresAt,
+		ExpiresAt:      expiresAt,
 	}, nil
 }
 

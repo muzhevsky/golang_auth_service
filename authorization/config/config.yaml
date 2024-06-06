@@ -1,0 +1,20 @@
+app:
+    name: "smartri"
+    version: "0.0.1"
+http:
+    addr: ""
+    port: ""
+pg:
+    user: ""
+    password: ""
+    host: ""
+    port: ""
+    database: ""
+    pool_max: "2"
+jwt:
+    signing_key: ""
+smtp:
+    username: ""
+    password: ""
+    host: "smtp.yandex.ru"
+    port: "587"

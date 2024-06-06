@@ -37,10 +37,6 @@ func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.Si
 		}
 	}
 
-	if !userRecord.IsVerified {
-		return nil, errors2.UserIsNotVerified
-	}
-
 	passwordMatched := u.hashProvider.CompareStringAndHash(userRequest.Password, userRecord.Password)
 	if !passwordMatched {
 		return nil, errors2.WrongPassword

@@ -13,3 +13,7 @@ type User struct {
 	IsVerified   bool
 	CreationTime time.Time
 }
+
+func (u *User) Verify() {
+	u.IsVerified = true
+}

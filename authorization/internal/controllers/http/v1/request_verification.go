@@ -1,0 +1,49 @@
+package v1
+
+import (
+	_ "authorization/docs"
+	"authorization/internal"
+	"authorization/pkg/logger"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+type requestVerificationHandler struct {
+	user         internal.ICreateUserUseCase
+	verification internal.IRequestVerificationUseCase
+	logger       logger.ILogger
+}
+
+func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateUserUseCase, verification internal.IRequestVerificationUseCase, logger logger.ILogger) {
+	u := &requestVerificationHandler{user, verification, logger}
+
+	handler.POST("/verification/request", u.requestVerification)
+}
+
+// RequestVerification godoc
+// @Summary      запрос на верификацию пользователя
+// @Description запрос на верификацию пользователя с использованием токена, переданного в заголовке "Authorization"
+// @Accept       json
+// @Produce      json
+// @Success      200  "(TODO: в данные момент возвращается код, чтобы каждый раз клиент не мучал почту) Ok"
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
+// @Failure 409 {object} middleware.ErrorResponse "пользователь уже верифицирован"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
+// @Router       /verification/request [post]
+func (u *requestVerificationHandler) requestVerification(c *gin.Context) {
+	userId, exists := c.Get("userId")
+	if !exists {
+		err, _ := c.Get("authError")
+		AddGinError(c, err.(error))
+		return
+	}
+
+	code, err := u.verification.RequestVerification(c, userId.(int))
+	if err != nil {
+		AddGinError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, code)
+}

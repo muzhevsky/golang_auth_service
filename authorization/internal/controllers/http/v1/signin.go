@@ -22,12 +22,17 @@ func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logge
 }
 
 // SignIn godoc
-// @Summary      sign in
-// @Description  sign in
+// @Summary      вход в аккаунт
+// @Tags signin
+// @Description  вход в аккаунт с использованием пар логин + пароль или email + пароль для получения токенов
 // @Accept       json
 // @Produce      json
-// @Param request body requests.SignInRequest true "request format"
+// @Param request body requests.SignInRequest true "структура запроса"
 // @Success      200  {object}  requests.SignInResponse
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 401 {object} middleware.ErrorResponse "неправильный пароль"
+// @Failure 404 {object} middleware.ErrorResponse "пользователь не найден"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /auth/signin [post]
 func (router *signInRouter) signIn(c *gin.Context) {
 	var request requests.SignInRequest
@@ -46,7 +51,7 @@ func (router *signInRouter) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, requests.SignInResponse{
 		AccessToken:  session.AccessToken,
 		RefreshToken: session.RefreshToken,
-		ExpireAt:     session.ExpireAt.Unix(),
+		ExpiresAt:    session.ExpiresAt.Unix(),
 	})
 	return
 }

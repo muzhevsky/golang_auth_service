@@ -10,5 +10,5 @@ type Session struct {
 	DeviceIdentity string
 	AccessToken    string
 	RefreshToken   string
-	ExpireAt       time.Time
+	ExpiresAt      time.Time
 }

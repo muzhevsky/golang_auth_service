@@ -22,7 +22,7 @@ type (
 		DeleteById(context context.Context, id int) error
 	}
 
-	ISessionDataSource interface {
+	ISessionDatasource interface {
 		Create(ctx context.Context, session *entities.Session) (int, error)
 		SelectByAccess(ctx context.Context, token string) (*entities.Session, error)
 		SelectByUserId(ctx context.Context, userId int) ([]*entities.Session, error)

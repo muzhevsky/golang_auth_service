@@ -22,13 +22,13 @@ type UserValidator struct {
 
 func (v *UserValidator) ValidateLogin(login string) error {
 	if !v.validateLoginLength(login) {
-		return fmt.Errorf("%w. login length can't be less than  %d OR more %d", errs.ValidationError, minLoginLen, maxLoginLen)
+		return fmt.Errorf("%w. login length can't be less than  %d OR more %d", errs.LoginValidationError, minLoginLen, maxLoginLen)
 	}
 	if !v.validateFirstCharacter(rune(login[0])) {
-		return fmt.Errorf("%w. login must start with letter", errs.ValidationError)
+		return fmt.Errorf("%w. login must start with letter", errs.LoginValidationError)
 	}
 	if !v.validateProhibitedCharacters(login) {
-		return fmt.Errorf("%w. login can contain Latin alphabet characters, numbers, underscores and hyphens", errs.ValidationError)
+		return fmt.Errorf("%w. login can contain Latin alphabet characters, numbers, underscores and hyphens", errs.LoginValidationError)
 	}
 	return nil
 }
@@ -52,11 +52,11 @@ func (v *UserValidator) validateProhibitedCharacters(source string) bool {
 
 func (v *UserValidator) ValidateEmail(email string) error {
 	if !v.validateLengthEmail(email) {
-		return fmt.Errorf("%w email length can't be less than  %d OR more %d", errs.ValidationError, minEmailLen, maxEmailLen)
+		return fmt.Errorf("%w email length can't be less than  %d OR more %d", errs.EmailValidationError, minEmailLen, maxEmailLen)
 	}
 	_, err := mail.ParseAddress(email)
 	if err != nil {
-		return fmt.Errorf("%w %s", errs.ValidationError, err)
+		return fmt.Errorf("%w %s", errs.EmailValidationError, err)
 	}
 	return nil
 }
@@ -67,10 +67,10 @@ func (v *UserValidator) validateLengthEmail(email string) bool {
 
 func (v *UserValidator) ValidatePassword(password string) error {
 	if !v.validatePasswordLength(password) {
-		return fmt.Errorf("%w, password length can't be less than  %d OR more %d", errs.ValidationError, minPasswordLen, maxPasswordLen)
+		return fmt.Errorf("%w, password length can't be less than  %d OR more %d", errs.PasswordValidationError, minPasswordLen, maxPasswordLen)
 	}
 	if !v.validatePasswordCharacters(password) {
-		return fmt.Errorf("%w. password should contain at least one Latin alphabet character and one number", errs.ValidationError) // todo задать нормальный exception
+		return fmt.Errorf("%w. password should contain at least one Latin alphabet character and one number", errs.PasswordValidationError)
 	}
 	return nil
 }
@@ -97,10 +97,10 @@ func (v *UserValidator) validatePasswordCharacters(password string) bool {
 }
 func (v *UserValidator) ValidateNickname(nickname string) error {
 	if !v.validateNicknameLength(nickname) {
-		return fmt.Errorf("%w. nickname length can't be less than  %d OR more %d", errs.ValidationError, minNicknameLen, maxNicknameLen)
+		return fmt.Errorf("%w. nickname length can't be less than  %d OR more %d", errs.LoginValidationError, minNicknameLen, maxNicknameLen)
 	}
 	if !v.validateProhibitedCharacters(nickname) { // todo другие правила валидации
-		return fmt.Errorf("%w. nickname can contain Latin alphabet characters, numbers, underscores and hyphens", errs.ValidationError)
+		return fmt.Errorf("%w. nickname can contain Latin alphabet characters, numbers, underscores and hyphens", errs.LoginValidationError)
 	}
 	return nil
 }

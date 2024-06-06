@@ -4,7 +4,9 @@ import (
 	"errors"
 )
 
-var ValidationError = errors.New("validation error")
+var LoginValidationError = errors.New("login validation error")
+var PasswordValidationError = errors.New("password validation error")
+var EmailValidationError = errors.New("email validation error")
 
 // auth
 var UserNotFound = errors.New("there's no user with such email or login")
@@ -16,9 +18,10 @@ var NotAValidAccessToken = errors.New("invalid access token")
 var NotAValidRefreshToken = errors.New("invalid refresh token")
 
 // verification
-var ExpiredCode = errors.New("the verification code is expired")
+var ExpiredVerificationCode = errors.New("the verification code is expired")
 var WrongVerificationCode = errors.New("the verification code is wrong")
 var UserIsNotVerified = errors.New("the user is not verified")
+var UserIsAlreadyVerified = errors.New("the user is already verified")
 
 var RecordAlreadyExists = errors.New("record already exists")
 
