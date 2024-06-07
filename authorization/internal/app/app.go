@@ -21,6 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	http3 "net/http"
 	"strconv"
 	"time"
 )
@@ -31,11 +32,11 @@ func Run() {
 		logrus.Error(fmt.Errorf("app - Run 1 : %w", err))
 	}
 
+	// Packages
 	log := logger.New("error")
 
 	jwt := jwt.New(cfg.SigningString)
 
-	// Repository
 	size, err := strconv.Atoi(cfg.PG.PoolMax)
 	fmt.Println(cfg.PG.PoolMax)
 	if err != nil {
@@ -47,6 +48,7 @@ func Run() {
 	}
 	defer pg.Close()
 
+	// Infrastructure
 	userDS := pg2.NewPgUserDatasource(pg)
 	sessionDS := pg2.NewSessionDatasource(pg)
 	verificationDS := pg2.NewPgVerificationDatasource(pg)
@@ -54,12 +56,6 @@ func Run() {
 	bcryptHashProvider := hash.NewBcryptHashProvider()
 	accessTokenProvider := tokens2.NewJwtProvider(jwt)
 	refreshTokenGenerator := tokens2.NewHashRefreshTokenGenerator(bcryptHashProvider)
-
-	userRepository := repositories.NewUserRepo(userDS)
-	verificationRepo := repositories.NewVerificationRepo(verificationDS)
-	sessionRepository := repositories.NewSessionRepository(sessionDS)
-
-	// Other infrastructure
 
 	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
 	smtpMailer := mailers2.NewSmtpMailer(smtpClient)
@@ -72,6 +68,12 @@ func Run() {
 		},
 		accessTokenProvider,
 		refreshTokenGenerator)
+
+	// Repository
+
+	userRepository := repositories.NewUserRepo(userDS)
+	verificationRepo := repositories.NewVerificationRepo(verificationDS)
+	sessionRepository := repositories.NewSessionRepository(sessionDS)
 
 	// UseCases
 
@@ -120,6 +122,7 @@ func Run() {
 	v1.NewRefreshSessionRouter(router, refreshSessionUseCase, log)
 	v1.NewRequestVerificationRouter(router, createUserUseCase, requestVerificationUseCase, log)
 
+	router.GET("/", func(c *gin.Context) { c.Redirect(http3.StatusPermanentRedirect, "/swagger/index.html") })
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	http.Start(router, cfg.HTTP)

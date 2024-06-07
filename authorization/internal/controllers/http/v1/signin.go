@@ -3,6 +3,7 @@ package v1
 import (
 	_ "authorization/docs"
 	"authorization/internal"
+	http2 "authorization/internal/controllers/http/middleware"
 	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
@@ -23,7 +24,6 @@ func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logge
 
 // SignIn godoc
 // @Summary      вход в аккаунт
-// @Tags signin
 // @Description  вход в аккаунт с использованием пар логин + пароль или email + пароль для получения токенов
 // @Accept       json
 // @Produce      json
@@ -37,14 +37,14 @@ func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logge
 func (router *signInRouter) signIn(c *gin.Context) {
 	var request requests.SignInRequest
 	if err := c.ShouldBind(&request); err != nil {
-		AddGinError(c, errs.DataBindError)
+		http2.AddGinError(c, errs.DataBindError)
 		return
 	}
 
 	session, err := router.user.SignIn(c, &request)
 
 	if err != nil {
-		AddGinError(c, err)
+		http2.AddGinError(c, err)
 		return
 	}
 

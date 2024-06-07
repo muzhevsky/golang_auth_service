@@ -3,6 +3,7 @@ package v1
 import (
 	_ "authorization/docs"
 	"authorization/internal"
+	http2 "authorization/internal/controllers/http/middleware"
 	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
@@ -35,21 +36,21 @@ func NewVerificationRouter(handler *gin.Engine, verification internal.IVerifyUse
 func (u *verificationRoute) verifyUser(c *gin.Context) {
 	var request requests.VerificationRequest
 	if err := c.ShouldBind(&request); err != nil {
-		AddGinError(c, errs.DataBindError)
+		http2.AddGinError(c, errs.DataBindError)
 		return
 	}
 
 	userId, exists := c.Get("userId")
 	if !exists {
 		err, _ := c.Get("authError")
-		AddGinError(c, err.(error))
+		http2.AddGinError(c, err.(error))
 		return
 	}
 
 	err := u.verification.Verify(c, userId.(int), request.Code)
 
 	if err != nil {
-		AddGinError(c, err)
+		http2.AddGinError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, "ok")

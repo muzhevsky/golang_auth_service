@@ -3,6 +3,7 @@ package v1
 import (
 	_ "authorization/docs"
 	"authorization/internal"
+	http2 "authorization/internal/controllers/http/middleware"
 	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
@@ -37,14 +38,14 @@ func (u *registerRouter) register(c *gin.Context) {
 	var userRequest requests.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		AddGinError(c, errs.DataBindError)
+		http2.AddGinError(c, errs.DataBindError)
 		return
 	}
 
 	response, err := u.user.CreateUser(c, &userRequest)
 
 	if err != nil {
-		AddGinError(c, err)
+		http2.AddGinError(c, err)
 		return
 	}
 
