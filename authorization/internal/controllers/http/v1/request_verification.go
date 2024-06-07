@@ -3,6 +3,7 @@ package v1
 import (
 	_ "authorization/docs"
 	"authorization/internal"
+	http2 "authorization/internal/controllers/http/middleware"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -35,13 +36,13 @@ func (u *requestVerificationHandler) requestVerification(c *gin.Context) {
 	userId, exists := c.Get("userId")
 	if !exists {
 		err, _ := c.Get("authError")
-		AddGinError(c, err.(error))
+		http2.AddGinError(c, err.(error))
 		return
 	}
 
 	code, err := u.verification.RequestVerification(c, userId.(int))
 	if err != nil {
-		AddGinError(c, err)
+		http2.AddGinError(c, err)
 		return
 	}
 

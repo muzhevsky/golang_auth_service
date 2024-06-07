@@ -3,6 +3,7 @@ package v1
 import (
 	_ "authorization/docs"
 	"authorization/internal"
+	http2 "authorization/internal/controllers/http/middleware"
 	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
@@ -25,23 +26,26 @@ func NewRefreshSessionRouter(handler *gin.Engine, useCase internal.IRefreshSessi
 }
 
 // RefreshSession godoc
-// @Summary      refreshes session
-// @Description  refreshes current session with token pair (access + refresh)
+// @Summary      обновление сессии
+// @Description  возвращает новую пару токенов при отправке старой пары и при условии их валидности
 // @Accept       json
 // @Produce      json
 // @Param request body requests.RefreshSessionRequest true "request format"
 // @Success      200  {object}  requests.RefreshSessionResponse
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 401 {object} middleware.ErrorResponse "невалидная пара токенов, либо истекший refresh token"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /auth/token/update [post]
 func (r *refreshSessionRouter) refreshSession(c *gin.Context) {
 	request := requests.RefreshSessionRequest{}
 	if err := c.ShouldBind(&request); err != nil {
-		AddGinError(c, errs.DataBindError)
+		http2.AddGinError(c, errs.DataBindError)
 		return
 	}
 	response := requests.RefreshSessionResponse{}
 	session, err := r.useCase.RefreshSession(c, &request)
 	if err != nil {
-		AddGinError(c, err)
+		http2.AddGinError(c, err)
 		return
 	}
 
