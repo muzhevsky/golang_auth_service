@@ -20,7 +20,7 @@ type registerRouter struct {
 func NewSignUpRouter(handler *gin.Engine, user internal.ICreateUserUseCase, verification internal.IVerifyUserUseCase, logger logger.ILogger) {
 	u := &registerRouter{user, verification, logger}
 
-	handler.POST("/auth/signup", u.register)
+	handler.POST("/signup", u.register)
 }
 
 // SignUp godoc

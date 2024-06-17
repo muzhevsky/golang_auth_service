@@ -1,0 +1,7 @@
+http:
+  addr: ""
+  port: "8000"
+
+gateway:
+  authHost: ""
+  authPort: ""

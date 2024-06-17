@@ -1,21 +1,28 @@
 version: '3.8'
 
 services:
-  postgres:
-    container_name: "smartri_db"
+  auth_db:
+    container_name: "auth_db"
     env_file:
-      - ./authorization/.env
+      - .env
     build: ./authorization/database
 #    volumes:
 #      - database:/var/lib/postgresql/data
-  auth:
-    container_name: "smartri_backend"
+  api_gateway:
+    container_name: "api_gateway"
     env_file:
-      - ./authorization/.env
+      - .env
+    build: ./api_gateway
+    depends_on:
+      - auth
+    ports:
+      - "8000:8000"
+  auth:
+    container_name: "auth"
+    env_file:
+      - .env
     build: ./authorization
     depends_on:
-      - postgres
-    ports:
-      - "8080:8080"
+      - auth_db
 #volumes:
 #  database:
