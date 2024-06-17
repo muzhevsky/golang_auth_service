@@ -8,8 +8,6 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init -g cmd/app/main.go -o ./docs
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/app/main.go
 
-EXPOSE ${AUTH_PORT}
-
 FROM alpine:latest
 
 WORKDIR /smartri_app

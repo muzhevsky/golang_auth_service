@@ -22,7 +22,7 @@ func NewRefreshSessionRouter(handler *gin.Engine, useCase internal.IRefreshSessi
 		logger:  logger,
 	}
 
-	handler.POST("/auth/token/update", u.refreshSession)
+	handler.POST("/token/update", u.refreshSession)
 }
 
 // RefreshSession godoc

@@ -19,7 +19,7 @@ type signInRouter struct {
 func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logger logger.ILogger) {
 	u := &signInRouter{useCase, logger}
 
-	handler.POST("/auth/signin", u.signIn)
+	handler.POST("/signin", u.signIn)
 }
 
 // SignIn godoc
