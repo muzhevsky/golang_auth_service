@@ -6,12 +6,12 @@ import (
 )
 
 type (
-	IUserDataSource interface {
-		Create(context context.Context, user *entities.User) (int, error)
-		SelectById(context context.Context, id int) (*entities.User, error)
-		SelectByLogin(context context.Context, login string) (*entities.User, error)
-		SelectByEmail(context context.Context, email string) (*entities.User, error)
-		UpdateById(context context.Context, id int, updateFunc func(*entities.User)) error
+	IAccountDataSource interface {
+		Create(context context.Context, user *entities.Account) (int, error)
+		SelectById(context context.Context, id int) (*entities.Account, error)
+		SelectByLogin(context context.Context, login string) (*entities.Account, error)
+		SelectByEmail(context context.Context, email string) (*entities.Account, error)
+		UpdateById(context context.Context, id int, updateFunc func(*entities.Account)) error
 		DeleteById(context context.Context, id int) error
 	}
 

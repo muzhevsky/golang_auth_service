@@ -6,17 +6,16 @@ import (
 	"authorization/pkg/postgres"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/Masterminds/squirrel"
 )
 
 type sessionDatasource struct {
-	pg *postgres.Postgres
+	pg *postgres.Client
 }
 
 const sessionsTableName = "sessions"
 
-func NewSessionDatasource(pg *postgres.Postgres) datasources.ISessionDatasource {
+func NewSessionDatasource(pg *postgres.Client) datasources.ISessionDatasource {
 	return &sessionDatasource{pg}
 }
 
@@ -32,11 +31,9 @@ func (s *sessionDatasource) Delete(ctx context.Context, session *entities.Sessio
 }
 
 func (s *sessionDatasource) Create(ctx context.Context, session *entities.Session) (int, error) {
-	fmt.Printf("%v ,%v ,%v ,%v ,%v ",
-		session.AccessToken, session.RefreshToken, session.UserId, session.DeviceIdentity, session.ExpiresAt)
 	sql, args, err := s.pg.Builder.Insert(sessionsTableName).
 		Columns("access_token", "refresh_token", "user_id", "device_identity", "expire_at").
-		Values(session.AccessToken, session.RefreshToken, session.UserId, session.DeviceIdentity, session.ExpiresAt).
+		Values(session.AccessToken, session.RefreshToken, session.AccountId, session.DeviceIdentity, session.ExpiresAt).
 		Suffix("RETURNING \"id\"").
 		ToSql()
 	if err != nil {
@@ -60,7 +57,7 @@ func (s *sessionDatasource) SelectByAccess(ctx context.Context, token string) (*
 	}
 
 	result := &entities.Session{}
-	err = s.pg.Pool.QueryRow(ctx, sql, args...).Scan(&result.AccessToken, &result.RefreshToken, &result.UserId, &result.DeviceIdentity, &result.ExpiresAt)
+	err = s.pg.Pool.QueryRow(ctx, sql, args...).Scan(&result.AccessToken, &result.RefreshToken, &result.AccountId, &result.DeviceIdentity, &result.ExpiresAt)
 
 	if errors.Is(err, s.pg.ErrNoRows) {
 		return nil, nil
@@ -72,7 +69,7 @@ func (s *sessionDatasource) UpdateById(ctx context.Context, id int, session *ent
 	sql, args, err := s.pg.Builder.Update(sessionsTableName).
 		Set("access_token", session.AccessToken).
 		Set("refresh_token", session.RefreshToken).
-		Set("user_id", session.UserId).
+		Set("user_id", session.AccountId).
 		Set("device_identity", session.DeviceIdentity).
 		Set("expire_at", session.ExpiresAt).ToSql()
 	if err != nil {

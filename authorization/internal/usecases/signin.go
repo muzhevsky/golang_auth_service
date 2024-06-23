@@ -10,18 +10,18 @@ import (
 )
 
 type signInUseCase struct {
-	userRepo       internal.IUserRepository
+	userRepo       internal.IAccountRepository
 	sessionRepo    internal.ISessionRepository
 	hashProvider   tokens2.IHashProvider
 	sessionManager tokens2.ISessionManager
 }
 
-func NewSignInUseCase(userRepo internal.IUserRepository, sessionRepo internal.ISessionRepository, hashProvider tokens2.IHashProvider, sessionManager tokens2.ISessionManager) *signInUseCase {
+func NewSignInUseCase(userRepo internal.IAccountRepository, sessionRepo internal.ISessionRepository, hashProvider tokens2.IHashProvider, sessionManager tokens2.ISessionManager) *signInUseCase {
 	return &signInUseCase{userRepo: userRepo, sessionRepo: sessionRepo, hashProvider: hashProvider, sessionManager: sessionManager}
 }
 
 func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.SignInRequest) (*entities.Session, error) {
-	var userRecord *entities.User
+	var userRecord *entities.Account
 	userRecord, err := u.userRepo.FindByLogin(context, userRequest.Login)
 	if err != nil {
 		return nil, err

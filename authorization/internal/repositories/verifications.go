@@ -23,7 +23,7 @@ func (repo *verificationRepo) FindById(context context.Context, id int) (*entiti
 	return repo.ds.SelectById(context, id)
 }
 
-func (repo *verificationRepo) FindByUserId(context context.Context, userId int) ([]*entities.Verification, error) {
+func (repo *verificationRepo) FindByAccountId(context context.Context, userId int) ([]*entities.Verification, error) {
 	return repo.ds.SelectByUserId(context, userId)
 }
 

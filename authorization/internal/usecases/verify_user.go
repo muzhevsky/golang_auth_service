@@ -10,12 +10,12 @@ import (
 )
 
 type verificationUseCase struct {
-	userRepo         internal.IUserRepository
+	userRepo         internal.IAccountRepository
 	verificationRepo internal.IVerificationRepository
 	mailer           mailers.IVerificationMailer
 }
 
-func NewVerificationUseCase(userRepo internal.IUserRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) internal.IVerifyUserUseCase {
+func NewVerificationUseCase(userRepo internal.IAccountRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) internal.IVerifyUserUseCase {
 	return &verificationUseCase{userRepo, verificationRepo, mailer}
 }
 
@@ -30,7 +30,7 @@ func (v *verificationUseCase) Verify(context context.Context, userId int, code s
 		Code:   code,
 	}
 
-	existingVerifications, err := v.verificationRepo.FindByUserId(context, verification.UserId)
+	existingVerifications, err := v.verificationRepo.FindByAccountId(context, verification.UserId)
 	if err != nil {
 		return err
 	}

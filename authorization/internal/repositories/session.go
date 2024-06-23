@@ -22,9 +22,13 @@ func (s *sessionRepository) FindByAccessToken(context context.Context, token str
 	return s.ds.SelectByAccess(context, token)
 }
 
-func (s *sessionRepository) Update(context context.Context, sessionToUpdate *entities.Session, updateFunc func(session *entities.Session)) (*entities.Session, error) {
+func (s *sessionRepository) Update(context context.Context, sessionToUpdate *entities.Session, newSession *entities.Session) (*entities.Session, error) {
 	id := sessionToUpdate.Id
-	updateFunc(sessionToUpdate)
+
+	sessionToUpdate.ExpiresAt = newSession.ExpiresAt
+	sessionToUpdate.AccessToken = newSession.AccessToken
+	sessionToUpdate.RefreshToken = newSession.RefreshToken
+
 	err := s.ds.UpdateById(context, id, sessionToUpdate)
 
 	return sessionToUpdate, err

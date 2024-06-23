@@ -13,7 +13,7 @@ import (
 )
 
 type userUseCase struct {
-	userRepo       internal.IUserRepository
+	userRepo       internal.IAccountRepository
 	hashProvider   tokens.IHashProvider
 	sessionRepo    internal.ISessionRepository
 	sessionManager tokens.ISessionManager
@@ -21,7 +21,7 @@ type userUseCase struct {
 }
 
 func NewCreateUserUseCase(
-	userRepo internal.IUserRepository,
+	userRepo internal.IAccountRepository,
 	sessionRepo internal.ISessionRepository,
 	sessionManager tokens.ISessionManager,
 	hashProvider tokens.IHashProvider,
@@ -42,8 +42,8 @@ func NewCreateUserUseCase(
 //   - non-unique login
 //   - non-unique email
 //   - errors of password hash and user repository
-func (u *userUseCase) CreateUser(context context.Context, request *requests.CreateUserRequest) (*requests.CreateUserResponse, error) {
-	user := &entities.User{
+func (u *userUseCase) CreateAccount(context context.Context, request *requests.CreateAccountRequest) (*requests.CreateAccountResponse, error) {
+	user := &entities.Account{
 		Login:    request.Login,
 		Password: request.Password,
 		EMail:    request.EMail,
@@ -94,7 +94,7 @@ func (u *userUseCase) CreateUser(context context.Context, request *requests.Crea
 		return nil, err
 	}
 
-	return &requests.CreateUserResponse{
+	return &requests.CreateAccountResponse{
 		Id: user.Id,
 		Session: requests.RefreshSessionResponse{
 			AccessToken:  session.AccessToken,
@@ -104,7 +104,7 @@ func (u *userUseCase) CreateUser(context context.Context, request *requests.Crea
 	}, nil
 }
 
-func validateFields(user *entities.User) error {
+func validateFields(user *entities.Account) error {
 	validator := entities.UserValidator{}
 	err := validator.ValidateLogin(user.Login)
 	if err != nil {

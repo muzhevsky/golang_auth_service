@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type User struct {
+type Account struct {
 	Id           int
 	Login        string
 	Password     string
@@ -14,6 +14,6 @@ type User struct {
 	CreationTime time.Time
 }
 
-func (u *User) Verify() {
+func (u *Account) Verify() {
 	u.IsVerified = true
 }

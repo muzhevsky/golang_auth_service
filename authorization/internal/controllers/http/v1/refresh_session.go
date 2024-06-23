@@ -11,13 +11,13 @@ import (
 	"net/http"
 )
 
-type refreshSessionRouter struct {
+type refreshSessionController struct {
 	useCase internal.IRefreshSessionUseCase
 	logger  logger.ILogger
 }
 
-func NewRefreshSessionRouter(handler *gin.Engine, useCase internal.IRefreshSessionUseCase, logger logger.ILogger) {
-	u := &refreshSessionRouter{
+func NewRefreshSessionController(handler *gin.Engine, useCase internal.IRefreshSessionUseCase, logger logger.ILogger) {
+	u := &refreshSessionController{
 		useCase: useCase,
 		logger:  logger,
 	}
@@ -36,7 +36,7 @@ func NewRefreshSessionRouter(handler *gin.Engine, useCase internal.IRefreshSessi
 // @Failure 401 {object} middleware.ErrorResponse "невалидная пара токенов, либо истекший refresh token"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /auth/token/update [post]
-func (r *refreshSessionRouter) refreshSession(c *gin.Context) {
+func (r *refreshSessionController) refreshSession(c *gin.Context) {
 	request := requests.RefreshSessionRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		http2.AddGinError(c, errs.DataBindError)

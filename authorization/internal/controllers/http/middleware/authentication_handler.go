@@ -42,6 +42,6 @@ func (h *authenticationHandler) HandleAuth(c *gin.Context) {
 		return
 	}
 
-	c.Set("userId", session.UserId)
+	c.Set("accountId", session.AccountId)
 	c.Next()
 }

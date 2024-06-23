@@ -15,7 +15,7 @@ func NewTokenManager(config TokenConfiguration, access IAccessTokenManager, refr
 	return &tokenManager{config: config, access: access, refresh: refresh}
 }
 
-func (t *tokenManager) CreateSession(user *entities.User) (*entities.Session, error) {
+func (t *tokenManager) CreateSession(user *entities.Account) (*entities.Session, error) {
 	claims := make(map[string]interface{})
 	expiresAt := time.Now().Add(t.config.AccessTokenDuration)
 	claims["iss"] = t.config.Issuer
@@ -33,7 +33,7 @@ func (t *tokenManager) CreateSession(user *entities.User) (*entities.Session, er
 	}
 
 	return &entities.Session{
-		UserId:         user.Id,
+		AccountId:      user.Id,
 		DeviceIdentity: "TODO",
 		AccessToken:    access,
 		RefreshToken:   refresh,

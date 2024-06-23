@@ -9,12 +9,12 @@ import (
 )
 
 type requestVerificationRequest struct {
-	userRepo         internal.IUserRepository
+	userRepo         internal.IAccountRepository
 	verificationRepo internal.IVerificationRepository
 	mailer           mailers.IVerificationMailer
 }
 
-func NewRequestVerificationRequest(userRepo internal.IUserRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) *requestVerificationRequest {
+func NewRequestVerificationRequest(userRepo internal.IAccountRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) *requestVerificationRequest {
 	return &requestVerificationRequest{userRepo: userRepo, verificationRepo: verificationRepo, mailer: mailer}
 }
 

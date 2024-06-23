@@ -11,10 +11,10 @@ import (
 const verificationTableName = "verification_codes"
 
 type pgVerificationDatasource struct {
-	pg *postgres.Postgres
+	pg *postgres.Client
 }
 
-func NewPgVerificationDatasource(pg *postgres.Postgres) *pgVerificationDatasource {
+func NewPgVerificationDatasource(pg *postgres.Client) *pgVerificationDatasource {
 	return &pgVerificationDatasource{pg: pg}
 }
 

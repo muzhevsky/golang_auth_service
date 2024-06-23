@@ -19,9 +19,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	http3 "net/http"
 	"strconv"
 	"time"
 )
@@ -33,23 +30,23 @@ func Run() {
 	}
 
 	// Packages
-	log := logger.New("error")
+	logger := logger.New("error")
 
 	jwt := jwt.New(cfg.SigningString)
 
 	size, err := strconv.Atoi(cfg.PG.PoolMax)
-	fmt.Println(cfg.PG.PoolMax)
+
 	if err != nil {
-		log.Fatal(fmt.Errorf("app - Run 2: %w", err))
+		logger.Fatal(fmt.Errorf("app - Run 2: %w", err))
 	}
 	pg, err := postgres.New(cfg.PG, postgres.MaxPoolSize(size))
 	if err != nil {
-		log.Fatal(fmt.Errorf("app - Run 3: %w", err))
+		logger.Fatal(fmt.Errorf("app - Run 3: %w", err))
 	}
 	defer pg.Close()
 
 	// Infrastructure
-	userDS := pg2.NewPgUserDatasource(pg)
+	accountDS := pg2.NewAccountDatasource(pg)
 	sessionDS := pg2.NewSessionDatasource(pg)
 	verificationDS := pg2.NewPgVerificationDatasource(pg)
 
@@ -71,7 +68,7 @@ func Run() {
 
 	// Repository
 
-	userRepository := repositories.NewUserRepo(userDS)
+	userRepository := repositories.NewUserRepo(accountDS)
 	verificationRepo := repositories.NewVerificationRepo(verificationDS)
 	sessionRepository := repositories.NewSessionRepository(sessionDS)
 
@@ -115,15 +112,13 @@ func Run() {
 	router.HandleMethodNotAllowed = true
 	router.Use(middleware.NewAuthenticationHandler(sessionRepository, sessionManager).HandleAuth)
 
-	http2.InitServiceMiddleware(router)
-	v1.NewSignUpRouter(router, createUserUseCase, verificationUseCase, log)
-	v1.NewVerificationRouter(router, verificationUseCase, log)
-	v1.NewSignInRouter(router, signInUseCase, log)
-	v1.NewRefreshSessionRouter(router, refreshSessionUseCase, log)
-	v1.NewRequestVerificationRouter(router, createUserUseCase, requestVerificationUseCase, log)
-
-	router.GET("/", func(c *gin.Context) { c.Redirect(http3.StatusPermanentRedirect, "/swagger/index.html") })
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	http2.InitServiceMiddleware(router, logger)
+	v1.NewAuthenticationController(router)
+	v1.NewSignUpController(router, createUserUseCase, verificationUseCase, logger)
+	v1.NewVerificationController(router, verificationUseCase, logger)
+	v1.NewSignInController(router, signInUseCase, logger)
+	v1.NewRefreshSessionController(router, refreshSessionUseCase, logger)
+	v1.NewRequestVerificationRouter(router, createUserUseCase, requestVerificationUseCase, logger)
 
 	http.Start(router, cfg.HTTP)
 }

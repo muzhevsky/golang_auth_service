@@ -9,7 +9,7 @@ type (
 	}
 
 	ISessionManager interface {
-		CreateSession(user *entities.User) (*entities.Session, error)
+		CreateSession(user *entities.Account) (*entities.Session, error)
 		ParseToken(token string) (map[string]interface{}, error)
 	}
 

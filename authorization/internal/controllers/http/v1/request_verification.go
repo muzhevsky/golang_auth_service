@@ -9,14 +9,14 @@ import (
 	"net/http"
 )
 
-type requestVerificationHandler struct {
-	user         internal.ICreateUserUseCase
+type requestVerificationController struct {
+	user         internal.ICreateAccountUseCase
 	verification internal.IRequestVerificationUseCase
 	logger       logger.ILogger
 }
 
-func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateUserUseCase, verification internal.IRequestVerificationUseCase, logger logger.ILogger) {
-	u := &requestVerificationHandler{user, verification, logger}
+func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IRequestVerificationUseCase, logger logger.ILogger) {
+	u := &requestVerificationController{user, verification, logger}
 
 	handler.POST("/verification/request", u.requestVerification)
 }
@@ -32,8 +32,8 @@ func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateUser
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже верифицирован"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /verification/request [post]
-func (u *requestVerificationHandler) requestVerification(c *gin.Context) {
-	userId, exists := c.Get("userId")
+func (u *requestVerificationController) requestVerification(c *gin.Context) {
+	userId, exists := c.Get("accountId")
 	if !exists {
 		err, _ := c.Get("authError")
 		http2.AddGinError(c, err.(error))

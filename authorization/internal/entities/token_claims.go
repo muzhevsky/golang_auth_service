@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	IssuerName      = "iss"
-	UserIdClaimName = "userId"
-	ExpiresAt       = "expiresAt"
+	IssuerName         = "iss"
+	AccountIdClaimName = "accountId"
+	ExpiresAt          = "expiresAt"
 )
 
 type TokenClaims struct {
@@ -22,7 +22,7 @@ func NewClaims(userId int, duration time.Duration, issuer string) *TokenClaims {
 }
 
 func NewClaimsFromMap(claimsMap map[string]interface{}) *TokenClaims {
-	userId, exists := claimsMap[UserIdClaimName].(float64)
+	userId, exists := claimsMap[AccountIdClaimName].(float64)
 	if !exists {
 		return nil
 	}
@@ -40,7 +40,7 @@ func NewClaimsFromMap(claimsMap map[string]interface{}) *TokenClaims {
 
 func (claims *TokenClaims) MapFromClaims() map[string]interface{} {
 	result := make(map[string]interface{})
-	result[UserIdClaimName] = claims.UserId
+	result[AccountIdClaimName] = claims.UserId
 	result[ExpiresAt] = claims.ExpiresAt.Unix()
 
 	return result

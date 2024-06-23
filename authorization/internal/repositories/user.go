@@ -7,27 +7,27 @@ import (
 )
 
 type userRepo struct {
-	userDS datasources.IUserDataSource
+	accountDS datasources.IAccountDataSource
 }
 
-func NewUserRepo(userDS datasources.IUserDataSource) *userRepo {
-	return &userRepo{userDS}
+func NewUserRepo(accountDS datasources.IAccountDataSource) *userRepo {
+	return &userRepo{accountDS}
 }
 
-func (u *userRepo) Create(context context.Context, user *entities.User) (id int, err error) {
-	return u.userDS.Create(context, user)
+func (u *userRepo) Create(context context.Context, user *entities.Account) (id int, err error) {
+	return u.accountDS.Create(context, user)
 }
 
-func (u *userRepo) FindById(context context.Context, id int) (*entities.User, error) {
-	return u.userDS.SelectById(context, id)
+func (u *userRepo) FindById(context context.Context, id int) (*entities.Account, error) {
+	return u.accountDS.SelectById(context, id)
 }
 
-func (u *userRepo) FindByLogin(context context.Context, login string) (*entities.User, error) {
-	return u.userDS.SelectByLogin(context, login)
+func (u *userRepo) FindByLogin(context context.Context, login string) (*entities.Account, error) {
+	return u.accountDS.SelectByLogin(context, login)
 }
 
-func (u *userRepo) FindByEmail(context context.Context, email string) (*entities.User, error) {
-	return u.userDS.SelectByEmail(context, email)
+func (u *userRepo) FindByEmail(context context.Context, email string) (*entities.Account, error) {
+	return u.accountDS.SelectByEmail(context, email)
 }
 
 func (u *userRepo) CheckLoginExist(context context.Context, login string) (result bool, err error) {
@@ -50,12 +50,12 @@ func (u *userRepo) CheckEmailExist(context context.Context, email string) (bool,
 	return user != nil, nil
 }
 
-func (u *userRepo) Update(context context.Context, user *entities.User) error {
-	return u.userDS.UpdateById(context, user.Id, func(u *entities.User) {
-		u.Login = user.Login
-		u.EMail = user.EMail
-		u.Password = user.Password
-		u.IsVerified = user.IsVerified
-		u.Nickname = user.Nickname
+func (u *userRepo) Update(context context.Context, account *entities.Account) error {
+	return u.accountDS.UpdateById(context, account.Id, func(u *entities.Account) {
+		u.Login = account.Login
+		u.EMail = account.EMail
+		u.Password = account.Password
+		u.IsVerified = account.IsVerified
+		u.Nickname = account.Nickname
 	})
 }

@@ -11,13 +11,13 @@ import (
 	"net/http"
 )
 
-type signInRouter struct {
+type signInController struct {
 	user   internal.ISignInUseCase
 	logger logger.ILogger
 }
 
-func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logger logger.ILogger) {
-	u := &signInRouter{useCase, logger}
+func NewSignInController(handler *gin.Engine, useCase internal.ISignInUseCase, logger logger.ILogger) {
+	u := &signInController{useCase, logger}
 
 	handler.POST("/signin", u.signIn)
 }
@@ -34,7 +34,7 @@ func NewSignInRouter(handler *gin.Engine, useCase internal.ISignInUseCase, logge
 // @Failure 404 {object} middleware.ErrorResponse "пользователь не найден"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /auth/signin [post]
-func (router *signInRouter) signIn(c *gin.Context) {
+func (router *signInController) signIn(c *gin.Context) {
 	var request requests.SignInRequest
 	if err := c.ShouldBind(&request); err != nil {
 		http2.AddGinError(c, errs.DataBindError)

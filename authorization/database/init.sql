@@ -4,7 +4,7 @@ CREATE DATABASE smartri;
 \c smartri;
 
 -- drop table if exists users;
-create table users
+create table accounts
 (
     id                serial
         primary key,

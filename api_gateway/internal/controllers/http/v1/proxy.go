@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httputil"
@@ -10,15 +9,11 @@ import (
 )
 
 type proxy struct {
-	redirectionURL *url.URL
-	serviceName    string
+	serviceMap map[string]string
 }
 
-func NewProxy(url *url.URL, serviceName string) *proxy {
-	return &proxy{
-		redirectionURL: url,
-		serviceName:    serviceName,
-	}
+func NewProxy(serviceMap map[string]string) *proxy {
+	return &proxy{serviceMap: serviceMap}
 }
 
 func (p *proxy) Handle(c *gin.Context) {
@@ -27,17 +22,30 @@ func (p *proxy) Handle(c *gin.Context) {
 	urlPrefix := urlPath[1:prefixIndex]
 	urlPostfix := urlPath[prefixIndex:]
 
-	if urlPrefix != p.serviceName {
+	var redirectionURL *string
+
+	for k, v := range p.serviceMap {
+		if urlPrefix == k {
+			redirectionURL = &v
+			break
+		}
+	}
+
+	if redirectionURL == nil {
 		c.Next()
 		return
 	}
 
-	fullRequestURL, _ := url.Parse(p.redirectionURL.String() + urlPostfix)
+	fullRequestRawURL := *redirectionURL + urlPostfix
+	fullRequestURL, err := url.Parse(fullRequestRawURL)
+	if err != nil {
+		c.Next()
+		return
+	}
 
 	proxy := &httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.Out.URL = fullRequestURL
-			fmt.Println(r.Out.URL)
 		},
 		ModifyResponse: func(response *http.Response) error {
 			c.Set("proxyResponseCode", response.StatusCode)

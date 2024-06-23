@@ -11,14 +11,14 @@ import (
 	"net/http"
 )
 
-type registerRouter struct {
-	user         internal.ICreateUserUseCase
+type registerController struct {
+	user         internal.ICreateAccountUseCase
 	verification internal.IVerifyUserUseCase
 	logger       logger.ILogger
 }
 
-func NewSignUpRouter(handler *gin.Engine, user internal.ICreateUserUseCase, verification internal.IVerifyUserUseCase, logger logger.ILogger) {
-	u := &registerRouter{user, verification, logger}
+func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IVerifyUserUseCase, logger logger.ILogger) {
+	u := &registerController{user, verification, logger}
 
 	handler.POST("/signup", u.register)
 }
@@ -28,21 +28,21 @@ func NewSignUpRouter(handler *gin.Engine, user internal.ICreateUserUseCase, veri
 // @Description  регистрация нового пользователя
 // @Accept       json
 // @Produce      json
-// @Param request body requests.CreateUserRequest true "структура запрос"
-// @Success      200  {object}  requests.CreateUserResponse
+// @Param request body requests.CreateAccountRequest true "структура запрос"
+// @Success      200  {object}  requests.CreateAccountResponse
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже существует"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /auth/signup [post]
-func (u *registerRouter) register(c *gin.Context) {
-	var userRequest requests.CreateUserRequest
+func (u *registerController) register(c *gin.Context) {
+	var userRequest requests.CreateAccountRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		http2.AddGinError(c, errs.DataBindError)
 		return
 	}
 
-	response, err := u.user.CreateUser(c, &userRequest)
+	response, err := u.user.CreateAccount(c, &userRequest)
 
 	if err != nil {
 		http2.AddGinError(c, err)

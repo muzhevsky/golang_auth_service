@@ -19,6 +19,9 @@ type (
 	Gateway struct {
 		AuthHost string `yaml:"authHost" env:"AUTH_HOST"`
 		AuthPort string `yaml:"authPort" env:"AUTH_PORT"`
+
+		ApplicationHost string `yaml:"applicationHost" env:"APPLICATION_HOST"`
+		ApplicationPort string `yaml:"applicationPort" env:"APPLICATION_PORT"`
 	}
 )
 

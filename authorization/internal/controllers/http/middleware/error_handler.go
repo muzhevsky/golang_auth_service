@@ -2,18 +2,26 @@ package middleware
 
 import (
 	errs "authorization/internal/errs"
+	"authorization/pkg/logger"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func ErrorHandler(c *gin.Context) {
+type ErrorHandler struct {
+	logger logger.ILogger
+}
+
+func NewErrorHandler(logger logger.ILogger) *ErrorHandler {
+	return &ErrorHandler{logger: logger}
+}
+
+func (h *ErrorHandler) HandleError(c *gin.Context) {
 	c.Next()
 	if len(c.Errors) > 0 {
 		err := c.Errors.Last()
 
-		fmt.Println(err) // todo поменять логгер
+		h.logger.Debug(err)
 
 		// Common ////////////////////////////////////////////////////////////////////////
 		if errors.Is(err, errs.DataBindError) {

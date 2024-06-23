@@ -17,7 +17,7 @@ const (
 	_defaultConnTimeout  = 10 * time.Second
 )
 
-type Postgres struct {
+type Client struct {
 	maxPoolSize  int
 	connAttempts int
 	connTimeout  time.Duration
@@ -27,8 +27,8 @@ type Postgres struct {
 	ErrNoRows error
 }
 
-func New(config config.PG, opts ...Option) (*Postgres, error) {
-	pg := &Postgres{
+func New(config config.PG, opts ...Option) (*Client, error) {
+	pg := &Client{
 		maxPoolSize:  _defaultMaxPoolSize,
 		connAttempts: _defaultConnAttempts,
 		connTimeout:  _defaultConnTimeout,
@@ -47,7 +47,7 @@ func New(config config.PG, opts ...Option) (*Postgres, error) {
 		config.Host,
 		config.Port,
 		config.Database)
-	fmt.Println(connectionString)
+
 	poolConfig, err := pgxpool.ParseConfig(connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
@@ -63,7 +63,7 @@ func New(config config.PG, opts ...Option) (*Postgres, error) {
 			}
 		}
 
-		log.Printf("Postgres is trying to connect, attempts left: %d", pg.connAttempts)
+		log.Printf("Client is trying to connect, attempts left: %d", pg.connAttempts)
 		time.Sleep(pg.connTimeout)
 
 		pg.connAttempts--
@@ -76,7 +76,7 @@ func New(config config.PG, opts ...Option) (*Postgres, error) {
 	return pg, nil
 }
 
-func (p *Postgres) Close() {
+func (p *Client) Close() {
 	if p.Pool != nil {
 		p.Pool.Close()
 	}

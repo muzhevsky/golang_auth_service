@@ -10,12 +10,12 @@ import (
 )
 
 type refreshSessionUseCase struct {
-	userRepo     internal.IUserRepository
+	userRepo     internal.IAccountRepository
 	sessionRepo  internal.ISessionRepository
 	tokenManager tokens.ISessionManager
 }
 
-func NewRefreshSessionUseCase(userRepo internal.IUserRepository, sessionRepo internal.ISessionRepository, tokenManager tokens.ISessionManager) *refreshSessionUseCase {
+func NewRefreshSessionUseCase(userRepo internal.IAccountRepository, sessionRepo internal.ISessionRepository, tokenManager tokens.ISessionManager) *refreshSessionUseCase {
 	return &refreshSessionUseCase{userRepo: userRepo, sessionRepo: sessionRepo, tokenManager: tokenManager}
 }
 
@@ -36,7 +36,7 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 		return nil, errors2.NotAValidRefreshToken
 	}
 
-	userId := storedSession.UserId
+	userId := storedSession.AccountId
 	user, err := s.userRepo.FindById(context, userId)
 	if err != nil {
 		return nil, err
@@ -47,11 +47,7 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 		return nil, err
 	}
 
-	result, err := s.sessionRepo.Update(context, storedSession, func(session *entities.Session) {
-		session.ExpiresAt = newSession.ExpiresAt
-		session.AccessToken = newSession.AccessToken
-		session.RefreshToken = newSession.RefreshToken
-	})
+	result, err := s.sessionRepo.Update(context, storedSession, newSession)
 
 	if err != nil {
 		return nil, err

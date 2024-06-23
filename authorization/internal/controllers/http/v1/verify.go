@@ -11,13 +11,13 @@ import (
 	"net/http"
 )
 
-type verificationRoute struct {
+type verificationController struct {
 	verification internal.IVerifyUserUseCase
 	logger       logger.ILogger
 }
 
-func NewVerificationRouter(handler *gin.Engine, verification internal.IVerifyUserUseCase, l logger.ILogger) {
-	u := &verificationRoute{verification, l}
+func NewVerificationController(handler *gin.Engine, verification internal.IVerifyUserUseCase, l logger.ILogger) {
+	u := &verificationController{verification, l}
 
 	handler.POST("/user/verify", u.verifyUser)
 }
@@ -33,14 +33,14 @@ func NewVerificationRouter(handler *gin.Engine, verification internal.IVerifyUse
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /user/verify [post]
-func (u *verificationRoute) verifyUser(c *gin.Context) {
+func (u *verificationController) verifyUser(c *gin.Context) {
 	var request requests.VerificationRequest
 	if err := c.ShouldBind(&request); err != nil {
 		http2.AddGinError(c, errs.DataBindError)
 		return
 	}
 
-	userId, exists := c.Get("userId")
+	userId, exists := c.Get("accountId")
 	if !exists {
 		err, _ := c.Get("authError")
 		http2.AddGinError(c, err.(error))

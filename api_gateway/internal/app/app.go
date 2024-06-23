@@ -6,7 +6,6 @@ import (
 	"api_gateway/pkg/http"
 	"github.com/gin-gonic/gin"
 	"log"
-	"net/url"
 )
 
 func Run() {
@@ -15,9 +14,15 @@ func Run() {
 		log.Fatalf("invalid config, %v", err.Error())
 	}
 
-	authUrl, _ := url.Parse("http://" + cfg.AuthHost + ":" + cfg.AuthPort)
+	authUrl := "http://" + cfg.AuthHost + ":" + cfg.AuthPort
+	applicationUrl := "http://" + cfg.ApplicationHost + ":" + cfg.ApplicationPort
+
+	serviceMap := make(map[string]string)
+	serviceMap[cfg.AuthHost] = authUrl
+	serviceMap[cfg.ApplicationHost] = applicationUrl
 
 	router := gin.New()
-	router.Use(v1.NewProxy(authUrl, cfg.AuthHost).Handle)
+	router.Use(v1.NewAuthProxy("auth", authUrl).Handle)
+	router.Use(v1.NewProxy(serviceMap).Handle)
 	http.Start(router, cfg.HTTP)
 }

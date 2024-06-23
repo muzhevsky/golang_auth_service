@@ -6,7 +6,7 @@ import (
 
 type Session struct {
 	Id             int
-	UserId         int
+	AccountId      int
 	DeviceIdentity string
 	AccessToken    string
 	RefreshToken   string
