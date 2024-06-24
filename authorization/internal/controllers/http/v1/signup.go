@@ -33,7 +33,7 @@ func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCas
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже существует"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /auth/signup [post]
+// @Router       /signup [post]
 func (u *registerController) register(c *gin.Context) {
 	var userRequest requests.CreateAccountRequest
 

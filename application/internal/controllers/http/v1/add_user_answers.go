@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "smartri_app/docs"
 	"smartri_app/internal"
 	"smartri_app/internal/controllers/http/middleware"
 	"smartri_app/internal/controllers/requests"
@@ -17,12 +18,24 @@ func NewAddUserAnswersController(useCase internal.IAddUserTestAnswersUseCase) *a
 	return &addUserAnswersController{useCase: useCase}
 }
 
+// AddUserAnswers godoc
+// @Summary      добавление ответов на тест
+// @Description  добавляет пользовательские ответы на входное тестирование
+// @Accept       json
+// @Produce      json
+// @Param request body requests.UserAnswersRequest true "request format"
+// @Success      200  "ok"
+// @Param Authorization header string true "access token"
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
+// @Router       /user/test [post]
 func (controller *addUserAnswersController) AddUserAnswers(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)
 
 	if err != nil {
-		middleware.AddGinError(c, errs.SomeErrorToDo)
+		middleware.AddGinError(c, errs.UnauthenticatedError)
 		return
 	}
 
@@ -30,7 +43,7 @@ func (controller *addUserAnswersController) AddUserAnswers(c *gin.Context) {
 	err = c.ShouldBindJSON(&answers)
 
 	if err != nil {
-		middleware.AddGinError(c, errs.SomeErrorToDo)
+		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
 

@@ -27,6 +27,7 @@ func (p *authProxy) Handle(c *gin.Context) {
 
 	req, err := http.NewRequest("GET", p.authHost+"/authenticate", nil)
 	if err != nil {
+		c.Set("authError", "Failed to send HTTP request to authentication")
 		c.Next()
 		return
 	}
@@ -35,23 +36,27 @@ func (p *authProxy) Handle(c *gin.Context) {
 
 	resp, err := p.client.Do(req)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to send HTTP request"})
+		c.Set("authError", "Failed to send HTTP request to authentication")
+		c.Next()
 		return
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		c.Set("authError", "Failed to read response body of authentication request")
 		c.Next()
 		return
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to read response body"})
+	bodystr := string(body)
+
+	if resp.StatusCode != http.StatusOK {
+		c.Set("authError", bodystr)
+		c.Next()
 		return
 	}
 
-	bodystr := string(body)
 	_, err = strconv.Atoi(bodystr)
 	if err != nil {
 		c.Next()

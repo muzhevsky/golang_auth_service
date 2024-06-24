@@ -27,6 +27,7 @@ func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateAcco
 // @Accept       json
 // @Produce      json
 // @Success      200  "(TODO: в данные момент возвращается код, чтобы каждый раз клиент не мучал почту) Ok"
+// @Param Authorization header string true "access token"
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже верифицирован"

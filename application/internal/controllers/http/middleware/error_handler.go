@@ -24,8 +24,12 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 		h.logger.Debug(err)
 
 		// Common ////////////////////////////////////////////////////////////////////////
-		if errors.Is(err, errs.SomeErrorToDo) {
+		if errors.Is(err, errs.DataBindError) {
 			response(c, http.StatusBadRequest, err.Error(), DataBindErrorCode)
+			return
+		}
+		if errors.Is(err, errs.UnauthenticatedError) {
+			response(c, http.StatusUnauthorized, err.Error(), UnauthenticatedErrorCode)
 			return
 		}
 		///////////////////////////////////////////////////////////////////////////////////

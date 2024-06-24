@@ -35,7 +35,7 @@ func NewRefreshSessionController(handler *gin.Engine, useCase internal.IRefreshS
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 401 {object} middleware.ErrorResponse "невалидная пара токенов, либо истекший refresh token"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /auth/token/update [post]
+// @Router       /token/update [post]
 func (r *refreshSessionController) refreshSession(c *gin.Context) {
 	request := requests.RefreshSessionRequest{}
 	if err := c.ShouldBind(&request); err != nil {

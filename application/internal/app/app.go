@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"smartri_app/config"
 	"smartri_app/internal/controllers/http"
 	v1 "smartri_app/internal/controllers/http/v1"
@@ -66,5 +68,6 @@ func Run() {
 	router.GET("/test", getTestController.GetQuestions)
 	router.POST("/user/data", addUserDataController.AddUserData)
 	router.POST("/user/test", addUserAnswersController.AddUserAnswers)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	http2.Start(router, cfg.HTTP)
 }

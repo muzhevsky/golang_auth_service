@@ -28,6 +28,7 @@ func NewVerificationController(handler *gin.Engine, verification internal.IVerif
 // @Accept       json
 // @Produce      json
 // @Param request body requests.VerificationRequest true "request format"
+// @Param Authorization header string true "access token"
 // @Success      200  "Ok"
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"

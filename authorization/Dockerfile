@@ -1,6 +1,6 @@
 FROM golang:1.21.4 as builder
 
-WORKDIR /app
+WORKDIR /auth
 
 COPY . .
 
@@ -10,10 +10,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/app/main.go
 
 FROM alpine:latest
 
-WORKDIR /smartri_app
+WORKDIR /smartri_auth
 
-COPY --from=builder /app/main .
-COPY --from=builder /app/docs ./docs
-COPY --from=builder /app/config/config.yaml ./config/config.yaml
+COPY --from=builder /auth/main .
+COPY --from=builder /auth/docs ./docs
+COPY --from=builder /auth/config/config.yaml ./config/config.yaml
 
 ENTRYPOINT ["./main"]

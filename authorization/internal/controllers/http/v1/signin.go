@@ -33,7 +33,7 @@ func NewSignInController(handler *gin.Engine, useCase internal.ISignInUseCase, l
 // @Failure 401 {object} middleware.ErrorResponse "неправильный пароль"
 // @Failure 404 {object} middleware.ErrorResponse "пользователь не найден"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /auth/signin [post]
+// @Router       /signin [post]
 func (router *signInController) signIn(c *gin.Context) {
 	var request requests.SignInRequest
 	if err := c.ShouldBind(&request); err != nil {

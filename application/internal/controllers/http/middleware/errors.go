@@ -5,7 +5,7 @@ import "github.com/gin-gonic/gin"
 const InternalServerErrorErrorCode = "Unexpected"
 
 const DataBindErrorCode = "Client-0001"
-const RecordExistErrorCode = "Client-0002"
+const UnauthenticatedErrorCode = "Auth-0005"
 
 func AddGinError(ctx *gin.Context, err error) {
 	ctx.Errors = append(ctx.Errors, &gin.Error{

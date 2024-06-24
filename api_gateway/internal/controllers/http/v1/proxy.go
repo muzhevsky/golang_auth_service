@@ -2,7 +2,6 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
@@ -19,6 +18,12 @@ func NewProxy(serviceMap map[string]string) *proxy {
 func (p *proxy) Handle(c *gin.Context) {
 	urlPath := c.Request.URL.Path
 	prefixIndex := strings.Index(urlPath[1:], "/") + 1
+
+	if prefixIndex == 0 {
+		c.Next()
+		return
+	}
+
 	urlPrefix := urlPath[1:prefixIndex]
 	urlPostfix := urlPath[prefixIndex:]
 
@@ -46,10 +51,6 @@ func (p *proxy) Handle(c *gin.Context) {
 	proxy := &httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.Out.URL = fullRequestURL
-		},
-		ModifyResponse: func(response *http.Response) error {
-			c.Set("proxyResponseCode", response.StatusCode)
-			return nil
 		},
 	}
 

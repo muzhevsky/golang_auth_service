@@ -43,19 +43,19 @@ func NewCreateUserUseCase(
 //   - non-unique email
 //   - errors of password hash and user repository
 func (u *userUseCase) CreateAccount(context context.Context, request *requests.CreateAccountRequest) (*requests.CreateAccountResponse, error) {
-	user := &entities.Account{
+	account := &entities.Account{
 		Login:    request.Login,
 		Password: request.Password,
 		EMail:    request.EMail,
 		Nickname: request.Nickname,
 	}
 
-	err := validateFields(user)
+	err := validateFields(account)
 	if err != nil {
 		return nil, err
 	}
 
-	exists, err := u.userRepo.CheckLoginExist(context, user.Login)
+	exists, err := u.userRepo.CheckLoginExist(context, account.Login)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 		return nil, fmt.Errorf("%w. Login already exists", errs.RecordAlreadyExists)
 	}
 
-	exists, err = u.userRepo.CheckEmailExist(context, user.EMail)
+	exists, err = u.userRepo.CheckEmailExist(context, account.EMail)
 	if err != nil {
 		return nil, err
 	}
@@ -71,20 +71,20 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 		return nil, fmt.Errorf("%w. Email already exists", errs.RecordAlreadyExists)
 	}
 
-	hashedPassword, err := u.hashProvider.GenerateHash(user.Password)
+	hashedPassword, err := u.hashProvider.GenerateHash(account.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	user.Password = string(hashedPassword)
-	user.CreationTime = time.Now()
+	account.Password = string(hashedPassword)
+	account.CreationTime = time.Now()
 
-	user.Id, err = u.userRepo.Create(context, user)
+	account.Id, err = u.userRepo.Create(context, account)
 	if err != nil {
 		return nil, err
 	}
 
-	session, err := u.sessionManager.CreateSession(user)
+	session, err := u.sessionManager.CreateSession(account)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 	}
 
 	return &requests.CreateAccountResponse{
-		Id: user.Id,
+		Id: account.Id,
 		Session: requests.RefreshSessionResponse{
 			AccessToken:  session.AccessToken,
 			RefreshToken: session.RefreshToken,
