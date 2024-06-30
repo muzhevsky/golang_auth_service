@@ -11,16 +11,16 @@ import (
 	"net/http"
 )
 
-type registerController struct {
+type signupController struct {
 	user         internal.ICreateAccountUseCase
 	verification internal.IVerifyUserUseCase
 	logger       logger.ILogger
 }
 
 func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IVerifyUserUseCase, logger logger.ILogger) {
-	u := &registerController{user, verification, logger}
+	u := &signupController{user, verification, logger}
 
-	handler.POST("/signup", u.register)
+	handler.POST("/signup", u.signup)
 }
 
 // SignUp godoc
@@ -34,7 +34,7 @@ func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCas
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже существует"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /signup [post]
-func (u *registerController) register(c *gin.Context) {
+func (u *signupController) signup(c *gin.Context) {
 	var userRequest requests.CreateAccountRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {

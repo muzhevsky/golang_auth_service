@@ -21,7 +21,7 @@ func (h *authenticationHandler) HandleAuth(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	session, err := h.session.FindByAccessToken(c, token)
 
-	if err != nil {
+	if err != nil || session == nil {
 		c.Set("authError", errs.NotAValidAccessToken)
 		c.Next()
 		return

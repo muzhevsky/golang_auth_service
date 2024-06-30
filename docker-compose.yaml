@@ -4,9 +4,9 @@ services:
   api_gateway:
     container_name: "api_gateway"
     env_file:
-      - /api_gateway/gateway.env
-      - /authorization/auth.env
-      - /application/application.env
+      - ./api_gateway/gateway.env
+      - ./authorization/auth.env
+      - ./application/application.env
     build: ./api_gateway
     depends_on:
       - auth
@@ -17,15 +17,15 @@ services:
   auth:
     container_name: "auth"
     env_file:
-      - /authorization/auth.env
-      - /authorization/database/auth_db.env
+      - ./authorization/auth.env
+      - ./authorization/database/auth_db.env
     build: ./authorization
     depends_on:
       - auth_db
   auth_db:
     container_name: "auth_db"
     env_file:
-      - /authorization/database/auth_db.env
+      - ./authorization/database/auth_db.env
     build: ./authorization/database
 #    volumes:
 #      - database:/var/lib/postgresql/data
@@ -34,15 +34,17 @@ services:
   application:
     container_name: "application"
     env_file:
-      - /application/application.env
-      - /application/database/application_db.env
+      - ./application/application.env
+      - ./application/database/application_db.env
     build: ./application
     depends_on:
       - application_db
   application_db:
     container_name: "application_db"
+    ports:
+      - "5432:5432"
     env_file:
-      - /application/database/application_db.env
+      - ./application/database/application_db.env
     build: ./application/database
 #    volumes:
 #      - database:/var/lib/postgresql/data

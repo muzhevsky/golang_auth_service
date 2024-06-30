@@ -9,7 +9,11 @@ import (
 	"smartri_app/config"
 	"smartri_app/internal/controllers/http"
 	v1 "smartri_app/internal/controllers/http/v1"
-	pg2 "smartri_app/internal/infrastructure/datasources/pg"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/answers"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/questions"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/skills"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/test"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/user_data"
 	"smartri_app/internal/repositories"
 	"smartri_app/internal/usecases"
 	http2 "smartri_app/pkg/http"
@@ -39,27 +43,44 @@ func Run() {
 
 	// Infrastructure
 
-	questionsDS := pg2.NewQuestionsDataSource(pgClient)
-	answersDS := pg2.NewAnswersDataSource(pgClient)
-	userAnswersDS := pg2.NewUserTestResultsSource(pgClient)
+	selectQuestionsCommand := questions.NewSelectAllQuestionsCommand(pgClient)
+	selectAnswerByIdCommand := answers.NewSelectAnswerByIdCommand(pgClient)
+	selectAnswersByQuestionIdCommand := answers.NewSelectAnswersByQuestionIdCommand(pgClient)
+	selectAnswerWithValuesCommand := answers.NewSelectAnswerValuesByAnswerIdCommand(pgClient)
+	insertUserTestResultsCommand := test.NewInsertUserTestResultsCommand(pgClient)
+	checkIfUserHasAnswersByAccountIdCommand := user_data.NewSelectUserHasAnswersByAccountIdCommand(pgClient)
 
-	userDataDS := pg2.NewUsersDataSource(pgClient)
+	selectAllSkillsCommand := skills.NewSelectAllSkillsCommand(pgClient)
+	selectAllSkillsByAccountIdCommand := skills.NewSelectSkillsByAccountIdCommand(pgClient)
+	selectNormalizationsBySkillIdCommand := skills.NewSelectSkillNormalizationBySkillIdCommand(pgClient)
+
+	insertUserDataCommand := user_data.NewInsertUserDataCommand(pgClient, selectAllSkillsCommand)
+	selectUserDataByAccountIdCommand := user_data.NewSelectUserDataByAccountId(pgClient)
+	updateUserDataByAccountIdCommand := user_data.NewUpdateUserDataByAccountIdCommand(pgClient, selectUserDataByAccountIdCommand)
 
 	// Repository
 
-	testRepo := repositories.NewTestRepository(questionsDS, answersDS, nil, userAnswersDS)
-	userDataRepo := repositories.NewUserRepository(userDataDS)
+	testRepo := repositories.NewTestRepository(
+		selectQuestionsCommand,
+		selectAnswerByIdCommand,
+		selectAnswersByQuestionIdCommand,
+		selectAnswerWithValuesCommand,
+		insertUserTestResultsCommand)
+	skillRepo := repositories.NewSkillRepository(selectAllSkillsCommand, selectAllSkillsByAccountIdCommand, selectNormalizationsBySkillIdCommand)
+	userDataRepo := repositories.NewUserRepository(selectUserDataByAccountIdCommand, updateUserDataByAccountIdCommand, insertUserDataCommand, checkIfUserHasAnswersByAccountIdCommand)
 
 	// UseCases
 
-	addUserDataUseCase := usecases.NewAddUserData(userDataRepo)
-	addUserAnswersUseCase := usecases.NewAddUserAnswers(testRepo)
+	addUserDataUseCase := usecases.NewAddOrUpdateUserDataUseCase(userDataRepo)
+	addUserAnswersUseCase := usecases.NewAddUserAnswers(testRepo, skillRepo, userDataRepo)
+	checkIfUserHasPassedTestYet := usecases.NewCheckUserHasPassedTestYetUseCase(userDataRepo)
 
 	// Controllers
 
 	getTestController := v1.NewGetTestController(testRepo)
 	addUserDataController := v1.NewAddUserDataController(addUserDataUseCase)
 	addUserAnswersController := v1.NewAddUserAnswersController(addUserAnswersUseCase)
+	checkIfUserHasPassedTestYetController := v1.NewCheckIfUserHasPassedTestYetController(checkIfUserHasPassedTestYet)
 
 	router := gin.New()
 	router.HandleMethodNotAllowed = true
@@ -68,6 +89,7 @@ func Run() {
 	router.GET("/test", getTestController.GetQuestions)
 	router.POST("/user/data", addUserDataController.AddUserData)
 	router.POST("/user/test", addUserAnswersController.AddUserAnswers)
+	router.GET("/user/passed", checkIfUserHasPassedTestYetController.Check)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	http2.Start(router, cfg.HTTP)
 }

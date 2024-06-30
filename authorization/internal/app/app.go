@@ -68,14 +68,14 @@ func Run() {
 
 	// Repository
 
-	userRepository := repositories.NewUserRepo(accountDS)
+	accountRepository := repositories.NewUserRepo(accountDS)
 	verificationRepo := repositories.NewVerificationRepo(verificationDS)
 	sessionRepository := repositories.NewSessionRepository(sessionDS)
 
 	// UseCases
 
 	createUserUseCase := usecases.NewCreateUserUseCase(
-		userRepository,
+		accountRepository,
 		sessionRepository,
 		sessionManager,
 		bcryptHashProvider,
@@ -83,29 +83,32 @@ func Run() {
 	)
 
 	verificationUseCase := usecases.NewVerificationUseCase(
-		userRepository,
+		accountRepository,
 		verificationRepo,
 		verificationMailer,
 	)
 
 	signInUseCase := usecases.NewSignInUseCase(
-		userRepository,
+		accountRepository,
 		sessionRepository,
 		bcryptHashProvider,
 		sessionManager,
 	)
 
 	refreshSessionUseCase := usecases.NewRefreshSessionUseCase(
-		userRepository,
+		accountRepository,
 		sessionRepository,
 		sessionManager,
 	)
 
 	requestVerificationUseCase := usecases.NewRequestVerificationRequest(
-		userRepository,
+		accountRepository,
 		verificationRepo,
 		verificationMailer,
 	)
+
+	checkVerificationUseCase := usecases.NewCheckVerificationUsecase(
+		accountRepository)
 	// Controllers
 
 	router := gin.New()
@@ -119,6 +122,7 @@ func Run() {
 	v1.NewSignInController(router, signInUseCase, logger)
 	v1.NewRefreshSessionController(router, refreshSessionUseCase, logger)
 	v1.NewRequestVerificationRouter(router, createUserUseCase, requestVerificationUseCase, logger)
+	v1.NewCheckVerificationController(router, checkVerificationUseCase)
 
 	http.Start(router, cfg.HTTP)
 }

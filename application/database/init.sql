@@ -3,10 +3,10 @@ CREATE DATABASE smartri;
 
 \c smartri;
 
-create table user_details
+create table user_data
 (
     id      serial
-        constraint user_details_pk
+        constraint user_data_pk
             primary key,
     account_id integer not null,
     age     integer not null,
@@ -14,7 +14,7 @@ create table user_details
     gender  char     not null
 );
 
-alter table user_details
+alter table user_data
     owner to postgres;
 
 create table test_questions
@@ -84,6 +84,63 @@ create table test_answers_values
 
 alter table test_answers_values
     owner to postgres;
+
+
+CREATE TABLE "user_skills"
+(
+    account_id integer NOT NULL,
+    skill_id smallint NOT NULL,
+    xp integer NOT NULL DEFAULT 0,
+    CONSTRAINT "user_skills_pk" PRIMARY KEY (account_id, skill_id)
+);
+
+
+CREATE TABLE "skill_changes"
+(
+    id serial NOT NULL,
+    account_id integer NOT NULL,
+    skill_id smallint NOT NULL,
+    date date NOT NULL,
+    action_id smallint NOT NULL,
+    points integer NOT NULL,
+    CONSTRAINT "user_skill_changes_pk" PRIMARY KEY (id)
+);
+
+
+create table "test_actions"
+(
+    id serial,
+    title varchar(64) not null,
+    constraint "test_actions_pk" primary key (id)
+);
+
+
+CREATE TABLE skill_normalizations
+(
+    skill_id smallint NOT NULL,
+    minimum smallint NOT NULL,
+    maximum smallint NOT NULL,
+    CONSTRAINT "skill_normalization_pkey" PRIMARY KEY (skill_id)
+);
+
+ALTER TABLE "skill_changes"
+    ADD CONSTRAINT "skill_changes_skill_fk" FOREIGN KEY (skill_id)
+        REFERENCES "skills" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+           ON DELETE NO ACTION
+        NOT VALID,
+    ADD CONSTRAINT "skill_changes_action_fk" FOREIGN KEY (action_id)
+        REFERENCES "test_actions" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+           ON DELETE NO ACTION
+        NOT VALID;
+
+ALTER TABLE skill_normalizations ADD
+    CONSTRAINT "skill_normalization_fk" FOREIGN KEY (skill_id)
+        REFERENCES "skills" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+    NOT VALID;
 
 
 
@@ -785,3 +842,16 @@ INSERT INTO "test_answers_values"(answer_id, skill_id, points) VALUES(103, 1, -2
 INSERT INTO "test_answers_values"(answer_id, skill_id, points) VALUES(103, 2, -2);
 INSERT INTO "test_answers_values"(answer_id, skill_id, points) VALUES(103, 3, -3);
 INSERT INTO "test_answers_values"(answer_id, skill_id, points) VALUES(103, 4, -2);
+
+insert into skill_normalizations(skill_id, minimum, maximum)
+values(1, -21, 42),
+      (2, -13, 39),
+      (3, -19, 34),
+      (4, -21, 26),
+      (5, -4, 11),
+      (6, -4, 11),
+      (7, -16, 34),
+      (8, -17, 38);
+
+insert into "test_actions"(title)
+values('init_test');

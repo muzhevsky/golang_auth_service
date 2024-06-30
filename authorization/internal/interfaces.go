@@ -27,6 +27,10 @@ type (
 		RefreshSession(context context.Context, tokens *requests.RefreshSessionRequest) (*entities.Session, error)
 	}
 
+	ICheckVerificationUseCase interface {
+		Check(context context.Context, accountId int) (bool, error)
+	}
+
 	IAccountRepository interface {
 		Create(context context.Context, user *entities.Account) (int, error)
 		FindById(context context.Context, id int) (*entities.Account, error)

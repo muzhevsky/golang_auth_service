@@ -89,6 +89,7 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 		///////////////////////////////////////////////////////////////////////////////////
 
 		response(c, http.StatusInternalServerError, "Internal server error", InternalServerErrorErrorCode)
+		h.logger.Error(err)
 	}
 }
 

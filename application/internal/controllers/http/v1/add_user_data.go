@@ -11,10 +11,10 @@ import (
 )
 
 type addUserDataController struct {
-	useCase internal.IAddUserDataUseCase
+	useCase internal.IAddOrUpdateUserDataUseCase
 }
 
-func NewAddUserDataController(useCase internal.IAddUserDataUseCase) *addUserDataController {
+func NewAddUserDataController(useCase internal.IAddOrUpdateUserDataUseCase) *addUserDataController {
 	return &addUserDataController{useCase: useCase}
 }
 
@@ -23,7 +23,7 @@ func NewAddUserDataController(useCase internal.IAddUserDataUseCase) *addUserData
 // @Description  добавление данных пользователя из теста (первые несколько никому не нужных вопросов)
 // @Accept       json
 // @Produce      json
-// @Param request body requests.UserDataRequest true "request format"
+// @Param request body requests.AddUserDataRequest true "request format"
 // @Param Authorization header string true "access token"
 // @Success      200  {object} requests.UserDataResponse
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
@@ -38,14 +38,14 @@ func (controller *addUserDataController) AddUserData(c *gin.Context) {
 		return
 	}
 
-	var details requests.UserDataRequest
+	var details requests.AddUserDataRequest
 	err = c.ShouldBindJSON(&details)
 	if err != nil {
 		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
 
-	response, err := controller.useCase.Add(c, &details, id)
+	response, err := controller.useCase.AddOrUpdate(c, &details, id)
 	if err != nil {
 		middleware.AddGinError(c, err)
 		return

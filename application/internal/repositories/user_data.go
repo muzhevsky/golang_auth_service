@@ -2,41 +2,47 @@ package repositories
 
 import (
 	"context"
+	"smartri_app/internal"
 	"smartri_app/internal/entities"
 	"smartri_app/internal/infrastructure/datasources"
 )
 
 type userRepository struct {
-	ds datasources.IUserDataSource
+	selectUserDataByAccountIdCommand        datasources.ISelectUserDataByAccountIdCommand
+	updateUserDataCommand                   datasources.IUpdateUserDataByAccountIdCommand
+	insertUserDataCommand                   datasources.IInsertUserDataCommand
+	checkIfUserHasAnswersByAccountIdCommand datasources.ICheckIfUserHasAnswersByAccountIdCommand
 }
 
-func NewUserRepository(ds datasources.IUserDataSource) *userRepository {
-	return &userRepository{ds: ds}
+func NewUserRepository(
+	selectUserDataByAccountIdCommand datasources.ISelectUserDataByAccountIdCommand,
+	updateUserDataCommand datasources.IUpdateUserDataByAccountIdCommand,
+	insertUserDataCommand datasources.IInsertUserDataCommand,
+	checkIfUserHasAnswersCommand datasources.ICheckIfUserHasAnswersByAccountIdCommand) internal.IUserDataRepository {
+	return &userRepository{
+		selectUserDataByAccountIdCommand:        selectUserDataByAccountIdCommand,
+		updateUserDataCommand:                   updateUserDataCommand,
+		insertUserDataCommand:                   insertUserDataCommand,
+		checkIfUserHasAnswersByAccountIdCommand: checkIfUserHasAnswersCommand}
 }
 
-func (u *userRepository) GetByAccountId(context context.Context, accountId int) (*entities.User, error) {
-	return u.ds.SelectByAccountId(context, accountId)
+func (u *userRepository) GetByAccountId(context context.Context, accountId int) (*entities.UserData, error) {
+	return u.selectUserDataByAccountIdCommand.Execute(context, accountId)
 }
 
-func (u *userRepository) AddOrUpdate(context context.Context, details *entities.User) error {
-	data, err := u.GetByAccountId(context, details.AccountId)
+func (u *userRepository) Update(context context.Context, details *entities.UserData) (*entities.UserData, error) {
+	updated, err := u.updateUserDataCommand.Execute(context, details)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return updated, nil
+}
 
-	if data == nil {
-		err := u.ds.Insert(context, details)
-		if err != nil {
-			return err
-		}
-	} else {
-		details.AccountId = data.AccountId
-		details.XP = data.XP
-		err := u.ds.UpdateByAccountId(context, details.AccountId, details)
-		if err != nil {
-			return err
-		}
-	}
+func (u *userRepository) Add(context context.Context, details *entities.UserData) error {
+	err := u.insertUserDataCommand.Execute(context, details)
+	return err
+}
 
-	return nil
+func (u *userRepository) CheckUserHasAnswers(context context.Context, accountId int) (bool, error) {
+	return u.checkIfUserHasAnswersByAccountIdCommand.Execute(context, accountId)
 }

@@ -11,6 +11,7 @@ FROM alpine:latest
 WORKDIR /smartri_api_gateway
 
 COPY --from=builder /app/main .
+COPY --from=builder /app/static ./static
 COPY --from=builder /app/config/config.yaml ./config/config.yaml
 
 ENTRYPOINT ["./main"]

@@ -68,6 +68,8 @@ func (ds *pgVerificationDatasource) SelectByUserId(context context.Context, user
 
 	result := make([]*entities.Verification, 0)
 	rows, err := ds.pg.Pool.Query(context, sql, args...)
+	defer rows.Close()
+
 	if err != nil {
 		return nil, err
 	}

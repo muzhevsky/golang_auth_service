@@ -1,6 +1,6 @@
 package requests
 
-type UserDataRequest struct {
+type AddUserDataRequest struct {
 	Age    int    `json:"age"`
 	Gender string `json:"gender"`
 }

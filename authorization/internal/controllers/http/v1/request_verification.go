@@ -34,14 +34,14 @@ func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateAcco
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /verification/request [post]
 func (u *requestVerificationController) requestVerification(c *gin.Context) {
-	userId, exists := c.Get("accountId")
+	accountId, exists := c.Get("accountId")
 	if !exists {
 		err, _ := c.Get("authError")
 		http2.AddGinError(c, err.(error))
 		return
 	}
 
-	code, err := u.verification.RequestVerification(c, userId.(int))
+	code, err := u.verification.RequestVerification(c, accountId.(int))
 	if err != nil {
 		http2.AddGinError(c, err)
 		return

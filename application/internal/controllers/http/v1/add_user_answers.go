@@ -47,11 +47,11 @@ func (controller *addUserAnswersController) AddUserAnswers(c *gin.Context) {
 		return
 	}
 
-	err = controller.useCase.Add(c, &answers, id)
+	response, err := controller.useCase.Add(c, &answers, id)
 
 	if err != nil {
 		middleware.AddGinError(c, err)
 		return
 	}
-	c.JSON(200, "ok")
+	c.JSON(200, response)
 }
