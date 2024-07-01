@@ -49,6 +49,7 @@ func Run() {
 	selectAnswerWithValuesCommand := answers.NewSelectAnswerValuesByAnswerIdCommand(pgClient)
 	insertUserTestResultsCommand := test.NewInsertUserTestResultsCommand(pgClient)
 	checkIfUserHasAnswersByAccountIdCommand := user_data.NewSelectUserHasAnswersByAccountIdCommand(pgClient)
+	applyUserXpChangeByAccoundIdCommand := user_data.NewApplySkillChangesByAccountId(pgClient)
 
 	selectAllSkillsCommand := skills.NewSelectAllSkillsCommand(pgClient)
 	selectAllSkillsByAccountIdCommand := skills.NewSelectSkillsByAccountIdCommand(pgClient)
@@ -67,17 +68,22 @@ func Run() {
 		selectAnswerWithValuesCommand,
 		insertUserTestResultsCommand)
 	skillRepo := repositories.NewSkillRepository(selectAllSkillsCommand, selectAllSkillsByAccountIdCommand, selectNormalizationsBySkillIdCommand)
-	userDataRepo := repositories.NewUserRepository(selectUserDataByAccountIdCommand, updateUserDataByAccountIdCommand, insertUserDataCommand, checkIfUserHasAnswersByAccountIdCommand)
+	userDataRepo := repositories.NewUserRepository(selectUserDataByAccountIdCommand, updateUserDataByAccountIdCommand,
+		insertUserDataCommand, checkIfUserHasAnswersByAccountIdCommand, applyUserXpChangeByAccoundIdCommand)
 
 	// UseCases
 
 	addUserDataUseCase := usecases.NewAddOrUpdateUserDataUseCase(userDataRepo)
 	addUserAnswersUseCase := usecases.NewAddUserAnswers(testRepo, skillRepo, userDataRepo)
+	addUserXpChangeUseCase := usecases.NewAddUserXpChange(skillRepo, userDataRepo)
 	checkIfUserHasPassedTestYet := usecases.NewCheckUserHasPassedTestYetUseCase(userDataRepo)
 
 	// Controllers
 
 	getTestController := v1.NewGetTestController(testRepo)
+	getUserSkillsController := v1.NewGetSkillDataController(skillRepo)
+
+	addUserXpChangeController := v1.NewAddUserXpController(addUserXpChangeUseCase)
 	addUserDataController := v1.NewAddUserDataController(addUserDataUseCase)
 	addUserAnswersController := v1.NewAddUserAnswersController(addUserAnswersUseCase)
 	checkIfUserHasPassedTestYetController := v1.NewCheckIfUserHasPassedTestYetController(checkIfUserHasPassedTestYet)
@@ -87,9 +93,12 @@ func Run() {
 
 	http.InitServiceMiddleware(router, logger)
 	router.GET("/test", getTestController.GetQuestions)
+	router.GET("/test/passed", checkIfUserHasPassedTestYetController.Check)
+
+	router.GET("/user/skills", getUserSkillsController.GetUserSkills)
+	router.POST("/user/xp", addUserXpChangeController.Add)
 	router.POST("/user/data", addUserDataController.AddUserData)
 	router.POST("/user/test", addUserAnswersController.AddUserAnswers)
-	router.GET("/user/passed", checkIfUserHasPassedTestYetController.Check)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	http2.Start(router, cfg.HTTP)
 }

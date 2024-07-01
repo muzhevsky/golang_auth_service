@@ -5,6 +5,7 @@ import (
 	"smartri_app/internal"
 	"smartri_app/internal/controllers/requests"
 	"smartri_app/internal/entities"
+	"smartri_app/internal/errs"
 	"time"
 )
 
@@ -24,7 +25,24 @@ func NewAddUserAnswers(
 }
 
 func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnswersRequest, accountId int) (*requests.UserAnswersResponse, error) {
+	hasAnswers, err := a.userRepo.CheckUserHasAnswers(context, accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	if hasAnswers {
+		return nil, errs.UserHasAlreadyPassedTestError
+	}
+
 	entityAnswers := &entities.UserTestAnswers{accountId, make([]entities.UserTestAnswer, 0)}
+
+	userData, err := a.userRepo.GetDataByAccountId(context, accountId)
+	if err != nil {
+		return nil, err
+	}
+	if userData == nil {
+		return nil, errs.UserDataNotFoundError
+	}
 
 	skills, err := a.skillRepo.GetAllSkills(context)
 	if err != nil {
@@ -85,11 +103,6 @@ func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnsw
 			Date:      time.Now().UTC(),
 			Points:    points,
 		})
-	}
-
-	userData, err := a.userRepo.GetByAccountId(context, accountId)
-	if err != nil {
-		return nil, err
 	}
 
 	newXP := 0

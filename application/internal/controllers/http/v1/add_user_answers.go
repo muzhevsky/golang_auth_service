@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	_ "smartri_app/docs"
 	"smartri_app/internal"
 	"smartri_app/internal/controllers/http/middleware"
@@ -28,6 +29,8 @@ func NewAddUserAnswersController(useCase internal.IAddUserTestAnswersUseCase) *a
 // @Param Authorization header string true "access token"
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
+// @Failure 404 {object} middleware.ErrorResponse "не найдены данные пользователя, сначала нужно отправить их /user/data [post]"
+// @Failure 409 {object} middleware.ErrorResponse "пользователь уже прошел тест ранее"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /user/test [post]
 func (controller *addUserAnswersController) AddUserAnswers(c *gin.Context) {
@@ -53,5 +56,5 @@ func (controller *addUserAnswersController) AddUserAnswers(c *gin.Context) {
 		middleware.AddGinError(c, err)
 		return
 	}
-	c.JSON(200, response)
+	c.JSON(http.StatusOK, response)
 }

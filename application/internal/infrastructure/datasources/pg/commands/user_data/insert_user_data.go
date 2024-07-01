@@ -2,7 +2,6 @@ package user_data
 
 import (
 	"context"
-	"fmt"
 	"smartri_app/internal/entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
@@ -21,24 +20,20 @@ func NewInsertUserDataCommand(client *postgres.Client, selectAllSkillsCommand da
 func (u *insertUserDataCommand) Execute(context context.Context, user *entities.UserData) error {
 	sql, args, err := query_builders.NewInsertUserDataQuery(&u.client.Builder, user)
 	if err != nil {
-		fmt.Println("1")
 		return err
 	}
 
 	tx, err := u.client.Pool.Begin(context)
 
 	if err != nil {
-		fmt.Println("2")
 		return err
 	}
 
 	_, err = tx.Exec(context, sql, args...)
 	if err != nil {
-		fmt.Println("3")
 		tx.Rollback(context)
 		return err
 	}
-	fmt.Println("ok")
 
 	skills, err := u.selectAllSkillsCommand.Execute(context)
 
@@ -50,14 +45,12 @@ func (u *insertUserDataCommand) Execute(context context.Context, user *entities.
 		})
 
 		if err != nil {
-			fmt.Println("4")
 			tx.Rollback(context)
 			return err
 		}
 
 		_, err = tx.Exec(context, sql, args...)
 		if err != nil {
-			fmt.Println("5")
 			tx.Rollback(context)
 			return err
 		}

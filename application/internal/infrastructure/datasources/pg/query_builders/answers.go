@@ -31,7 +31,7 @@ func NewSelectAnswerByIdQuery(builder *squirrel.StatementBuilderType, id int) (s
 func NewSelectUserAnswersByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int) (string, []any, error) {
 	return builder.
 		Select("question_id", "answer_id").
-		From("test_answers").
+		From("user_answers").
 		Where(squirrel.Eq{"id": accountId}).
 		ToSql()
 }
@@ -39,8 +39,8 @@ func NewSelectUserAnswersByAccountIdQuery(builder *squirrel.StatementBuilderType
 func NewSelectUserAnswerByAccountIdQueryLimit1(builder *squirrel.StatementBuilderType, accountId int) (string, []any, error) {
 	return builder.
 		Select("question_id", "answer_id").
-		From("test_answers").
-		Where(squirrel.Eq{"id": accountId}).
+		From("user_answers").
+		Where(squirrel.Eq{"account_id": accountId}).
 		Limit(1).
 		ToSql()
 }

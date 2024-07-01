@@ -20,11 +20,10 @@ func (s *selectUserHasAnswersByAccountIdCommand) Execute(context context.Context
 		return false, nil
 	}
 
-	row := s.client.Pool.QueryRow(context, sql, args...)
-
-	err = row.Scan()
+	rows, err := s.client.Pool.Query(context, sql, args...)
 	if err != nil {
 		return false, nil
 	}
-	return true, nil
+
+	return rows.Next(), nil
 }

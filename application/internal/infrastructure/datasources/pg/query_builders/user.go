@@ -35,3 +35,10 @@ func NewInsertUserSkillsQuery(builder *squirrel.StatementBuilderType, userSkills
 		Values(userSkills.AccountId, userSkills.SkillId, userSkills.Xp).
 		ToSql()
 }
+
+func NewUpdateUserSkillsQuery(builder *squirrel.StatementBuilderType, skills *entities.UserSkills) (string, []any, error) {
+	return builder.Update("user_skills").
+		Set("xp", skills.Xp).
+		Where(squirrel.Eq{"account_id": skills.AccountId, "skill_id": skills.SkillId}).
+		ToSql()
+}

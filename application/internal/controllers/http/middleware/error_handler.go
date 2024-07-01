@@ -34,6 +34,15 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 		}
 		///////////////////////////////////////////////////////////////////////////////////
 
+		if errors.Is(err, errs.UserDataNotFoundError) {
+			response(c, http.StatusNotFound, err.Error(), "Client-TODO") //todo
+			return
+		}
+
+		if errors.Is(err, errs.UserHasAlreadyPassedTestError) {
+			response(c, http.StatusConflict, err.Error(), "Client-TODO") // todo
+			return
+		}
 		response(c, http.StatusInternalServerError, "Internal server error", InternalServerErrorErrorCode)
 	}
 }

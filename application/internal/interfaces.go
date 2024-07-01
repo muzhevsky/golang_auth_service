@@ -22,10 +22,11 @@ type (
 	}
 
 	IUserDataRepository interface {
-		GetByAccountId(context context.Context, accountId int) (*entities.UserData, error)
+		GetDataByAccountId(context context.Context, accountId int) (*entities.UserData, error)
+		ApplySkillChangesByAccountId(context context.Context, userSkill *entities.UserSkills, userData *entities.UserData, change *entities.SkillChange) error
 		CheckUserHasAnswers(context context.Context, accountId int) (bool, error)
-		Add(context context.Context, userData *entities.UserData) error
-		Update(context context.Context, details *entities.UserData) (*entities.UserData, error)
+		AddUserData(context context.Context, userData *entities.UserData) error
+		UpdateUserData(context context.Context, details *entities.UserData) (*entities.UserData, error)
 	}
 
 	IAddOrUpdateUserDataUseCase interface {
@@ -38,5 +39,9 @@ type (
 
 	ICheckIfUserHasPassedTestYetUseCase interface {
 		Check(context context.Context, accountId int) (bool, error)
+	}
+
+	IAddUserXpChangeUseCase interface {
+		Add(context context.Context, accountId int, request *requests.AddSkillChangeRequest) (*requests.UserDataResponse, error)
 	}
 )

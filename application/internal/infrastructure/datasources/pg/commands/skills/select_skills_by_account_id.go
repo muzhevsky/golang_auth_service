@@ -29,7 +29,7 @@ func (c *selectSkillsByAccountIdCommand) Execute(context context.Context, accoun
 
 	result := make([]*entities.UserSkills, 0)
 	for rows.Next() {
-		newUserSkill := entities.UserSkills{AccountId: accountId}
+		newUserSkill := entities.UserSkills{}
 		err = rows.Scan(&newUserSkill.SkillId, &newUserSkill.Xp)
 		if err != nil {
 			return nil, err

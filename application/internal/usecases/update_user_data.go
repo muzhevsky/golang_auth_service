@@ -16,14 +16,14 @@ func NewAddOrUpdateUserDataUseCase(repo internal.IUserDataRepository) internal.I
 }
 
 func (u *addOrUpdateUserDataUseCase) AddOrUpdate(context context.Context, data *requests.AddUserDataRequest, accountId int) (*requests.UserDataResponse, error) {
-	user, err := u.repo.GetByAccountId(context, accountId)
+	user, err := u.repo.GetDataByAccountId(context, accountId)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if user == nil {
-		err = u.repo.Add(context, &entities.UserData{
+		err = u.repo.AddUserData(context, &entities.UserData{
 			Age:       data.Age,
 			Gender:    data.Gender,
 			XP:        0,
@@ -42,7 +42,7 @@ func (u *addOrUpdateUserDataUseCase) AddOrUpdate(context context.Context, data *
 	user.Age = data.Age
 	user.Gender = data.Gender
 
-	result, err := u.repo.Update(context, user)
+	result, err := u.repo.UpdateUserData(context, user)
 	if err != nil {
 		return nil, err
 	}

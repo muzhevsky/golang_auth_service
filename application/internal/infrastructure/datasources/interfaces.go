@@ -70,10 +70,16 @@ type (
 	ISelectSkillChangesByAccountIdAndActionIdCommand interface {
 		Execute(context context.Context, accountId int, actionId int) ([]*entities.SkillChange, error)
 	}
+
 	ISelectUserAnswersByAccountIdCommand interface {
 		Execute(context context.Context, accountId int) (*entities.UserTestAnswers, error)
 	}
+
 	ICheckIfUserHasAnswersByAccountIdCommand interface {
 		Execute(context context.Context, accountId int) (bool, error)
+	}
+
+	IApplySkillChangesByAccountIdCommand interface {
+		Execute(context context.Context, skills *entities.UserSkills, userData *entities.UserData, change *entities.SkillChange) error
 	}
 )
