@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "smartri_app/docs"
 	"smartri_app/internal"
 	"smartri_app/internal/controllers/http/middleware"
 	"smartri_app/internal/controllers/requests"
@@ -17,7 +18,19 @@ func NewAddUserXpController(uc internal.IAddUserXpChangeUseCase) *addUserXpContr
 	return &addUserXpController{uc: uc}
 }
 
-func (controller *addUserXpController) Add(c *gin.Context) {
+// AddUserXp godoc
+// @Summary      добавляет опыт пользователю
+// @Description  добавляет опыт пользователю по скиллам используя access token
+// @Accept       json
+// @Produce      json
+// @Param request body requests.AddSkillChangeRequest true "request format"
+// @Param Authorization header string true "access token"
+// @Success      200  {object} requests.UserDataResponse
+// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
+// @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
+// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
+// @Router       /user/xp [post]
+func (controller *addUserXpController) AddUserXp(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)
 	if err != nil {

@@ -40,8 +40,10 @@ func (controller *getUserSkillDataController) GetUserSkills(c *gin.Context) {
 		middleware.AddGinError(c, err)
 		return
 	}
+
 	c.JSON(200, requests.UserSkillResponse{
 		AccountId: id,
 		Skills:    skills,
 	})
+
 }

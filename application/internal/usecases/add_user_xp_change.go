@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	_ "smartri_app/docs"
 	"smartri_app/internal"
 	"smartri_app/internal/controllers/requests"
 	"smartri_app/internal/entities"
@@ -23,25 +22,13 @@ func NewAddUserXpChange(
 	}
 }
 
-// Add godoc
-// @Summary      добавляет опыт пользователю
-// @Description  добавляет опыт пользователю по скиллам используя access token
-// @Accept       json
-// @Produce      json
-// @Param request body requests.AddSkillChangeRequest true "request format"
-// @Param Authorization header string true "access token"
-// @Success      200  {object} requests.UserDataResponse
-// @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
-// @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
-// @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/xp [post]
 func (uc *addUserXpChange) Add(context context.Context, accountId int, request *requests.AddSkillChangeRequest) (*requests.UserDataResponse, error) {
 	skills, err := uc.skillRepository.GetSkillsByAccountId(context, accountId)
 	if err != nil {
 		return nil, err
 	}
 
-	userData, err := uc.userRepository.GetDataByAccountId(context, accountId)
+	userData, err := uc.userRepository.GetUserDataByAccountId(context, accountId)
 	if err != nil {
 		return nil, err
 	}

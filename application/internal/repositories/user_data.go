@@ -29,7 +29,7 @@ func NewUserRepository(
 		applySkillChangesByAccountIdCommand:     applySkillChangesByAccountIdCommand}
 }
 
-func (u *userRepository) GetDataByAccountId(context context.Context, accountId int) (*entities.UserData, error) {
+func (u *userRepository) GetUserDataByAccountId(context context.Context, accountId int) (*entities.UserData, error) {
 	return u.selectUserDataByAccountIdCommand.Execute(context, accountId)
 }
 

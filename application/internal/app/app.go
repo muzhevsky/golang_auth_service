@@ -11,9 +11,11 @@ import (
 	v1 "smartri_app/internal/controllers/http/v1"
 	"smartri_app/internal/infrastructure/datasources/pg/commands/answers"
 	"smartri_app/internal/infrastructure/datasources/pg/commands/questions"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/skill_changes"
 	"smartri_app/internal/infrastructure/datasources/pg/commands/skills"
-	"smartri_app/internal/infrastructure/datasources/pg/commands/test"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/user_answers"
 	"smartri_app/internal/infrastructure/datasources/pg/commands/user_data"
+	"smartri_app/internal/infrastructure/datasources/pg/commands/user_skills"
 	"smartri_app/internal/repositories"
 	"smartri_app/internal/usecases"
 	http2 "smartri_app/pkg/http"
@@ -47,12 +49,12 @@ func Run() {
 	selectAnswerByIdCommand := answers.NewSelectAnswerByIdCommand(pgClient)
 	selectAnswersByQuestionIdCommand := answers.NewSelectAnswersByQuestionIdCommand(pgClient)
 	selectAnswerWithValuesCommand := answers.NewSelectAnswerValuesByAnswerIdCommand(pgClient)
-	insertUserTestResultsCommand := test.NewInsertUserTestResultsCommand(pgClient)
-	checkIfUserHasAnswersByAccountIdCommand := user_data.NewSelectUserHasAnswersByAccountIdCommand(pgClient)
-	applyUserXpChangeByAccoundIdCommand := user_data.NewApplySkillChangesByAccountId(pgClient)
+	insertUserTestResultsCommand := user_answers.NewInsertUserTestResultsCommand(pgClient)
+	checkIfUserHasAnswersByAccountIdCommand := user_answers.NewSelectUserHasAnswersByAccountIdCommand(pgClient)
+	applyUserXpChangeByAccoundIdCommand := skill_changes.NewApplySkillChangesByAccountId(pgClient)
 
 	selectAllSkillsCommand := skills.NewSelectAllSkillsCommand(pgClient)
-	selectAllSkillsByAccountIdCommand := skills.NewSelectSkillsByAccountIdCommand(pgClient)
+	selectAllSkillsByAccountIdCommand := user_skills.NewSelectSkillsByAccountIdCommand(pgClient)
 	selectNormalizationsBySkillIdCommand := skills.NewSelectSkillNormalizationBySkillIdCommand(pgClient)
 
 	insertUserDataCommand := user_data.NewInsertUserDataCommand(pgClient, selectAllSkillsCommand)
@@ -93,10 +95,10 @@ func Run() {
 
 	http.InitServiceMiddleware(router, logger)
 	router.GET("/test", getTestController.GetQuestions)
-	router.GET("/test/passed", checkIfUserHasPassedTestYetController.Check)
+	router.GET("/test/passed", checkIfUserHasPassedTestYetController.CheckIfUserHasPassedTestYet)
 
 	router.GET("/user/skills", getUserSkillsController.GetUserSkills)
-	router.POST("/user/xp", addUserXpChangeController.Add)
+	router.POST("/user/xp", addUserXpChangeController.AddUserXp)
 	router.POST("/user/data", addUserDataController.AddUserData)
 	router.POST("/user/test", addUserAnswersController.AddUserAnswers)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

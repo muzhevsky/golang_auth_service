@@ -41,8 +41,6 @@ services:
       - application_db
   application_db:
     container_name: "application_db"
-    ports:
-      - "5432:5432"
     env_file:
       - ./application/database/application_db.env
     build: ./application/database

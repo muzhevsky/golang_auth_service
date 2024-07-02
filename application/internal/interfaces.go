@@ -22,7 +22,7 @@ type (
 	}
 
 	IUserDataRepository interface {
-		GetDataByAccountId(context context.Context, accountId int) (*entities.UserData, error)
+		GetUserDataByAccountId(context context.Context, accountId int) (*entities.UserData, error)
 		ApplySkillChangesByAccountId(context context.Context, userSkill *entities.UserSkills, userData *entities.UserData, change *entities.SkillChange) error
 		CheckUserHasAnswers(context context.Context, accountId int) (bool, error)
 		AddUserData(context context.Context, userData *entities.UserData) error

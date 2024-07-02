@@ -26,7 +26,7 @@ func NewCheckIfUserHasPassedTestYetController(useCase internal.ICheckIfUserHasPa
 // @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /test/passed [get]
-func (controller *checkIfUserHasPassedTestYetController) Check(c *gin.Context) {
+func (controller *checkIfUserHasPassedTestYetController) CheckIfUserHasPassedTestYet(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)
 	if err != nil {
