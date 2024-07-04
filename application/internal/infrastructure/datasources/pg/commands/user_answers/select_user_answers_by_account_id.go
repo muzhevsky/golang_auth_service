@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectUserAnswersByAccountIdCommand struct {
+type selectUserAnswersByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectUserAnswersByAccountIdCommand(client *postgres.Client) datasources.ISelectUserAnswersByAccountIdCommand {
-	return &selectUserAnswersByAccountIdCommand{client: client}
+func NewSelectUserAnswersByAccountIdPGCommand(client *postgres.Client) datasources.ISelectUserAnswersByAccountIdCommand {
+	return &selectUserAnswersByAccountIdPGCommand{client: client}
 }
 
-func (s *selectUserAnswersByAccountIdCommand) Execute(context context.Context, accountId int) (*entities.UserTestAnswers, error) {
+func (s *selectUserAnswersByAccountIdPGCommand) Execute(context context.Context, accountId int) (*test.UserTestAnswers, error) {
 	sql, args, err := query_builders.NewSelectUserAnswersByAccountIdQuery(&s.client.Builder, accountId)
 	if err != nil {
 		return nil, err
@@ -34,11 +34,11 @@ func (s *selectUserAnswersByAccountIdCommand) Execute(context context.Context, a
 		return nil, err
 	}
 
-	result := &entities.UserTestAnswers{
+	result := &test.UserTestAnswers{
 		AccountId: accountId,
 	}
 	for rows.Next() {
-		row := entities.UserTestAnswer{}
+		row := test.UserTestAnswer{}
 		err = rows.Scan(&row.QuestionId, &row.AnswerId)
 		if err != nil {
 			return nil, err

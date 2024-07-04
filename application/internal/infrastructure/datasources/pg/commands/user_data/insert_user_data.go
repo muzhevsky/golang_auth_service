@@ -2,23 +2,23 @@ package user_data
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type insertUserDataCommand struct {
+type insertUserDataPGCommand struct {
 	client                 *postgres.Client
 	selectAllSkillsCommand datasources.ISelectAllSkillsCommand
 }
 
-func NewInsertUserDataCommand(client *postgres.Client, selectAllSkillsCommand datasources.ISelectAllSkillsCommand) datasources.IInsertUserDataCommand {
-	return &insertUserDataCommand{client: client, selectAllSkillsCommand: selectAllSkillsCommand}
+func NewInsertUserDataPGCommand(client *postgres.Client, selectAllSkillsCommand datasources.ISelectAllSkillsCommand) datasources.IInsertUserDataCommand {
+	return &insertUserDataPGCommand{client: client, selectAllSkillsCommand: selectAllSkillsCommand}
 }
 
-func (u *insertUserDataCommand) Execute(context context.Context, user *entities.UserData) error {
-	sql, args, err := query_builders.NewInsertUserDataQuery(&u.client.Builder, user)
+func (u *insertUserDataPGCommand) Execute(context context.Context, userData *user_data.UserData) error {
+	sql, args, err := query_builders.NewInsertUserDataQuery(&u.client.Builder, userData)
 	if err != nil {
 		return err
 	}
@@ -38,10 +38,9 @@ func (u *insertUserDataCommand) Execute(context context.Context, user *entities.
 	skills, err := u.selectAllSkillsCommand.Execute(context)
 
 	for _, skill := range skills {
-		sql, args, err = query_builders.NewInsertUserSkillsQuery(&u.client.Builder, &entities.UserSkills{
-			AccountId: user.AccountId,
-			SkillId:   skill.Id,
-			Xp:        0,
+		sql, args, err = query_builders.NewInsertUserSkillsQuery(&u.client.Builder, userData.AccountId, &user_data.UserSkill{
+			SkillId: skill.Id,
+			Xp:      0,
 		})
 
 		if err != nil {

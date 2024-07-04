@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectSkillChangesByAccountIdAndActionId struct {
+type selectSkillChangesByAccountIdAndActionIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectSkillChangesByAccountIdAndActionId(client *postgres.Client) datasources.ISelectSkillChangesByAccountIdAndActionIdCommand {
-	return &selectSkillChangesByAccountIdAndActionId{client: client}
+func NewSelectSkillChangesByAccountIdAndActionIdPGCommand(client *postgres.Client) datasources.ISelectSkillChangesByAccountIdAndActionIdCommand {
+	return &selectSkillChangesByAccountIdAndActionIdPGCommand{client: client}
 }
 
-func (s *selectSkillChangesByAccountIdAndActionId) Execute(context context.Context, accountId int, actionId int) ([]*entities.SkillChange, error) {
+func (s *selectSkillChangesByAccountIdAndActionIdPGCommand) Execute(context context.Context, accountId int, actionId int) ([]*user_data.SkillChange, error) {
 	sql, args, err := query_builders.NewSelectSkillChangesByAccountIdAndActionIdQuery(&s.client.Builder, accountId, actionId)
 
 	if err != nil {
@@ -30,15 +30,15 @@ func (s *selectSkillChangesByAccountIdAndActionId) Execute(context context.Conte
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []*entities.SkillChange{}, nil
+			return []*user_data.SkillChange{}, nil
 		}
 		return nil, err
 	}
 
-	result := make([]*entities.SkillChange, 0)
+	result := make([]*user_data.SkillChange, 0)
 
 	for rows.Next() {
-		change := entities.SkillChange{AccountId: accountId, ActionId: actionId}
+		change := user_data.SkillChange{AccountId: accountId, ActionId: actionId}
 		err = rows.Scan(&change.Id, &change.SkillId, change.Date, &change.Points)
 		if err != nil {
 			return nil, err

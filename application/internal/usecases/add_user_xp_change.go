@@ -2,53 +2,56 @@ package usecases
 
 import (
 	"context"
+	"smartri_app/controllers/requests"
 	"smartri_app/internal"
-	"smartri_app/internal/controllers/requests"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"time"
 )
 
 type addUserXpChange struct {
-	skillRepository internal.ISkillRepository
-	userRepository  internal.IUserDataRepository
+	skillRepo      internal.ISkillRepository
+	userDataRepo   internal.IUserDataRepository
+	userSkillsRepo internal.IUserSkillsRepository
 }
 
 func NewAddUserXpChange(
 	skillRepository internal.ISkillRepository,
-	userRepository internal.IUserDataRepository) *addUserXpChange {
+	userDataRepository internal.IUserDataRepository,
+	userSkillsRepository internal.IUserSkillsRepository) internal.IAddUserXpChangeUseCase {
 	return &addUserXpChange{
-		skillRepository: skillRepository,
-		userRepository:  userRepository,
+		skillRepo:      skillRepository,
+		userDataRepo:   userDataRepository,
+		userSkillsRepo: userSkillsRepository,
 	}
 }
 
 func (uc *addUserXpChange) Add(context context.Context, accountId int, request *requests.AddSkillChangeRequest) (*requests.UserDataResponse, error) {
-	skills, err := uc.skillRepository.GetSkillsByAccountId(context, accountId)
+	skills, err := uc.skillRepo.GetSkillsByAccountId(context, accountId)
 	if err != nil {
 		return nil, err
 	}
 
-	userData, err := uc.userRepository.GetUserDataByAccountId(context, accountId)
+	userData, err := uc.userDataRepo.GetByAccountId(context, accountId)
 	if err != nil {
 		return nil, err
 	}
 
-	var skill *entities.UserSkills
-	for i := range skills {
-		if skills[i].SkillId == request.SkillId {
-			skills[i].Xp += request.Points
-			if skills[i].Xp > maxPoints {
-				request.Points = skills[i].Xp - maxPoints
-				skills[i].Xp = maxPoints
+	var skill *user_data.UserSkill
+	for i := range skills.Skills {
+		s := skills.Skills[i]
+		if s.SkillId == request.SkillId {
+			s.Xp += request.Points
+			if s.Xp > maxPoints {
+				request.Points = skill.Xp - maxPoints
+				skill.Xp = maxPoints
 			}
 			userData.XP += request.Points
-			skill = skills[i]
+			skill = s
 			break
 		}
 	}
 
-	skill.AccountId = accountId
-	err = uc.userRepository.ApplySkillChangesByAccountId(context, skill, userData, &entities.SkillChange{
+	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &user_data.SkillChange{
 		AccountId: accountId,
 		SkillId:   skill.SkillId,
 		ActionId:  1, // todo а надо ли?

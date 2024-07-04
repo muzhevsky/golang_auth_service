@@ -2,21 +2,21 @@ package user_skills
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectSkillsByAccountIdCommand struct {
+type selectSkillsByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectSkillsByAccountIdCommand(client *postgres.Client) *selectSkillsByAccountIdCommand {
-	return &selectSkillsByAccountIdCommand{client: client}
+func NewSelectSkillsByAccountIdPGCommand(client *postgres.Client) *selectSkillsByAccountIdPGCommand {
+	return &selectSkillsByAccountIdPGCommand{client: client}
 }
 
-func (c *selectSkillsByAccountIdCommand) Execute(context context.Context, accountId int) ([]*entities.UserSkills, error) {
-	sql, args, err := query_builders.NewSelectSkillsByAccountIdQuery(&c.client.Builder, accountId)
+func (c *selectSkillsByAccountIdPGCommand) Execute(context context.Context, accountId int) (*user_data.UserSkills, error) {
+	sql, args, err := query_builders.NewSelectUserSkillsByAccountIdQuery(&c.client.Builder, accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -27,14 +27,16 @@ func (c *selectSkillsByAccountIdCommand) Execute(context context.Context, accoun
 		return nil, err
 	}
 
-	result := make([]*entities.UserSkills, 0)
+	result := user_data.UserSkills{AccountId: accountId}
+	skills := make([]*user_data.UserSkill, 0)
 	for rows.Next() {
-		newUserSkill := entities.UserSkills{}
+		newUserSkill := user_data.UserSkill{}
 		err = rows.Scan(&newUserSkill.SkillId, &newUserSkill.Xp)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, &newUserSkill)
+		skills = append(skills, &newUserSkill)
 	}
-	return result, nil
+	result.Skills = skills
+	return &result, nil
 }

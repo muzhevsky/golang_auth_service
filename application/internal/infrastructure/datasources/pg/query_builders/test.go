@@ -2,10 +2,10 @@ package query_builders
 
 import (
 	"github.com/Masterminds/squirrel"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 )
 
-func NewInsertUserTestResultsQuery(builder *squirrel.StatementBuilderType, results *entities.UserTestAnswers) (string, []any, error) {
+func NewInsertUserTestResultsQuery(builder *squirrel.StatementBuilderType, results *test.UserTestAnswers) (string, []any, error) {
 	query := builder.Insert("user_answers").
 		Columns("account_id", "question_id", "answer_id")
 	for i := range results.Answers {

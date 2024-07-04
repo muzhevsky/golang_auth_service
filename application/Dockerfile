@@ -5,8 +5,8 @@ WORKDIR /app
 COPY . .
 
 RUN go install github.com/swaggo/swag/cmd/swag@latest
-RUN swag init -g cmd/app/main.go -o ./docs
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/app/main.go
+RUN swag init -g cmd/main.go -o ./docs
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/main.go
 
 FROM alpine:latest
 

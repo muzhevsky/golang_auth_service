@@ -2,21 +2,21 @@ package skill_changes
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type applySkillChangesByAccountId struct {
+type applySkillChangesByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewApplySkillChangesByAccountId(client *postgres.Client) *applySkillChangesByAccountId {
-	return &applySkillChangesByAccountId{client: client}
+func NewApplySkillChangesByAccountIdPGCommand(client *postgres.Client) *applySkillChangesByAccountIdPGCommand {
+	return &applySkillChangesByAccountIdPGCommand{client: client}
 }
 
-func (a *applySkillChangesByAccountId) Execute(context context.Context, skills *entities.UserSkills, userData *entities.UserData, change *entities.SkillChange) error {
-	sql, args, err := query_builders.NewUpdateUserSkillsQuery(&a.client.Builder, skills)
+func (a *applySkillChangesByAccountIdPGCommand) Execute(context context.Context, skills *user_data.UserSkill, userData *user_data.UserData, change *user_data.SkillChange) error {
+	sql, args, err := query_builders.NewUpdateUserSkillsQuery(&a.client.Builder, userData.AccountId, skills)
 	if err != nil {
 		return err
 	}

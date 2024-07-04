@@ -3,7 +3,8 @@ package repositories
 import (
 	"context"
 	"smartri_app/internal"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
 )
 
@@ -30,15 +31,15 @@ func NewTestRepository(
 	}
 }
 
-func (repo *testRepository) GetAllQuestions(context context.Context) ([]*entities.Question, error) {
+func (repo *testRepository) GetAllQuestions(context context.Context) ([]*test.Question, error) {
 	return repo.selectAllQuestions.Execute(context)
 }
 
-func (repo *testRepository) GetAnswersForQuestion(context context.Context, question *entities.Question) ([]*entities.Answer, error) {
+func (repo *testRepository) GetAnswersForQuestion(context context.Context, question *test.Question) ([]*test.Answer, error) {
 	return repo.selectAnswersByQuestionId.Execute(context, question.Id)
 }
 
-func (repo *testRepository) GetAllQuestionsWithAnswers(context context.Context) ([]*entities.Question, error) {
+func (repo *testRepository) GetAllQuestionsWithAnswers(context context.Context) ([]*test.Question, error) {
 	questions, err := repo.selectAllQuestions.Execute(context)
 	if err != nil {
 		return nil, err
@@ -56,17 +57,17 @@ func (repo *testRepository) GetAllQuestionsWithAnswers(context context.Context) 
 	return questions, nil
 }
 
-func (repo *testRepository) AddUserTestResults(
+func (repo *testRepository) AddUserAnswersWithSkillChanges(
 	context context.Context,
-	answers *entities.UserTestAnswers,
-	changes []*entities.SkillChange,
-	userSkills []*entities.UserSkills,
-	data *entities.UserData) error {
+	answers *test.UserTestAnswers,
+	changes []*user_data.SkillChange,
+	userSkills *user_data.UserSkills,
+	data *user_data.UserData) error {
 	err := repo.insertUserAnswers.Execute(context, answers, changes, userSkills, data)
 	return err
 }
 
-func (repo *testRepository) GetAnswerWithValues(context context.Context, answerId int) (*entities.Answer, error) {
+func (repo *testRepository) GetAnswerWithValues(context context.Context, answerId int) (*test.Answer, error) {
 	values, err := repo.selectAnswerWithAnswerValuesById.Execute(context, answerId)
 	if err != nil {
 		return nil, err

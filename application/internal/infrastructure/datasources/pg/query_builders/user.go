@@ -2,10 +2,10 @@ package query_builders
 
 import (
 	"github.com/Masterminds/squirrel"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 )
 
-func NewInsertUserDataQuery(builder *squirrel.StatementBuilderType, data *entities.UserData) (string, []any, error) {
+func NewInsertUserDataQuery(builder *squirrel.StatementBuilderType, data *user_data.UserData) (string, []any, error) {
 	return builder.
 		Insert("user_data").
 		Columns("age", "gender", "xp", "account_id").
@@ -21,7 +21,7 @@ func NewSelectUserDataByAccountIdQuery(builder *squirrel.StatementBuilderType, a
 		ToSql()
 }
 
-func NewUpdateUserDataByAccountIdQuery(builder *squirrel.StatementBuilderType, data *entities.UserData) (string, []any, error) {
+func NewUpdateUserDataByAccountIdQuery(builder *squirrel.StatementBuilderType, data *user_data.UserData) (string, []any, error) {
 	return builder.Update("user_data").
 		Set("xp", data.XP).
 		Set("age", data.Age).
@@ -29,16 +29,16 @@ func NewUpdateUserDataByAccountIdQuery(builder *squirrel.StatementBuilderType, d
 		Where(squirrel.Eq{"account_id": data.AccountId}).ToSql()
 }
 
-func NewInsertUserSkillsQuery(builder *squirrel.StatementBuilderType, userSkills *entities.UserSkills) (string, []any, error) {
+func NewInsertUserSkillsQuery(builder *squirrel.StatementBuilderType, accountId int, userSkills *user_data.UserSkill) (string, []any, error) {
 	return builder.Insert("user_skills").
 		Columns("account_id", "skill_id", "xp").
-		Values(userSkills.AccountId, userSkills.SkillId, userSkills.Xp).
+		Values(accountId, userSkills.SkillId, userSkills.Xp).
 		ToSql()
 }
 
-func NewUpdateUserSkillsQuery(builder *squirrel.StatementBuilderType, skills *entities.UserSkills) (string, []any, error) {
+func NewUpdateUserSkillsQuery(builder *squirrel.StatementBuilderType, accountId int, skills *user_data.UserSkill) (string, []any, error) {
 	return builder.Update("user_skills").
 		Set("xp", skills.Xp).
-		Where(squirrel.Eq{"account_id": skills.AccountId, "skill_id": skills.SkillId}).
+		Where(squirrel.Eq{"account_id": accountId, "skill_id": skills.SkillId}).
 		ToSql()
 }

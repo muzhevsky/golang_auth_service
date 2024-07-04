@@ -6,21 +6,22 @@ import (
 	"smartri_app/pkg/postgres"
 )
 
-type selectUserHasAnswersByAccountIdCommand struct {
+type selectUserHasAnswersByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectUserHasAnswersByAccountIdCommand(client *postgres.Client) *selectUserHasAnswersByAccountIdCommand {
-	return &selectUserHasAnswersByAccountIdCommand{client: client}
+func NewSelectUserHasAnswersByAccountIdPGCommand(client *postgres.Client) *selectUserHasAnswersByAccountIdPGCommand {
+	return &selectUserHasAnswersByAccountIdPGCommand{client: client}
 }
 
-func (s *selectUserHasAnswersByAccountIdCommand) Execute(context context.Context, accountId int) (bool, error) {
+func (s *selectUserHasAnswersByAccountIdPGCommand) Execute(context context.Context, accountId int) (bool, error) {
 	sql, args, err := query_builders.NewSelectUserAnswerByAccountIdQueryLimit1(&s.client.Builder, accountId)
 	if err != nil {
 		return false, nil
 	}
 
 	rows, err := s.client.Pool.Query(context, sql, args...)
+	defer rows.Close()
 	if err != nil {
 		return false, nil
 	}

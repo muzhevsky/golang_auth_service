@@ -4,26 +4,26 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectAnswerValuesByAnswerIdCommand struct {
+type selectAnswerValuesByAnswerIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectAnswerValuesByAnswerIdCommand(client *postgres.Client) datasources.ISelectAnswerValuesByAnswerIdCommand {
-	return &selectAnswerValuesByAnswerIdCommand{client: client}
+func NewSelectAnswerValuesByAnswerIdPGCommand(client *postgres.Client) datasources.ISelectAnswerValuesByAnswerIdCommand {
+	return &selectAnswerValuesByAnswerIdPGCommand{client: client}
 }
 
-func (a *selectAnswerValuesByAnswerIdCommand) Execute(context context.Context, answerId int) ([]*entities.AnswerValue, error) {
+func (a *selectAnswerValuesByAnswerIdPGCommand) Execute(context context.Context, answerId int) ([]*test.AnswerValue, error) {
 	sql, args, err := query_builders.NewSelectAnswerValuesByAnswerIdQuery(&a.client.Builder, answerId)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []*entities.AnswerValue{}, nil
+			return []*test.AnswerValue{}, nil
 		}
 		return nil, nil
 	}
@@ -35,10 +35,10 @@ func (a *selectAnswerValuesByAnswerIdCommand) Execute(context context.Context, a
 		return nil, err
 	}
 
-	result := make([]*entities.AnswerValue, 0)
+	result := make([]*test.AnswerValue, 0)
 
 	for rows.Next() {
-		value := entities.AnswerValue{AnswerId: answerId}
+		value := test.AnswerValue{AnswerId: answerId}
 		err = rows.Scan(&value.Id, &value.SkillId, &value.Points)
 		if err != nil {
 			return nil, err

@@ -4,28 +4,28 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectAnswerByIdCommand struct {
+type selectAnswerByIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectAnswerByIdCommand(client *postgres.Client) datasources.ISelectAnswerByIdCommand {
-	return &selectAnswerByIdCommand{client: client}
+func NewSelectAnswerByIdPGCommand(client *postgres.Client) datasources.ISelectAnswerByIdCommand {
+	return &selectAnswerByIdPGCommand{client: client}
 }
 
-func (s *selectAnswerByIdCommand) Execute(context context.Context, id int) (*entities.Answer, error) {
+func (s *selectAnswerByIdPGCommand) Execute(context context.Context, id int) (*test.Answer, error) {
 	sql, args, err := query_builders.NewSelectAnswerByIdQuery(&s.client.Builder, id)
 	if err != nil {
 		return nil, err
 	}
 
 	row := s.client.Pool.QueryRow(context, sql, args...)
-	var answer entities.Answer
+	var answer test.Answer
 
 	answer.Id = id
 	err = row.Scan(&answer.Text, &answer.QuestionId)

@@ -142,6 +142,18 @@ ALTER TABLE skill_normalizations ADD
         ON DELETE NO ACTION
     NOT VALID;
 
+CREATE TABLE "avatars"
+(
+    account_id serial NOT NULL,
+    hair_id smallint NOT NULL,
+    hair_color int NOT NULL,
+    eyes_id smallint NOT NULL,
+    eyes_color int NOT NULL,
+    clothes_id smallint NOT NULL,
+    expression_id smallint NOT NULL,
+    skin_color int NOT NULL,
+    CONSTRAINT "avatar_pkey" PRIMARY KEY (account_id)
+);
 
 
 INSERT INTO public."skills"(id, title) VALUES(1, 'Confidences');
@@ -855,3 +867,19 @@ values(1, -21, 42),
 
 insert into "test_actions"(title)
 values('init_test');
+
+insert into user_data(account_id, age, xp, gender)
+values(1, 1337, 0, 'm');
+
+insert into user_answers(account_id, question_id, answer_id)
+values (1, 6, 1);
+
+insert into user_skills(account_id, skill_id, xp)
+values (1, 1, 0),
+(1, 2, 0),
+(1, 3, 0),
+(1, 4, 0),
+(1, 5, 0),
+(1, 6, 0),
+(1, 7, 0),
+(1, 8, 0);

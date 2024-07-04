@@ -2,20 +2,20 @@ package questions
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectQuestionByIdCommand struct {
+type selectQuestionByIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectQuestionByIdCommand(client *postgres.Client) *selectQuestionByIdCommand {
-	return &selectQuestionByIdCommand{client: client}
+func NewSelectQuestionByIdPGCommand(client *postgres.Client) *selectQuestionByIdPGCommand {
+	return &selectQuestionByIdPGCommand{client: client}
 }
 
-func (s *selectQuestionByIdCommand) Execute(context context.Context, id int) (*entities.Question, error) {
+func (s *selectQuestionByIdPGCommand) Execute(context context.Context, id int) (*test.Question, error) {
 	sql, args, err := query_builders.NewSelectQuestionByIdQuery(&s.client.Builder, id)
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func (s *selectQuestionByIdCommand) Execute(context context.Context, id int) (*e
 
 	row := s.client.Pool.QueryRow(context, sql, args...)
 
-	var result entities.Question
+	var result test.Question
 	err = row.Scan(&result.Id, &result.Text)
 	if err != nil {
 		return nil, err

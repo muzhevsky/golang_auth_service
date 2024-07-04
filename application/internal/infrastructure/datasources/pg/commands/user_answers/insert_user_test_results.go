@@ -2,27 +2,28 @@ package user_answers
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type insertUserTestResultsCommand struct {
+type insertUserTestResultsPGCommand struct {
 	client *postgres.Client
 }
 
-func NewInsertUserTestResultsCommand(
+func NewInsertUserTestResultsPGCommand(
 	client *postgres.Client) datasources.IInsertUserTestResultsCommand {
-	return &insertUserTestResultsCommand{client: client}
+	return &insertUserTestResultsPGCommand{client: client}
 }
 
-func (u *insertUserTestResultsCommand) Execute(
+func (u *insertUserTestResultsPGCommand) Execute(
 	context context.Context,
-	answers *entities.UserTestAnswers,
-	changes []*entities.SkillChange,
-	userSkills []*entities.UserSkills,
-	userData *entities.UserData) error {
+	answers *test.UserTestAnswers,
+	changes []*user_data.SkillChange,
+	userSkills *user_data.UserSkills,
+	userData *user_data.UserData) error {
 	insertTestResultsSQL, args, err := query_builders.NewInsertUserTestResultsQuery(&u.client.Builder, answers)
 	if err != nil {
 		return err
@@ -67,8 +68,8 @@ func (u *insertUserTestResultsCommand) Execute(
 		return err
 	}
 
-	for i := range userSkills {
-		updateUserSkillsSQL, args, err := query_builders.NewUpdateUserSkillsByAccountIdQuery(&u.client.Builder, userSkills[i])
+	for i := range userSkills.Skills {
+		updateUserSkillsSQL, args, err := query_builders.NewUpdateUserSkillsByAccountIdQuery(&u.client.Builder, userData.AccountId, userSkills.Skills[i])
 		if err != nil {
 			tx.Rollback(context)
 			return err

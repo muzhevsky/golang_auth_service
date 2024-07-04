@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectAllSkillsCommand struct {
+type selectAllSkillsPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectAllSkillsCommand(client *postgres.Client) datasources.ISelectAllSkillsCommand {
-	return &selectAllSkillsCommand{client: client}
+func NewSelectAllSkillsPGCommand(client *postgres.Client) datasources.ISelectAllSkillsCommand {
+	return &selectAllSkillsPGCommand{client: client}
 }
 
-func (s *selectAllSkillsCommand) Execute(context context.Context) ([]*entities.Skill, error) {
+func (s *selectAllSkillsPGCommand) Execute(context context.Context) ([]*user_data.Skill, error) {
 	sql, i, err := query_builders.NewSelectAllSkillsQuery(&s.client.Builder)
 
 	if err != nil {
@@ -30,14 +30,14 @@ func (s *selectAllSkillsCommand) Execute(context context.Context) ([]*entities.S
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []*entities.Skill{}, nil
+			return []*user_data.Skill{}, nil
 		}
 		return nil, err
 	}
-	skills := make([]*entities.Skill, 0)
+	skills := make([]*user_data.Skill, 0)
 
 	for rows.Next() {
-		newSkill := entities.Skill{}
+		newSkill := user_data.Skill{}
 		err = rows.Scan(&newSkill.Id, &newSkill.Title)
 		if err != nil {
 			return nil, err

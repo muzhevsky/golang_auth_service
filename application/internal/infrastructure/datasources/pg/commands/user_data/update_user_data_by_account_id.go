@@ -2,25 +2,25 @@ package user_data
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type updateUserDataByAccountIdCommand struct {
+type updateUserDataByAccountIdPGCommand struct {
 	client        *postgres.Client
 	selectCommand datasources.ISelectUserDataByAccountIdCommand
 }
 
-func NewUpdateUserDataByAccountIdCommand(client *postgres.Client, selectCommand datasources.ISelectUserDataByAccountIdCommand) datasources.IUpdateUserDataByAccountIdCommand {
-	return &updateUserDataByAccountIdCommand{
+func NewUpdateUserDataByAccountIdPGCommand(client *postgres.Client, selectCommand datasources.ISelectUserDataByAccountIdCommand) datasources.IUpdateUserDataByAccountIdCommand {
+	return &updateUserDataByAccountIdPGCommand{
 		client:        client,
 		selectCommand: selectCommand,
 	}
 }
 
-func (u *updateUserDataByAccountIdCommand) Execute(context context.Context, data *entities.UserData) (*entities.UserData, error) {
+func (u *updateUserDataByAccountIdPGCommand) Execute(context context.Context, data *user_data.UserData) (*user_data.UserData, error) {
 	user, err := u.selectCommand.Execute(context, data.AccountId)
 	if err != nil || user == nil {
 		return nil, err

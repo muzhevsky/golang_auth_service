@@ -2,21 +2,21 @@ package questions
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectAllQuestionsCommand struct {
+type selectAllQuestionsPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectAllQuestionsCommand(client *postgres.Client) datasources.ISelectAllQuestionsCommand {
-	return &selectAllQuestionsCommand{client: client}
+func NewSelectAllQuestionsPGCommand(client *postgres.Client) datasources.ISelectAllQuestionsCommand {
+	return &selectAllQuestionsPGCommand{client: client}
 }
 
-func (q *selectAllQuestionsCommand) Execute(context context.Context) ([]*entities.Question, error) {
+func (q *selectAllQuestionsPGCommand) Execute(context context.Context) ([]*test.Question, error) {
 	sql, args, err := query_builders.NewSelectAllQuestionsQuery(&q.client.Builder)
 	if err != nil {
 		return nil, err
@@ -29,9 +29,9 @@ func (q *selectAllQuestionsCommand) Execute(context context.Context) ([]*entitie
 		return nil, err
 	}
 
-	result := make([]*entities.Question, 0)
+	result := make([]*test.Question, 0)
 	for rows.Next() {
-		question := entities.Question{}
+		question := test.Question{}
 		err = rows.Scan(&question.Id, &question.Text)
 		if err != nil {
 			return nil, err

@@ -6,10 +6,10 @@ import (
 )
 
 type checkUserPassedTestUseCase struct {
-	repo internal.IUserDataRepository
+	repo internal.IUserAnswersRepository
 }
 
-func NewCheckUserHasPassedTestYetUseCase(repo internal.IUserDataRepository) *checkUserPassedTestUseCase {
+func NewCheckUserHasPassedTestYetUseCase(repo internal.IUserAnswersRepository) *checkUserPassedTestUseCase {
 	return &checkUserPassedTestUseCase{repo: repo}
 }
 

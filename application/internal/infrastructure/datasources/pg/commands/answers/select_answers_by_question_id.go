@@ -2,20 +2,20 @@ package answers
 
 import (
 	"context"
-	"smartri_app/internal/entities"
+	"smartri_app/internal/entities/test"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
 
-type selectAnswersByQuestionIdCommand struct {
+type selectAnswersByQuestionIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectAnswersByQuestionIdCommand(client *postgres.Client) *selectAnswersByQuestionIdCommand {
-	return &selectAnswersByQuestionIdCommand{client: client}
+func NewSelectAnswersByQuestionIdPGCommand(client *postgres.Client) *selectAnswersByQuestionIdPGCommand {
+	return &selectAnswersByQuestionIdPGCommand{client: client}
 }
 
-func (q *selectAnswersByQuestionIdCommand) Execute(context context.Context, questionId int) ([]*entities.Answer, error) {
+func (q *selectAnswersByQuestionIdPGCommand) Execute(context context.Context, questionId int) ([]*test.Answer, error) {
 	sql, args, err := query_builders.NewSelectAnswersByQuestionIdQuery(&q.client.Builder, questionId)
 	if err != nil {
 		return nil, err
@@ -28,9 +28,9 @@ func (q *selectAnswersByQuestionIdCommand) Execute(context context.Context, ques
 		return nil, err
 	}
 
-	result := make([]*entities.Answer, 0)
+	result := make([]*test.Answer, 0)
 	for rows.Next() {
-		answer := entities.Answer{}
+		answer := test.Answer{}
 		err = rows.Scan(&answer.Id, &answer.Text, &answer.QuestionId)
 		if err != nil {
 			return nil, err
