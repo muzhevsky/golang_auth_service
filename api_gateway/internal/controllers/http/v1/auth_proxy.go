@@ -12,7 +12,7 @@ type authProxy struct {
 	client   *http.Client
 }
 
-func NewAuthProxy(authName string, authHost string) *authProxy {
+func NewAuthProxy(authHost string) *authProxy {
 	return &authProxy{authHost: authHost, client: &http.Client{}}
 }
 

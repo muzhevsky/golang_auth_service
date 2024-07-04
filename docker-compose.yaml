@@ -27,8 +27,8 @@ services:
     env_file:
       - ./authorization/database/auth_db.env
     build: ./authorization/database
-#    volumes:
-#      - database:/var/lib/postgresql/data
+    volumes:
+      - database:/var/lib/postgresql/data
 
 
   application:
@@ -44,8 +44,9 @@ services:
     env_file:
       - ./application/database/application_db.env
     build: ./application/database
-#    volumes:
-#      - database:/var/lib/postgresql/data
+    volumes:
+      - auth:/var/lib/postgresql/data
 
-#volumes:
-#  database:
+volumes:
+  database:
+  auth:

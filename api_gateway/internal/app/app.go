@@ -22,7 +22,7 @@ func Run() {
 	serviceMap[cfg.ApplicationHost] = applicationUrl
 
 	router := gin.New()
-	router.Use(v1.NewAuthProxy("auth", authUrl).Handle)
+	router.Use(v1.NewAuthProxy(authUrl).Handle)
 	router.Use(v1.NewProxy(serviceMap).Handle)
 	router.Static("/static", "./static")
 	http.Start(router, cfg.HTTP)
