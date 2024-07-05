@@ -1,8 +1,9 @@
 package internal
 
 import (
-	"authorization/internal/controllers/requests"
+	"authorization/controllers/requests"
 	"authorization/internal/entities"
+	"authorization/internal/entities/account"
 	"context"
 )
 
@@ -32,13 +33,13 @@ type (
 	}
 
 	IAccountRepository interface {
-		Create(context context.Context, user *entities.Account) (int, error)
-		FindById(context context.Context, id int) (*entities.Account, error)
-		FindByLogin(context context.Context, login string) (*entities.Account, error)
-		FindByEmail(context context.Context, email string) (*entities.Account, error)
-		CheckLoginExist(context context.Context, login string) (bool, error)
-		CheckEmailExist(context context.Context, email string) (bool, error)
-		Update(context context.Context, user *entities.Account) error
+		Create(context context.Context, user *account.Account) (int, error)
+		FindById(context context.Context, id int) (*account.Account, error)
+		FindByLogin(context context.Context, login *account.Login) (*account.Account, error)
+		FindByEmail(context context.Context, email *account.Email) (*account.Account, error)
+		CheckLoginExist(context context.Context, login *account.Login) (bool, error)
+		CheckEmailExist(context context.Context, email *account.Email) (bool, error)
+		UpdateById(context context.Context, id int, user *account.Account) error
 	}
 
 	IVerificationRepository interface {

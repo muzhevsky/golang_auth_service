@@ -10,7 +10,7 @@ pg:
     host: ""
     port: ""
     database: ""
-    pool_max: "2"
+    pool_max: "6"
 jwt:
     signing_key: ""
 smtp:

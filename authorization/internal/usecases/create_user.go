@@ -1,9 +1,9 @@
 package usecases
 
 import (
+	"authorization/controllers/requests"
 	"authorization/internal"
-	"authorization/internal/controllers/requests"
-	"authorization/internal/entities"
+	accountpkg "authorization/internal/entities/account"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"authorization/internal/infrastructure/services/tokens"
@@ -43,14 +43,19 @@ func NewCreateUserUseCase(
 //   - non-unique email
 //   - errors of password hash and user repository
 func (u *userUseCase) CreateAccount(context context.Context, request *requests.CreateAccountRequest) (*requests.CreateAccountResponse, error) {
-	account := &entities.Account{
-		Login:    request.Login,
-		Password: request.Password,
-		EMail:    request.EMail,
-		Nickname: request.Nickname,
+	login := accountpkg.Login(request.Login)
+	email := accountpkg.Email(request.Email)
+	password := accountpkg.Password(request.Password)
+	nickname := accountpkg.Nickname(login)
+
+	account := &accountpkg.Account{
+		Login:    &login,
+		Password: &password,
+		Email:    &email,
+		Nickname: &nickname,
 	}
 
-	err := validateFields(account)
+	err := account.Validate()
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +68,7 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 		return nil, fmt.Errorf("%w. Login already exists", errs.RecordAlreadyExists)
 	}
 
-	exists, err = u.userRepo.CheckEmailExist(context, account.EMail)
+	exists, err = u.userRepo.CheckEmailExist(context, account.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +76,14 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 		return nil, fmt.Errorf("%w. Email already exists", errs.RecordAlreadyExists)
 	}
 
-	hashedPassword, err := u.hashProvider.GenerateHash(account.Password)
+	hashedPassword, err := u.hashProvider.GenerateHash(request.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	account.Password = string(hashedPassword)
-	account.CreationTime = time.Now()
+	password = accountpkg.Password(hashedPassword)
+	account.Password = &password
+	account.RegistrationDate = time.Now()
 
 	account.Id, err = u.userRepo.Create(context, account)
 	if err != nil {
@@ -102,25 +108,4 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 			ExpiresAt:    session.ExpiresAt.Unix(),
 		},
 	}, nil
-}
-
-func validateFields(user *entities.Account) error {
-	validator := entities.UserValidator{}
-	err := validator.ValidateLogin(user.Login)
-	if err != nil {
-		return err
-	}
-	err = validator.ValidatePassword(user.Password)
-	if err != nil {
-		return err
-	}
-	err = validator.ValidateEmail(user.EMail)
-	if err != nil {
-		return err
-	}
-	err = validator.ValidateNickname(user.Nickname)
-	if err != nil {
-		return err
-	}
-	return nil
 }

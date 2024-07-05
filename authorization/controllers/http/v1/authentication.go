@@ -1,7 +1,7 @@
 package v1
 
 import (
-	http2 "authorization/internal/controllers/http/middleware"
+	"authorization/controllers/http/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,7 +19,7 @@ func (r *authenticationController) authenticate(c *gin.Context) {
 	accountId, exists := c.Get("accountId")
 	if !exists {
 		err, _ := c.Get("authError")
-		http2.AddGinError(c, err.(error))
+		middleware.AddGinError(c, err.(error))
 		return
 	}
 

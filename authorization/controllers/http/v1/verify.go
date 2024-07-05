@@ -1,10 +1,10 @@
 package v1
 
 import (
+	"authorization/controllers/http/middleware"
+	"authorization/controllers/requests"
 	_ "authorization/docs"
 	"authorization/internal"
-	http2 "authorization/internal/controllers/http/middleware"
-	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func NewVerificationController(handler *gin.Engine, verification internal.IVerif
 	handler.POST("/user/verify", u.verifyUser)
 }
 
-// Update godoc
+// UpdateById godoc
 // @Summary      верификация пользователя
 // @Description верификация пользователя с использованием токена, переданного в заголовке "Authorization"
 // @Accept       json
@@ -37,21 +37,21 @@ func NewVerificationController(handler *gin.Engine, verification internal.IVerif
 func (u *verificationController) verifyUser(c *gin.Context) {
 	var request requests.VerificationRequest
 	if err := c.ShouldBind(&request); err != nil {
-		http2.AddGinError(c, errs.DataBindError)
+		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
 
 	userId, exists := c.Get("accountId")
 	if !exists {
 		err, _ := c.Get("authError")
-		http2.AddGinError(c, err.(error))
+		middleware.AddGinError(c, err.(error))
 		return
 	}
 
 	err := u.verification.Verify(c, userId.(int), request.Code)
 
 	if err != nil {
-		http2.AddGinError(c, err)
+		middleware.AddGinError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, "ok")

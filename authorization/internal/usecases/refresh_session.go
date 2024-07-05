@@ -1,8 +1,8 @@
 package usecases
 
 import (
+	"authorization/controllers/requests"
 	"authorization/internal"
-	"authorization/internal/controllers/requests"
 	"authorization/internal/entities"
 	errors2 "authorization/internal/errs"
 	"authorization/internal/infrastructure/services/tokens"

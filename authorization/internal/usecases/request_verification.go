@@ -34,7 +34,7 @@ func (u *requestVerificationRequest) RequestVerification(context context.Context
 		return "", err
 	}
 
-	u.mailer.SendMail(user.EMail, verification.Code)
+	u.mailer.SendMail(string(*user.Email), verification.Code)
 
 	return verification.Code, nil
 	return "", nil

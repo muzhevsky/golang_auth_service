@@ -56,7 +56,7 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, errs.UserNotFound) {
-			response(c, http.StatusNotFound, err.Error(), AuthUserNotFoundErrorCode)
+			response(c, http.StatusNotFound, err.Error(), AuthAccountNotFoundErrorCode)
 			return
 		}
 		if errors.Is(err, errs.NotAValidAccessToken) || errors.Is(err, errs.AccessTokenExpired) {

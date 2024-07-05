@@ -1,7 +1,7 @@
 package http
 
 import (
-	"authorization/internal/controllers/http/middleware"
+	"authorization/controllers/http/middleware"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

@@ -1,10 +1,10 @@
 package v1
 
 import (
+	"authorization/controllers/http/middleware"
+	"authorization/controllers/requests"
 	_ "authorization/docs"
 	"authorization/internal"
-	http2 "authorization/internal/controllers/http/middleware"
-	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -39,13 +39,13 @@ func NewRefreshSessionController(handler *gin.Engine, useCase internal.IRefreshS
 func (r *refreshSessionController) refreshSession(c *gin.Context) {
 	request := requests.RefreshSessionRequest{}
 	if err := c.ShouldBind(&request); err != nil {
-		http2.AddGinError(c, errs.DataBindError)
+		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
 	response := requests.RefreshSessionResponse{}
 	session, err := r.useCase.RefreshSession(c, &request)
 	if err != nil {
-		http2.AddGinError(c, err)
+		middleware.AddGinError(c, err)
 		return
 	}
 

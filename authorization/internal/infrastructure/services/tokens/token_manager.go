@@ -2,6 +2,7 @@ package tokens
 
 import (
 	"authorization/internal/entities"
+	"authorization/internal/entities/account"
 	"time"
 )
 
@@ -15,7 +16,7 @@ func NewTokenManager(config TokenConfiguration, access IAccessTokenManager, refr
 	return &tokenManager{config: config, access: access, refresh: refresh}
 }
 
-func (t *tokenManager) CreateSession(user *entities.Account) (*entities.Session, error) {
+func (t *tokenManager) CreateSession(user *account.Account) (*entities.Session, error) {
 	claims := make(map[string]interface{})
 	expiresAt := time.Now().Add(t.config.AccessTokenDuration)
 	claims["iss"] = t.config.Issuer

@@ -1,9 +1,9 @@
 package v1
 
 import (
+	"authorization/controllers/http/middleware"
 	_ "authorization/docs"
 	"authorization/internal"
-	http2 "authorization/internal/controllers/http/middleware"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -37,13 +37,13 @@ func (u *requestVerificationController) requestVerification(c *gin.Context) {
 	accountId, exists := c.Get("accountId")
 	if !exists {
 		err, _ := c.Get("authError")
-		http2.AddGinError(c, err.(error))
+		middleware.AddGinError(c, err.(error))
 		return
 	}
 
 	code, err := u.verification.RequestVerification(c, accountId.(int))
 	if err != nil {
-		http2.AddGinError(c, err)
+		middleware.AddGinError(c, err)
 		return
 	}
 

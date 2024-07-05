@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"time"
@@ -22,9 +21,8 @@ type Client struct {
 	connAttempts int
 	connTimeout  time.Duration
 
-	Builder   squirrel.StatementBuilderType
-	Pool      *pgxpool.Pool
-	ErrNoRows error
+	Builder squirrel.StatementBuilderType
+	Pool    *pgxpool.Pool
 }
 
 func New(config config.PG, opts ...Option) (*Client, error) {
@@ -38,7 +36,6 @@ func New(config config.PG, opts ...Option) (*Client, error) {
 		opt(pg)
 	}
 
-	pg.ErrNoRows = pgx.ErrNoRows
 	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",

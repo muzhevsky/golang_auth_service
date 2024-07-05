@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 )
 
 type sessionDatasource struct {
@@ -59,7 +60,7 @@ func (s *sessionDatasource) SelectByAccess(ctx context.Context, token string) (*
 	result := &entities.Session{}
 	err = s.pg.Pool.QueryRow(ctx, sql, args...).Scan(&result.AccessToken, &result.RefreshToken, &result.AccountId, &result.DeviceIdentity, &result.ExpiresAt)
 
-	if errors.Is(err, s.pg.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
 	return result, err
@@ -71,7 +72,10 @@ func (s *sessionDatasource) UpdateById(ctx context.Context, id int, session *ent
 		Set("refresh_token", session.RefreshToken).
 		Set("user_id", session.AccountId).
 		Set("device_identity", session.DeviceIdentity).
-		Set("expire_at", session.ExpiresAt).ToSql()
+		Set("expire_at", session.ExpiresAt).
+		Where(squirrel.Eq{"id": id}).
+		ToSql()
+
 	if err != nil {
 		return err
 	}

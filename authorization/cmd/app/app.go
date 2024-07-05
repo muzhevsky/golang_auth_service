@@ -2,10 +2,11 @@ package app
 
 import (
 	"authorization/config"
-	http2 "authorization/internal/controllers/http"
-	"authorization/internal/controllers/http/middleware"
-	"authorization/internal/controllers/http/v1"
+	http2 "authorization/controllers/http"
+	"authorization/controllers/http/middleware"
+	v1 "authorization/controllers/http/v1"
 	pg2 "authorization/internal/infrastructure/datasources/pg"
+	"authorization/internal/infrastructure/datasources/pg/commands/accounts"
 	"authorization/internal/infrastructure/services/hash"
 	mailers2 "authorization/internal/infrastructure/services/mailers"
 	tokens2 "authorization/internal/infrastructure/services/tokens"
@@ -46,7 +47,12 @@ func Run() {
 	defer pg.Close()
 
 	// Infrastructure
-	accountDS := pg2.NewAccountDatasource(pg)
+	selectAccountByIdCommand := accounts.NewSelectAccountByIdPGCommand(pg)
+	selectAccountByEmailCommand := accounts.NewSelectAccountByEmailPGCommand(pg)
+	selectAccountByLoginCommand := accounts.NewSelectAccountByLoginPGCommand(pg)
+	updateAccountByIdCommand := accounts.NewUpdateAccountByIdPGCommand(pg)
+	insertAccountCommand := accounts.NewInsertAccountPGCommand(pg)
+
 	sessionDS := pg2.NewSessionDatasource(pg)
 	verificationDS := pg2.NewPgVerificationDatasource(pg)
 
@@ -68,7 +74,12 @@ func Run() {
 
 	// Repository
 
-	accountRepository := repositories.NewUserRepo(accountDS)
+	accountRepository := repositories.NewAccountRepo(
+		selectAccountByIdCommand,
+		selectAccountByEmailCommand,
+		selectAccountByLoginCommand,
+		updateAccountByIdCommand,
+		insertAccountCommand)
 	verificationRepo := repositories.NewVerificationRepo(verificationDS)
 	sessionRepository := repositories.NewSessionRepository(sessionDS)
 

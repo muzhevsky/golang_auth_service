@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 )
 
 const verificationTableName = "verification_codes"
@@ -49,7 +50,7 @@ func (ds *pgVerificationDatasource) SelectById(context context.Context, id int) 
 	row := ds.pg.Pool.QueryRow(context, sql, args...)
 	err = row.Scan(&result.Id, &result.UserId, &result.Code, &result.ExpirationTime)
 	if err != nil {
-		if errors.Is(err, ds.pg.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err

@@ -1,6 +1,9 @@
 package tokens
 
-import "authorization/internal/entities"
+import (
+	"authorization/internal/entities"
+	"authorization/internal/entities/account"
+)
 
 type (
 	IHashProvider interface {
@@ -9,7 +12,7 @@ type (
 	}
 
 	ISessionManager interface {
-		CreateSession(user *entities.Account) (*entities.Session, error)
+		CreateSession(user *account.Account) (*entities.Session, error)
 		ParseToken(token string) (map[string]interface{}, error)
 	}
 

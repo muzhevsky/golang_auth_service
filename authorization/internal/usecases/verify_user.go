@@ -24,9 +24,9 @@ func NewVerificationUseCase(userRepo internal.IAccountRepository, verificationRe
 // returns:
 //   - ExpiredVerificationCode error if there are no active verification codes
 //   - WrongVerificationCode error if code is wrong
-func (v *verificationUseCase) Verify(context context.Context, userId int, code string) error {
+func (v *verificationUseCase) Verify(context context.Context, accountId int, code string) error {
 	verification := &entities.Verification{
-		UserId: userId,
+		UserId: accountId,
 		Code:   code,
 	}
 
@@ -55,19 +55,19 @@ func (v *verificationUseCase) Verify(context context.Context, userId int, code s
 		return errs.WrongVerificationCode
 	}
 
-	user, err := v.userRepo.FindById(context, userId)
+	account, err := v.userRepo.FindById(context, accountId)
 	if err != nil {
 		return err
 	}
 
-	user.Verify()
+	account.Verify()
 
-	err = v.userRepo.Update(context, user)
+	err = v.userRepo.UpdateById(context, accountId, account)
 	if err != nil {
 		return err
 	}
 
-	err = v.verificationRepo.Clear(context, userId)
+	err = v.verificationRepo.Clear(context, accountId)
 	if err != nil {
 		return err
 	}

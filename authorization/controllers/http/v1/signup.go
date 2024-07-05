@@ -1,10 +1,10 @@
 package v1
 
 import (
+	"authorization/controllers/http/middleware"
+	"authorization/controllers/requests"
 	_ "authorization/docs"
 	"authorization/internal"
-	http2 "authorization/internal/controllers/http/middleware"
-	"authorization/internal/controllers/requests"
 	"authorization/internal/errs"
 	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -38,14 +38,14 @@ func (u *signupController) signup(c *gin.Context) {
 	var userRequest requests.CreateAccountRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		http2.AddGinError(c, errs.DataBindError)
+		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
 
 	response, err := u.user.CreateAccount(c, &userRequest)
 
 	if err != nil {
-		http2.AddGinError(c, err)
+		middleware.AddGinError(c, err)
 		return
 	}
 

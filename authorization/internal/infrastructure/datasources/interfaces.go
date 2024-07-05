@@ -2,19 +2,26 @@ package datasources
 
 import (
 	"authorization/internal/entities"
+	"authorization/internal/entities/account"
 	"context"
 )
 
 type (
-	IAccountDataSource interface {
-		Create(context context.Context, user *entities.Account) (int, error)
-		SelectById(context context.Context, id int) (*entities.Account, error)
-		SelectByLogin(context context.Context, login string) (*entities.Account, error)
-		SelectByEmail(context context.Context, email string) (*entities.Account, error)
-		UpdateById(context context.Context, id int, updateFunc func(*entities.Account)) error
-		DeleteById(context context.Context, id int) error
+	IInsertAccountCommand interface {
+		Execute(context context.Context, user *account.Account) (int, error)
 	}
-
+	ISelectAccountByIdCommand interface {
+		Execute(context context.Context, id int) (*account.Account, error)
+	}
+	ISelectAccountByLoginCommand interface {
+		Execute(context context.Context, login string) (*account.Account, error)
+	}
+	ISelectAccountByEmailCommand interface {
+		Execute(context context.Context, email string) (*account.Account, error)
+	}
+	IUpdateAccountByIdCommand interface {
+		Execute(context context.Context, id int, newAccount *account.Account) error
+	}
 	IVerificationDataSource interface {
 		Create(context context.Context, user *entities.Verification) (int, error)
 		SelectById(context context.Context, id int) (*entities.Verification, error)
