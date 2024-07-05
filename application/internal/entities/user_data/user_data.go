@@ -9,7 +9,6 @@ type UserData struct {
 	AccountId int    `json:"account_id"`
 }
 
-// TODO
 func NewUserData(age int, gender string, XP int, accountId int) (*UserData, error) {
 	if age < 0 || age > 100 {
 		return nil, errs.SomeErrorToDo
