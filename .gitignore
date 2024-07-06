@@ -29,3 +29,4 @@ config/*.json
 config/*.cfg
 config/*.ini
 config/*.txt
+*.conf
