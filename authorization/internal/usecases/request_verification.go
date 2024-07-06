@@ -8,17 +8,17 @@ import (
 	"context"
 )
 
-type requestVerificationRequest struct {
+type requestVerificationUseCase struct {
 	userRepo         internal.IAccountRepository
 	verificationRepo internal.IVerificationRepository
 	mailer           mailers.IVerificationMailer
 }
 
-func NewRequestVerificationRequest(userRepo internal.IAccountRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) *requestVerificationRequest {
-	return &requestVerificationRequest{userRepo: userRepo, verificationRepo: verificationRepo, mailer: mailer}
+func NewRequestVerificationUseCase(userRepo internal.IAccountRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) *requestVerificationUseCase {
+	return &requestVerificationUseCase{userRepo: userRepo, verificationRepo: verificationRepo, mailer: mailer}
 }
 
-func (u *requestVerificationRequest) RequestVerification(context context.Context, userId int) (string, error) {
+func (u *requestVerificationUseCase) RequestVerification(context context.Context, userId int) (string, error) {
 	user, err := u.userRepo.FindById(context, userId)
 	if err != nil {
 		return "", err
@@ -34,7 +34,7 @@ func (u *requestVerificationRequest) RequestVerification(context context.Context
 		return "", err
 	}
 
-	u.mailer.SendMail(string(*user.Email), verification.Code)
+	u.mailer.SendMail(string(user.Email), verification.Code)
 
 	return verification.Code, nil
 	return "", nil

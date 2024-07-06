@@ -13,7 +13,7 @@ type (
 
 	ISessionManager interface {
 		CreateSession(user *account.Account) (*entities.Session, error)
-		ParseToken(token string) (map[string]interface{}, error)
+		ParseToken(token string) (*entities.TokenClaims, error)
 	}
 
 	IAccessTokenManager interface {

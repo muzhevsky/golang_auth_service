@@ -36,16 +36,8 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 		//////////////////////////////////////////////////////////////////////////////////
 
 		// Validation ////////////////////////////////////////////////////////////////////
-		if errors.Is(err, errs.LoginValidationError) {
+		if errors.Is(err, errs.ValidationError) {
 			response(c, http.StatusBadRequest, err.Error(), LoginValidationErrorCode)
-			return
-		}
-		if errors.Is(err, errs.EmailValidationError) {
-			response(c, http.StatusBadRequest, err.Error(), EmailValidationErrorCode)
-			return
-		}
-		if errors.Is(err, errs.PasswordValidationError) {
-			response(c, http.StatusBadRequest, err.Error(), PasswordValidationErrorCode)
 			return
 		}
 		///////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +47,7 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 			response(c, http.StatusUnauthorized, err.Error(), AuthWrongPasswordErrorCode)
 			return
 		}
-		if errors.Is(err, errs.UserNotFound) {
+		if errors.Is(err, errs.AccountNotFound) {
 			response(c, http.StatusNotFound, err.Error(), AuthAccountNotFoundErrorCode)
 			return
 		}

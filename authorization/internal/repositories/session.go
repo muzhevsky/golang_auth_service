@@ -1,35 +1,48 @@
 package repositories
 
 import (
+	"authorization/internal"
 	"authorization/internal/entities"
 	"authorization/internal/infrastructure/datasources"
 	"context"
+	"fmt"
 )
 
 type sessionRepository struct {
-	ds datasources.ISessionDatasource
+	selectSessionByIdCommand          datasources.ISelectSessionByIdCommand
+	selectSessionByAccessTokenCommand datasources.ISelectSessionByAccessTokenCommand
+	selectSessionsByAccountIdCommand  datasources.ISelectSessionsByAccountIdCommand
+	insertSessionCommand              datasources.IInsertSessionCommand
+	updateSessionByIdCommand          datasources.IUpdateSessionByIdCommand
 }
 
-func NewSessionRepository(ds datasources.ISessionDatasource) *sessionRepository {
-	return &sessionRepository{ds: ds}
+func NewSessionRepository(
+	selectSessionByIdCommand datasources.ISelectSessionByIdCommand,
+	selectSessionByAccessTokenCommand datasources.ISelectSessionByAccessTokenCommand,
+	selectSessionsByAccountIdCommand datasources.ISelectSessionsByAccountIdCommand,
+	insertSessionCommand datasources.IInsertSessionCommand,
+	updateSessionByIdCommand datasources.IUpdateSessionByIdCommand) internal.ISessionRepository {
+	return &sessionRepository{selectSessionByIdCommand: selectSessionByIdCommand, selectSessionByAccessTokenCommand: selectSessionByAccessTokenCommand, selectSessionsByAccountIdCommand: selectSessionsByAccountIdCommand, insertSessionCommand: insertSessionCommand, updateSessionByIdCommand: updateSessionByIdCommand}
 }
 
 func (s *sessionRepository) Create(context context.Context, session *entities.Session) (int, error) {
-	return s.ds.Create(context, session)
+	fmt.Println("a")
+	return s.insertSessionCommand.Execute(context, session)
 }
 
 func (s *sessionRepository) FindByAccessToken(context context.Context, token string) (*entities.Session, error) {
-	return s.ds.SelectByAccess(context, token)
+	return s.selectSessionByAccessTokenCommand.Execute(context, token)
 }
 
 func (s *sessionRepository) Update(context context.Context, sessionToUpdate *entities.Session, newSession *entities.Session) (*entities.Session, error) {
-	id := sessionToUpdate.Id
-
-	sessionToUpdate.ExpiresAt = newSession.ExpiresAt
-	sessionToUpdate.AccessToken = newSession.AccessToken
-	sessionToUpdate.RefreshToken = newSession.RefreshToken
-
-	err := s.ds.UpdateById(context, id, sessionToUpdate)
+	cpy := entities.Session{
+		Id:           sessionToUpdate.Id,
+		AccountId:    newSession.AccountId,
+		AccessToken:  newSession.AccessToken,
+		RefreshToken: newSession.RefreshToken,
+		ExpiresAt:    newSession.ExpiresAt,
+	}
+	err := s.updateSessionByIdCommand.Execute(context, &cpy)
 
 	return sessionToUpdate, err
 }

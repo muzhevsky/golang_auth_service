@@ -41,17 +41,13 @@ func (router *signInController) signIn(c *gin.Context) {
 		return
 	}
 
-	session, err := router.user.SignIn(c, &request)
+	response, err := router.user.SignIn(c, &request)
 
 	if err != nil {
 		middleware.AddGinError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, requests.SignInResponse{
-		AccessToken:  session.AccessToken,
-		RefreshToken: session.RefreshToken,
-		ExpiresAt:    session.ExpiresAt.Unix(),
-	})
+	c.JSON(http.StatusOK, response)
 	return
 }

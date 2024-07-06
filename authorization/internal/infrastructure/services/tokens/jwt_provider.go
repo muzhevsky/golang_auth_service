@@ -8,7 +8,7 @@ type jwtProvider struct {
 	jwt *jwt.JWT
 }
 
-func NewJwtProvider(jwt *jwt.JWT) *jwtProvider {
+func NewJwtProvider(jwt *jwt.JWT) IAccessTokenManager {
 	return &jwtProvider{jwt: jwt}
 }
 

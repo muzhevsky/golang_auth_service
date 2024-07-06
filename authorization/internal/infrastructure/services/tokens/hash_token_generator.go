@@ -13,10 +13,10 @@ func NewHashRefreshTokenGenerator(hashProvider IHashProvider) *hashTokenGenerato
 	return &hashTokenGenerator{hashProvider: hashProvider}
 }
 
-func (h *hashTokenGenerator) GenerateToken(userId int) (string, error) {
+func (h *hashTokenGenerator) GenerateToken(accountId int) (string, error) {
 	var number *big.Int
 	randomNumber := big.NewInt(rand.Int63())
-	number = big.NewInt(int64(userId))
+	number = big.NewInt(int64(accountId))
 	number.Lsh(number, 64)
 	number.Add(number, randomNumber)
 	stringToHash := number.String()

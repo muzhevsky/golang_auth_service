@@ -16,45 +16,47 @@ const (
 	accountRegistrationDateFieldName = "registration_date"
 )
 
+// NewSelectAccountByIdQuery - creates sql string with args and error using squirrel StatementBuilder
+// order of selected fields:
+//   - id
+//   - login
+//   - password
+//   - nickname
+//   - email
+//   - registration_date
+//   - is_verified
 func NewSelectAccountByIdQuery(builder *sq.StatementBuilderType, id int) (string, []any, error) {
-	return builder.Select(
-		accountIdFieldName,
-		accountLoginFieldName,
-		accountPasswordFieldName,
-		accountNicknameFieldName,
-		accountEmailFieldName,
-		accountRegistrationDateFieldName,
-		accountIsVerifiedFieldName).
-		From(accountTableName).
+	return selectStarAccounts(builder).
 		Where(sq.Eq{accountIdFieldName: id}).
 		ToSql()
 }
 
+// NewSelectAccountByLoginQuery - creates sql string with args and error using squirrel StatementBuilder
+// order of selected fields:
+//   - id
+//   - login
+//   - password
+//   - nickname
+//   - email
+//   - registration_date
+//   - is_verified
 func NewSelectAccountByLoginQuery(builder *sq.StatementBuilderType, login string) (string, []any, error) {
-	return builder.Select(
-		accountIdFieldName,
-		accountLoginFieldName,
-		accountPasswordFieldName,
-		accountNicknameFieldName,
-		accountEmailFieldName,
-		accountRegistrationDateFieldName,
-		accountIsVerifiedFieldName).
-		From(accountTableName).
+	return selectStarAccounts(builder).
 		Where(sq.Eq{accountLoginFieldName: login}).
 		ToSql()
 }
 
+// NewSelectAccountByEmailQuery - creates sql string with args and error using squirrel StatementBuilder
+// order of selected fields:
+//   - id
+//   - login
+//   - password
+//   - nickname
+//   - email
+//   - registration_date
+//   - is_verified
 func NewSelectAccountByEmailQuery(builder *sq.StatementBuilderType, email string) (string, []any, error) {
-	return builder.
-		Select(
-			accountIdFieldName,
-			accountLoginFieldName,
-			accountPasswordFieldName,
-			accountNicknameFieldName,
-			accountEmailFieldName,
-			accountRegistrationDateFieldName,
-			accountIsVerifiedFieldName).
-		From(accountTableName).
+	return selectStarAccounts(builder).
 		Where(sq.Eq{accountEmailFieldName: email}).
 		ToSql()
 }
@@ -83,4 +85,17 @@ func NewUpdateAccountByIdQuery(builder *sq.StatementBuilderType, id int, newAcco
 		Set(accountIsVerifiedFieldName, newAccount.IsVerified).
 		Where(sq.Eq{accountIdFieldName: id}).
 		ToSql()
+}
+
+func selectStarAccounts(builder *sq.StatementBuilderType) sq.SelectBuilder {
+	return builder.
+		Select(
+			accountIdFieldName,
+			accountLoginFieldName,
+			accountPasswordFieldName,
+			accountNicknameFieldName,
+			accountEmailFieldName,
+			accountRegistrationDateFieldName,
+			accountIsVerifiedFieldName).
+		From(accountTableName)
 }

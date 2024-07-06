@@ -3,7 +3,6 @@ package usecases
 import (
 	"authorization/controllers/requests"
 	"authorization/internal"
-	"authorization/internal/entities"
 	"authorization/internal/entities/account"
 	errors2 "authorization/internal/errs"
 	tokens2 "authorization/internal/infrastructure/services/tokens"
@@ -21,32 +20,32 @@ func NewSignInUseCase(userRepo internal.IAccountRepository, sessionRepo internal
 	return &signInUseCase{userRepo: userRepo, sessionRepo: sessionRepo, hashProvider: hashProvider, sessionManager: sessionManager}
 }
 
-func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.SignInRequest) (*entities.Session, error) {
-	var userRecord *account.Account
+func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.SignInRequest) (*requests.SignInResponse, error) {
+	var accountRecord *account.Account
 	login := account.Login(userRequest.Login)
 	email := account.Email(userRequest.Login)
 
-	userRecord, err := u.userRepo.FindByLogin(context, &login)
+	accountRecord, err := u.userRepo.FindByLogin(context, login)
 	if err != nil {
 		return nil, err
 
 	}
-	if userRecord == nil {
-		userRecord, err = u.userRepo.FindByEmail(context, &email)
+	if accountRecord == nil {
+		accountRecord, err = u.userRepo.FindByEmail(context, email)
 		if err != nil {
 			return nil, err
 		}
-		if userRecord == nil {
-			return nil, errors2.UserNotFound
+		if accountRecord == nil {
+			return nil, errors2.AccountNotFound
 		}
 	}
 
-	passwordMatched := u.hashProvider.CompareStringAndHash(userRequest.Password, string(*userRecord.Password))
+	passwordMatched := u.hashProvider.CompareStringAndHash(userRequest.Password, string(accountRecord.Password))
 	if !passwordMatched {
 		return nil, errors2.WrongPassword
 	}
 
-	session, err := u.sessionManager.CreateSession(userRecord)
+	session, err := u.sessionManager.CreateSession(accountRecord)
 	if err != nil {
 		return nil, err
 	}
@@ -56,5 +55,12 @@ func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.Si
 		return nil, err
 	}
 
-	return session, nil
+	return &requests.SignInResponse{
+		Id: accountRecord.Id,
+		Session: requests.RefreshSessionResponse{
+			AccessToken:  session.AccessToken,
+			RefreshToken: session.RefreshToken,
+			ExpiresAt:    session.AccessExpiresAt.Unix(),
+		},
+	}, nil
 }

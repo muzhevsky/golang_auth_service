@@ -42,14 +42,12 @@ func (r *refreshSessionController) refreshSession(c *gin.Context) {
 		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
-	response := requests.RefreshSessionResponse{}
-	session, err := r.useCase.RefreshSession(c, &request)
+
+	response, err := r.useCase.RefreshSession(c, &request)
 	if err != nil {
 		middleware.AddGinError(c, err)
 		return
 	}
 
-	response.AccessToken = session.AccessToken
-	response.RefreshToken = session.RefreshToken
 	c.JSON(http.StatusOK, response)
 }

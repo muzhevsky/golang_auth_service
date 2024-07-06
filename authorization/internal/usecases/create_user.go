@@ -9,7 +9,6 @@ import (
 	"authorization/internal/infrastructure/services/tokens"
 	"context"
 	"fmt"
-	"time"
 )
 
 type userUseCase struct {
@@ -35,24 +34,25 @@ func NewCreateUserUseCase(
 	}
 }
 
-// CreateUser - creates new record in database with user's repositories
-// returns objects including user's repositories
-// possible errors:
-//   - validation errors
-//   - non-unique login
-//   - non-unique email
-//   - errors of password hash and user repository
-func (u *userUseCase) CreateAccount(context context.Context, request *requests.CreateAccountRequest) (*requests.CreateAccountResponse, error) {
+// CreateAccount creates new account if it satisfies the necessary conditions and stores it using IAccountRepository
+//
+// Returns: requests.SignUpResponse
+//
+// Possible errors:
+//   - errs.LoginValidationError, errs.EmailValidationError, errs.PasswordValidationError
+//   - errs.RecordAlreadyExists if email or login are not unique
+//   - errors of infrastructure from sources like IHashProvider or IAccountRepository implementations
+func (u *userUseCase) CreateAccount(context context.Context, request *requests.SignUpRequest) (*requests.SignUpResponse, error) {
 	login := accountpkg.Login(request.Login)
 	email := accountpkg.Email(request.Email)
 	password := accountpkg.Password(request.Password)
 	nickname := accountpkg.Nickname(login)
 
 	account := &accountpkg.Account{
-		Login:    &login,
-		Password: &password,
-		Email:    &email,
-		Nickname: &nickname,
+		Login:    login,
+		Password: password,
+		Email:    email,
+		Nickname: nickname,
 	}
 
 	err := account.Validate()
@@ -81,9 +81,7 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 		return nil, err
 	}
 
-	password = accountpkg.Password(hashedPassword)
-	account.Password = &password
-	account.RegistrationDate = time.Now()
+	account.ConfirmCreationBytes(hashedPassword)
 
 	account.Id, err = u.userRepo.Create(context, account)
 	if err != nil {
@@ -100,12 +98,12 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.C
 		return nil, err
 	}
 
-	return &requests.CreateAccountResponse{
+	return &requests.SignUpResponse{
 		Id: account.Id,
 		Session: requests.RefreshSessionResponse{
 			AccessToken:  session.AccessToken,
 			RefreshToken: session.RefreshToken,
-			ExpiresAt:    session.ExpiresAt.Unix(),
+			ExpiresAt:    session.AccessExpiresAt.Unix(),
 		},
 	}, nil
 }

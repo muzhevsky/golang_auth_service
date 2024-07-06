@@ -12,36 +12,46 @@ type tokenManager struct {
 	refresh IRefreshTokenGenerator
 }
 
-func NewTokenManager(config TokenConfiguration, access IAccessTokenManager, refresh IRefreshTokenGenerator) *tokenManager {
+func NewTokenManager(
+	config TokenConfiguration,
+	access IAccessTokenManager,
+	refresh IRefreshTokenGenerator) ISessionManager {
 	return &tokenManager{config: config, access: access, refresh: refresh}
 }
 
-func (t *tokenManager) CreateSession(user *account.Account) (*entities.Session, error) {
-	claims := make(map[string]interface{})
-	expiresAt := time.Now().Add(t.config.AccessTokenDuration)
-	claims["iss"] = t.config.Issuer
-	claims["userId"] = user.Id
-	claims["expiresAt"] = expiresAt.Unix()
+func (t *tokenManager) CreateSession(account *account.Account) (*entities.Session, error) {
+	refreshExpiresAt := time.Now().Add(t.config.RefreshTokenDuration)
 
-	access, err := t.access.CreateToken(claims)
+	claims := entities.NewClaims(account.Id, t.config.AccessTokenDuration, t.config.Issuer)
+
+	access, err := t.access.CreateToken(claims.MapFromClaims())
 	if err != nil {
 		return nil, err
 	}
 
-	refresh, err := t.refresh.GenerateToken(user.Id)
+	refresh, err := t.refresh.GenerateToken(account.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	return &entities.Session{
-		AccountId:      user.Id,
-		DeviceIdentity: "TODO",
-		AccessToken:    access,
-		RefreshToken:   refresh,
-		ExpiresAt:      expiresAt,
+		AccountId:       account.Id,
+		AccessToken:     access,
+		AccessExpiresAt: claims.ExpiresAt,
+		RefreshToken:    refresh,
+		ExpiresAt:       refreshExpiresAt,
 	}, nil
 }
 
-func (t *tokenManager) ParseToken(token string) (map[string]interface{}, error) {
-	return t.access.ParseToken(token)
+func (t *tokenManager) ParseToken(token string) (*entities.TokenClaims, error) {
+	dict, err := t.access.ParseToken(token)
+	if err != nil {
+		return nil, err
+	}
+	claims, err := entities.NewClaimsFromMap(dict)
+	if err != nil {
+		return nil, err
+	}
+
+	return claims, nil
 }

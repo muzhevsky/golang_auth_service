@@ -35,7 +35,7 @@ func (v *checkVerificationController) checkVerification(c *gin.Context) {
 		return
 	}
 
-	checked, err := v.useCase.Check(c, accountId.(int))
+	checked, err := v.useCase.CheckVerification(c, accountId.(int))
 	if err != nil {
 		middleware.AddGinError(c, err.(error))
 		return

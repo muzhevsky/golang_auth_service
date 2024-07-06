@@ -7,7 +7,7 @@ create sequence accounts_seq;
 -- drop table if exists users;
 create table accounts
 (
-    id                integer default nextval('accounts_seq') not null
+    id                bigint default nextval('accounts_seq') not null
         primary key,
     login             varchar(20)                           not null,
     nickname          varchar(16)                           not null,
@@ -29,12 +29,11 @@ create table verification_codes
 -- drop table if exists sessions;
 create table sessions
 (
-    id              serial primary key,
+    id              bigserial primary key,
     access_token    varchar(256) not null,
     refresh_token   varchar(256) not null,
-    user_id         int          not null,
-    device_identity varchar(128),
-    expire_at       date         not null
+    account_id         int          not null,
+    expires_at       date         not null
 );
 
 insert into accounts(id, login, nickname, password, email, registration_date, is_verified)

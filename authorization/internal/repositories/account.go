@@ -15,7 +15,7 @@ type accountRepo struct {
 	insertAccountCommand        datasources.IInsertAccountCommand
 }
 
-func NewAccountRepo(
+func NewAccountRepository(
 	selectAccountByIdCommand datasources.ISelectAccountByIdCommand,
 	selectAccountByEmailCommand datasources.ISelectAccountByEmailCommand,
 	selectAccountByLoginCommand datasources.ISelectAccountByLoginCommand,
@@ -37,15 +37,15 @@ func (u *accountRepo) FindById(context context.Context, id int) (*account.Accoun
 	return u.selectAccountByIdCommand.Execute(context, id)
 }
 
-func (u *accountRepo) FindByLogin(context context.Context, login *account.Login) (*account.Account, error) {
-	return u.selectAccountByLoginCommand.Execute(context, string(*login))
+func (u *accountRepo) FindByLogin(context context.Context, login account.Login) (*account.Account, error) {
+	return u.selectAccountByLoginCommand.Execute(context, string(login))
 }
 
-func (u *accountRepo) FindByEmail(context context.Context, email *account.Email) (*account.Account, error) {
-	return u.selectAccountByEmailCommand.Execute(context, string(*email))
+func (u *accountRepo) FindByEmail(context context.Context, email account.Email) (*account.Account, error) {
+	return u.selectAccountByEmailCommand.Execute(context, string(email))
 }
 
-func (u *accountRepo) CheckLoginExist(context context.Context, login *account.Login) (result bool, err error) {
+func (u *accountRepo) CheckLoginExist(context context.Context, login account.Login) (result bool, err error) {
 	user, err := u.FindByLogin(context, login)
 
 	if err != nil {
@@ -55,7 +55,7 @@ func (u *accountRepo) CheckLoginExist(context context.Context, login *account.Lo
 	return user != nil, nil
 }
 
-func (u *accountRepo) CheckEmailExist(context context.Context, email *account.Email) (bool, error) {
+func (u *accountRepo) CheckEmailExist(context context.Context, email account.Email) (bool, error) {
 	user, err := u.FindByEmail(context, email)
 
 	if err != nil {

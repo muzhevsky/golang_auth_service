@@ -21,20 +21,25 @@ func (h *authenticationHandler) HandleAuth(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	session, err := h.session.FindByAccessToken(c, token)
 
-	if err != nil || session == nil {
-		c.Set("authError", errs.NotAValidAccessToken)
-		c.Next()
-		return
-	}
-
-	parsedToken, err := h.manager.ParseToken(token)
 	if err != nil {
+		AddGinError(c, err)
+	}
+
+	if session == nil {
 		c.Set("authError", errs.NotAValidAccessToken)
 		c.Next()
 		return
 	}
 
-	expiresAt := time.Unix(int64(parsedToken["expiresAt"].(float64)), 0)
+	claims, err := h.manager.ParseToken(token)
+	if err != nil {
+		AddGinError(c, err)
+		c.Set("authError", errs.NotAValidAccessToken)
+		c.Next()
+		return
+	}
+
+	expiresAt := claims.ExpiresAt
 
 	if expiresAt.Before(time.Now()) {
 		c.Set("authError", errs.AccessTokenExpired)

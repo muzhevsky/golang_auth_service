@@ -6,32 +6,47 @@ import (
 
 type Account struct {
 	Id               int
-	Login            *Login
-	Password         *Password
-	Email            *Email
-	Nickname         *Nickname
+	Login            Login
+	Password         Password
+	Email            Email
+	Nickname         Nickname
 	IsVerified       bool
 	RegistrationDate time.Time
 }
 
-func (u *Account) Verify() {
-	u.IsVerified = true
+func (a *Account) Verify() {
+	a.IsVerified = true
 }
 
-func (u *Account) Validate() error {
-	err := u.Login.Validate()
+func (a *Account) ConfirmCreation(hashedPassword Password) {
+	a.Password = hashedPassword
+	a.RegistrationDate = time.Now()
+}
+
+func (a *Account) ConfirmCreationString(hashedPassword string) {
+	password := Password(hashedPassword)
+	a.ConfirmCreation(password)
+}
+
+func (a *Account) ConfirmCreationBytes(hashedPassword []byte) {
+	password := Password(hashedPassword)
+	a.ConfirmCreation(password)
+}
+
+func (a *Account) Validate() error {
+	err := a.Login.Validate()
 	if err != nil {
 		return err
 	}
-	err = u.Email.Validate()
+	err = a.Email.Validate()
 	if err != nil {
 		return err
 	}
-	err = u.Password.Validate()
+	err = a.Password.Validate()
 	if err != nil {
 		return err
 	}
-	err = u.Nickname.Validate()
+	err = a.Nickname.Validate()
 	if err != nil {
 		return err
 	}

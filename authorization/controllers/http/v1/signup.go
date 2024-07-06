@@ -28,14 +28,14 @@ func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCas
 // @Description  регистрация нового пользователя
 // @Accept       json
 // @Produce      json
-// @Param request body requests.CreateAccountRequest true "структура запрос"
-// @Success      200  {object}  requests.CreateAccountResponse
+// @Param request body requests.SignUpRequest true "структура запрос"
+// @Success      200  {object}  requests.SignUpResponse
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже существует"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
 // @Router       /signup [post]
 func (u *signupController) signup(c *gin.Context) {
-	var userRequest requests.CreateAccountRequest
+	var userRequest requests.SignUpRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		middleware.AddGinError(c, errs.DataBindError)

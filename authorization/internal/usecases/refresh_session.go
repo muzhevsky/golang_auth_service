@@ -3,25 +3,25 @@ package usecases
 import (
 	"authorization/controllers/requests"
 	"authorization/internal"
-	"authorization/internal/entities"
 	errors2 "authorization/internal/errs"
 	"authorization/internal/infrastructure/services/tokens"
 	"context"
 )
 
 type refreshSessionUseCase struct {
-	userRepo     internal.IAccountRepository
+	accountRepo  internal.IAccountRepository
 	sessionRepo  internal.ISessionRepository
 	tokenManager tokens.ISessionManager
 }
 
-func NewRefreshSessionUseCase(userRepo internal.IAccountRepository, sessionRepo internal.ISessionRepository, tokenManager tokens.ISessionManager) *refreshSessionUseCase {
-	return &refreshSessionUseCase{userRepo: userRepo, sessionRepo: sessionRepo, tokenManager: tokenManager}
+func NewRefreshSessionUseCase(accountRepo internal.IAccountRepository, sessionRepo internal.ISessionRepository, tokenManager tokens.ISessionManager) internal.IRefreshSessionUseCase {
+	return &refreshSessionUseCase{accountRepo: accountRepo, sessionRepo: sessionRepo, tokenManager: tokenManager}
 }
 
-func (s *refreshSessionUseCase) RefreshSession(context context.Context, request *requests.RefreshSessionRequest) (*entities.Session, error) {
+func (s *refreshSessionUseCase) RefreshSession(context context.Context, request *requests.RefreshSessionRequest) (*requests.RefreshSessionResponse, error) {
 	accessToken := request.AccessToken
 	refreshToken := request.RefreshToken
+
 	err := s.verifyToken(request.AccessToken)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 	}
 
 	userId := storedSession.AccountId
-	user, err := s.userRepo.FindById(context, userId)
+	user, err := s.accountRepo.FindById(context, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -47,21 +47,21 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 		return nil, err
 	}
 
-	result, err := s.sessionRepo.Update(context, storedSession, newSession)
+	_, err = s.sessionRepo.Update(context, storedSession, newSession)
 
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return &requests.RefreshSessionResponse{
+		AccessToken:  newSession.AccessToken,
+		RefreshToken: newSession.RefreshToken,
+		ExpiresAt:    newSession.ExpiresAt.Unix(),
+	}, nil
 }
 
 func (s *refreshSessionUseCase) verifyToken(token string) error {
-	claimsMap, err := s.tokenManager.ParseToken(token)
+	_, err := s.tokenManager.ParseToken(token)
 	if err != nil {
-		return errors2.NotAValidAccessToken
-	}
-	claims := entities.NewClaimsFromMap(claimsMap)
-	if claims == nil {
 		return errors2.NotAValidAccessToken
 	}
 

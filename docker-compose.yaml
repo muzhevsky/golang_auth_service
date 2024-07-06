@@ -31,21 +31,21 @@ services:
       - database:/var/lib/postgresql/data
 
 
-#  application:
-#    container_name: "application"
-#    env_file:
-#      - ./application/application.env
-#      - ./application/database/application_db.env
-#    build: ./application
-#    depends_on:
-#      - application_db
-#  application_db:
-#    container_name: "application_db"
-#    env_file:
-#      - ./application/database/application_db.env
-#    build: ./application/database
-#    volumes:
-#      - auth:/var/lib/postgresql/data
+  application:
+    container_name: "application"
+    env_file:
+      - ./application/application.env
+      - ./application/database/application_db.env
+    build: ./application
+    depends_on:
+      - application_db
+  application_db:
+    container_name: "application_db"
+    env_file:
+      - ./application/database/application_db.env
+    build: ./application/database
+    volumes:
+      - auth:/var/lib/postgresql/data
 
 volumes:
   database:

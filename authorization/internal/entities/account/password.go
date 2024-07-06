@@ -12,23 +12,23 @@ const (
 	maxPasswordLen = 20
 )
 
-func (p *Password) Validate() error {
+func (p Password) Validate() error {
 	if !p.validateLength() {
-		return fmt.Errorf("%w, password length can't be less than %d OR more %d", errs.PasswordValidationError, minPasswordLen, maxPasswordLen)
+		return fmt.Errorf("%w, password length can't be less than %d OR more %d", errs.ValidationError, minPasswordLen, maxPasswordLen)
 	}
 	if !p.validateCharacters() {
-		return fmt.Errorf("%w. password should contain at least one Latin alphabet character and one digit", errs.PasswordValidationError)
+		return fmt.Errorf("%w. password should contain at least one Latin alphabet character and one digit", errs.ValidationError)
 	}
 	return nil
 }
 
-func (p *Password) validateLength() bool {
-	return stringLengthInRange(string(*p), minPasswordLen, maxPasswordLen)
+func (p Password) validateLength() bool {
+	return stringLengthInRange(string(p), minPasswordLen, maxPasswordLen)
 }
 
-func (p *Password) validateCharacters() bool {
+func (p Password) validateCharacters() bool {
 	digitCount, letterCount := 0, 0
-	for _, char := range string(*p) {
+	for _, char := range string(p) {
 		if isLatinLetter(char) {
 			letterCount++
 		} else if isDigit(char) {

@@ -9,11 +9,11 @@ import (
 
 type (
 	ICreateAccountUseCase interface {
-		CreateAccount(context context.Context, request *requests.CreateAccountRequest) (*requests.CreateAccountResponse, error)
+		CreateAccount(context context.Context, request *requests.SignUpRequest) (*requests.SignUpResponse, error)
 	}
 
 	ISignInUseCase interface {
-		SignIn(context context.Context, user *requests.SignInRequest) (*entities.Session, error)
+		SignIn(context context.Context, user *requests.SignInRequest) (*requests.SignInResponse, error)
 	}
 
 	IVerifyUserUseCase interface {
@@ -25,20 +25,20 @@ type (
 	}
 
 	IRefreshSessionUseCase interface {
-		RefreshSession(context context.Context, tokens *requests.RefreshSessionRequest) (*entities.Session, error)
+		RefreshSession(context context.Context, tokens *requests.RefreshSessionRequest) (*requests.RefreshSessionResponse, error)
 	}
 
 	ICheckVerificationUseCase interface {
-		Check(context context.Context, accountId int) (bool, error)
+		CheckVerification(context context.Context, accountId int) (bool, error)
 	}
 
 	IAccountRepository interface {
 		Create(context context.Context, user *account.Account) (int, error)
 		FindById(context context.Context, id int) (*account.Account, error)
-		FindByLogin(context context.Context, login *account.Login) (*account.Account, error)
-		FindByEmail(context context.Context, email *account.Email) (*account.Account, error)
-		CheckLoginExist(context context.Context, login *account.Login) (bool, error)
-		CheckEmailExist(context context.Context, email *account.Email) (bool, error)
+		FindByLogin(context context.Context, login account.Login) (*account.Account, error)
+		FindByEmail(context context.Context, email account.Email) (*account.Account, error)
+		CheckLoginExist(context context.Context, login account.Login) (bool, error)
+		CheckEmailExist(context context.Context, email account.Email) (bool, error)
 		UpdateById(context context.Context, id int, user *account.Account) error
 	}
 

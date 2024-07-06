@@ -7,6 +7,7 @@ import (
 	v1 "authorization/controllers/http/v1"
 	pg2 "authorization/internal/infrastructure/datasources/pg"
 	"authorization/internal/infrastructure/datasources/pg/commands/accounts"
+	"authorization/internal/infrastructure/datasources/pg/commands/sessions"
 	"authorization/internal/infrastructure/services/hash"
 	mailers2 "authorization/internal/infrastructure/services/mailers"
 	tokens2 "authorization/internal/infrastructure/services/tokens"
@@ -53,35 +54,46 @@ func Run() {
 	updateAccountByIdCommand := accounts.NewUpdateAccountByIdPGCommand(pg)
 	insertAccountCommand := accounts.NewInsertAccountPGCommand(pg)
 
-	sessionDS := pg2.NewSessionDatasource(pg)
+	selectSessionByIdCommand := sessions.NewSelectSessionByIdPGCommand(pg)
+	selectSessionByAccessTokenCommand := sessions.NewSelectSessionByAccessTokenPGCommand(pg)
+	selectSessionsByAccountIdCommand := sessions.NewSelectSessionByAccountIdPGCommand(pg)
+	insertSessionCommand := sessions.NewInsertSessionPGCommand(pg)
+	updateSessionByIdCommand := sessions.NewUpdateSessionByIdPGCommand(pg)
+
 	verificationDS := pg2.NewPgVerificationDatasource(pg)
 
 	bcryptHashProvider := hash.NewBcryptHashProvider()
+
 	accessTokenProvider := tokens2.NewJwtProvider(jwt)
 	refreshTokenGenerator := tokens2.NewHashRefreshTokenGenerator(bcryptHashProvider)
-
-	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
-	smtpMailer := mailers2.NewSmtpMailer(smtpClient)
-	verificationMailer := mailers2.NewVerificationMailer(smtpMailer)
 	sessionManager := tokens2.NewTokenManager(
 		tokens2.TokenConfiguration{
-			AccessTokenDuration:  time.Minute * 30,
+			AccessTokenDuration:  time.Second * 30, //TODO minutes
 			RefreshTokenDuration: time.Hour * 24 * 30,
 			Issuer:               "TODO",
 		},
 		accessTokenProvider,
 		refreshTokenGenerator)
 
+	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
+	smtpMailer := mailers2.NewSmtpMailer(smtpClient)
+	verificationMailer := mailers2.NewVerificationMailer(smtpMailer)
+
 	// Repository
 
-	accountRepository := repositories.NewAccountRepo(
+	accountRepository := repositories.NewAccountRepository(
 		selectAccountByIdCommand,
 		selectAccountByEmailCommand,
 		selectAccountByLoginCommand,
 		updateAccountByIdCommand,
 		insertAccountCommand)
+	sessionRepository := repositories.NewSessionRepository(
+		selectSessionByIdCommand,
+		selectSessionByAccessTokenCommand,
+		selectSessionsByAccountIdCommand,
+		insertSessionCommand,
+		updateSessionByIdCommand)
 	verificationRepo := repositories.NewVerificationRepo(verificationDS)
-	sessionRepository := repositories.NewSessionRepository(sessionDS)
 
 	// UseCases
 
@@ -112,7 +124,7 @@ func Run() {
 		sessionManager,
 	)
 
-	requestVerificationUseCase := usecases.NewRequestVerificationRequest(
+	requestVerificationUseCase := usecases.NewRequestVerificationUseCase(
 		accountRepository,
 		verificationRepo,
 		verificationMailer,
@@ -132,7 +144,7 @@ func Run() {
 	v1.NewVerificationController(router, verificationUseCase, logger)
 	v1.NewSignInController(router, signInUseCase, logger)
 	v1.NewRefreshSessionController(router, refreshSessionUseCase, logger)
-	v1.NewRequestVerificationRouter(router, createUserUseCase, requestVerificationUseCase, logger)
+	v1.NewRequestVerificationController(router, createUserUseCase, requestVerificationUseCase, logger)
 	v1.NewCheckVerificationController(router, checkVerificationUseCase)
 
 	http.Start(router, cfg.HTTP)

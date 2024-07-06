@@ -15,7 +15,7 @@ type requestVerificationController struct {
 	logger       logger.ILogger
 }
 
-func NewRequestVerificationRouter(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IRequestVerificationUseCase, logger logger.ILogger) {
+func NewRequestVerificationController(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IRequestVerificationUseCase, logger logger.ILogger) {
 	u := &requestVerificationController{user, verification, logger}
 
 	handler.POST("/verification/request", u.requestVerification)

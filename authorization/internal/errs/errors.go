@@ -4,12 +4,10 @@ import (
 	"errors"
 )
 
-var LoginValidationError = errors.New("login validation error")
-var PasswordValidationError = errors.New("password validation error")
-var EmailValidationError = errors.New("email validation error")
+var ValidationError = errors.New("validation error")
 
 // auth
-var UserNotFound = errors.New("there's no user with such email or login")
+var AccountNotFound = errors.New("there's no user with such email or login")
 var WrongPassword = errors.New("wrong password")
 
 var AccessTokenExpired = errors.New("access token is expired")
