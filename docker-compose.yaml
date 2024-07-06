@@ -18,32 +18,35 @@ services:
     container_name: "auth"
     env_file:
       - ./authorization/auth.env
-      - ./authorization/database/auth_db.env
     build: ./authorization
     depends_on:
       - auth_db
   auth_db:
     container_name: "auth_db"
     env_file:
-      - ./authorization/database/auth_db.env
-    build: ./authorization/database
+      - authorization/auth.env
+    build: ./authorization/pkg/postgres
     volumes:
       - database:/var/lib/postgresql/data
+  auth_redis:
+    container_name: "auth_redis"
+    env_file:
+      - authorization/auth.env
+    build: ./authorization/pkg/redis
 
 
   application:
     container_name: "application"
     env_file:
       - ./application/application.env
-      - ./application/database/application_db.env
     build: ./application
     depends_on:
       - application_db
   application_db:
     container_name: "application_db"
     env_file:
-      - ./application/database/application_db.env
-    build: ./application/database
+      - ./application/application.env
+    build: ./application/pkg/postgres
     volumes:
       - auth:/var/lib/postgresql/data
 

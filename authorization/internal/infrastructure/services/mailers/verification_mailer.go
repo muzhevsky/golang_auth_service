@@ -1,18 +1,23 @@
 package mailers
 
 import (
+	"authorization/pkg/smtp"
 	"fmt"
 )
 
-type verificationMailer struct {
-	mailer *smtpMailer
+type smtpVerificationMailer struct {
+	mailer *smtp.SMTP
 }
 
-func NewVerificationMailer(mailer *smtpMailer) *verificationMailer {
-	return &verificationMailer{mailer: mailer}
+func NewSMTPVerificationMailer(mailer *smtp.SMTP) IVerificationMailer {
+	return &smtpVerificationMailer{mailer: mailer}
 }
 
-func (vm *verificationMailer) SendMail(email string, verificationCode string) {
-	vm.mailer.SendMail(email, "Код подтверждения", fmt.Sprintf(
-		"Я могу поставить сюда другой текст, если будет нужно: %v", verificationCode))
+func (vm *smtpVerificationMailer) SendMail(email string, verificationCode string) {
+	vm.mailer.SendMail(email, "Код подтверждения", bodyFromTemplate(verificationCode))
+}
+
+func bodyFromTemplate(verificationCode string) string {
+	return fmt.Sprintf("here should be HTML-code to represent email properly, but who cares?\n"+
+		"here's the code: %v", verificationCode)
 }

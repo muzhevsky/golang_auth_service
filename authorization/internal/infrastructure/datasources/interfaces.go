@@ -43,10 +43,13 @@ type (
 )
 
 type (
-	IVerificationDataSource interface {
-		Create(context context.Context, user *entities.Verification) (int, error)
-		SelectById(context context.Context, id int) (*entities.Verification, error)
-		SelectByUserId(context context.Context, userId int) ([]*entities.Verification, error)
-		DeleteById(context context.Context, id int) error
+	ICreateVerificationCommand interface {
+		Execute(context context.Context, verification *entities.Verification) error
+	}
+	ISelectVerificationsByAccountIdCommand interface {
+		Execute(context context.Context, accountId int) ([]*entities.Verification, error)
+	}
+	IDeleteVerificationsByAccountIdCommand interface {
+		Execute(context context.Context, accountId int) error
 	}
 )

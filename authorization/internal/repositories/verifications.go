@@ -8,36 +8,29 @@ import (
 )
 
 type verificationRepo struct {
-	ds datasources.IVerificationDataSource
+	create            datasources.ICreateVerificationCommand
+	selectByAccountId datasources.ISelectVerificationsByAccountIdCommand
+	deleteByAccountId datasources.IDeleteVerificationsByAccountIdCommand
 }
 
-func NewVerificationRepo(ds datasources.IVerificationDataSource) internal.IVerificationRepository {
-	return &verificationRepo{ds}
+func NewVerificationRepo(
+	createVerificationCommand datasources.ICreateVerificationCommand,
+	selectVerificationsByAccountIdCommand datasources.ISelectVerificationsByAccountIdCommand,
+	deleteVerificationsByAccountIdCommand datasources.IDeleteVerificationsByAccountIdCommand) internal.IVerificationRepository {
+	return &verificationRepo{
+		createVerificationCommand,
+		selectVerificationsByAccountIdCommand,
+		deleteVerificationsByAccountIdCommand}
 }
 
-func (repo *verificationRepo) Create(context context.Context, verification *entities.Verification) (int, error) {
-	return repo.ds.Create(context, verification)
-}
-
-func (repo *verificationRepo) FindById(context context.Context, id int) (*entities.Verification, error) {
-	return repo.ds.SelectById(context, id)
+func (repo *verificationRepo) Create(context context.Context, verification *entities.Verification) error {
+	return repo.create.Execute(context, verification)
 }
 
 func (repo *verificationRepo) FindByAccountId(context context.Context, userId int) ([]*entities.Verification, error) {
-	return repo.ds.SelectByUserId(context, userId)
+	return repo.selectByAccountId.Execute(context, userId)
 }
 
-func (repo *verificationRepo) Clear(context context.Context, userId int) error {
-	verifications, err := repo.ds.SelectByUserId(context, userId)
-	if err != nil {
-		return err
-	}
-	for _, verification := range verifications {
-		err = repo.ds.DeleteById(context, verification.Id)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+func (repo *verificationRepo) Clear(context context.Context, accountId int) error {
+	return repo.deleteByAccountId.Execute(context, accountId)
 }

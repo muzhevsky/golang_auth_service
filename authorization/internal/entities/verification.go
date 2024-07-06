@@ -13,7 +13,7 @@ const (
 
 type Verification struct {
 	Id             int
-	UserId         int
+	AccountId      int
 	Code           string
 	ExpirationTime time.Time
 }

@@ -1,28 +1,29 @@
 package tokens
 
 import (
+	"authorization/config"
 	"authorization/internal/entities"
 	"authorization/internal/entities/account"
 	"time"
 )
 
 type tokenManager struct {
-	config  TokenConfiguration
+	config  config.TokenConfiguration
 	access  IAccessTokenManager
 	refresh IRefreshTokenGenerator
 }
 
 func NewTokenManager(
-	config TokenConfiguration,
+	config config.TokenConfiguration,
 	access IAccessTokenManager,
 	refresh IRefreshTokenGenerator) ISessionManager {
 	return &tokenManager{config: config, access: access, refresh: refresh}
 }
 
 func (t *tokenManager) CreateSession(account *account.Account) (*entities.Session, error) {
-	refreshExpiresAt := time.Now().Add(t.config.RefreshTokenDuration)
+	refreshExpiresAt := time.Now().Add(time.Duration(int64(time.Second) * t.config.RefreshTokenDuration))
 
-	claims := entities.NewClaims(account.Id, t.config.AccessTokenDuration, t.config.Issuer)
+	claims := entities.NewClaims(account.Id, time.Duration(int64(time.Second)*t.config.AccessTokenDuration), t.config.Issuer)
 
 	access, err := t.access.CreateToken(claims.MapFromClaims())
 	if err != nil {

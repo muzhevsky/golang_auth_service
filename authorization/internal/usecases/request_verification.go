@@ -29,7 +29,7 @@ func (u *requestVerificationUseCase) RequestVerification(context context.Context
 	}
 
 	verification := entities.GenerateVerification(userId)
-	_, err = u.verificationRepo.Create(context, verification)
+	err = u.verificationRepo.Create(context, verification)
 	if err != nil {
 		return "", err
 	}

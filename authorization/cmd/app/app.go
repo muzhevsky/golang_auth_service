@@ -1,28 +1,25 @@
 package app
 
 import (
+	"authorization/cmd/app/factories"
 	"authorization/config"
 	http2 "authorization/controllers/http"
 	"authorization/controllers/http/middleware"
 	v1 "authorization/controllers/http/v1"
-	pg2 "authorization/internal/infrastructure/datasources/pg"
-	"authorization/internal/infrastructure/datasources/pg/commands/accounts"
-	"authorization/internal/infrastructure/datasources/pg/commands/sessions"
 	"authorization/internal/infrastructure/services/hash"
 	mailers2 "authorization/internal/infrastructure/services/mailers"
 	tokens2 "authorization/internal/infrastructure/services/tokens"
-	"authorization/internal/repositories"
 	"authorization/internal/usecases"
 	"authorization/pkg/http"
 	"authorization/pkg/jwt"
 	"authorization/pkg/logger"
 	"authorization/pkg/postgres"
+	"authorization/pkg/redis"
 	"authorization/pkg/smtp"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"strconv"
-	"time"
 )
 
 func Run() {
@@ -33,7 +30,7 @@ func Run() {
 
 	// Packages
 	logger := logger.New("error")
-
+	redisClient := redis.NewRedisClient(cfg.Redis)
 	jwt := jwt.New(cfg.SigningString)
 
 	size, err := strconv.Atoi(cfg.PG.PoolMax)
@@ -41,59 +38,28 @@ func Run() {
 	if err != nil {
 		logger.Fatal(fmt.Errorf("app - Run 2: %w", err))
 	}
-	pg, err := postgres.New(cfg.PG, postgres.MaxPoolSize(size))
+	pgClient, err := postgres.New(cfg.PG, postgres.MaxPoolSize(size))
 	if err != nil {
 		logger.Fatal(fmt.Errorf("app - Run 3: %w", err))
 	}
-	defer pg.Close()
+	defer pgClient.Close()
 
 	// Infrastructure
-	selectAccountByIdCommand := accounts.NewSelectAccountByIdPGCommand(pg)
-	selectAccountByEmailCommand := accounts.NewSelectAccountByEmailPGCommand(pg)
-	selectAccountByLoginCommand := accounts.NewSelectAccountByLoginPGCommand(pg)
-	updateAccountByIdCommand := accounts.NewUpdateAccountByIdPGCommand(pg)
-	insertAccountCommand := accounts.NewInsertAccountPGCommand(pg)
-
-	selectSessionByIdCommand := sessions.NewSelectSessionByIdPGCommand(pg)
-	selectSessionByAccessTokenCommand := sessions.NewSelectSessionByAccessTokenPGCommand(pg)
-	selectSessionsByAccountIdCommand := sessions.NewSelectSessionByAccountIdPGCommand(pg)
-	insertSessionCommand := sessions.NewInsertSessionPGCommand(pg)
-	updateSessionByIdCommand := sessions.NewUpdateSessionByIdPGCommand(pg)
-
-	verificationDS := pg2.NewPgVerificationDatasource(pg)
 
 	bcryptHashProvider := hash.NewBcryptHashProvider()
 
 	accessTokenProvider := tokens2.NewJwtProvider(jwt)
 	refreshTokenGenerator := tokens2.NewHashRefreshTokenGenerator(bcryptHashProvider)
-	sessionManager := tokens2.NewTokenManager(
-		tokens2.TokenConfiguration{
-			AccessTokenDuration:  time.Second * 30, //TODO minutes
-			RefreshTokenDuration: time.Hour * 24 * 30,
-			Issuer:               "TODO",
-		},
-		accessTokenProvider,
-		refreshTokenGenerator)
+	sessionManager := tokens2.NewTokenManager(cfg.TokenConfiguration, accessTokenProvider, refreshTokenGenerator)
 
 	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
-	smtpMailer := mailers2.NewSmtpMailer(smtpClient)
-	verificationMailer := mailers2.NewVerificationMailer(smtpMailer)
+	verificationMailer := mailers2.NewSMTPVerificationMailer(smtpClient)
 
 	// Repository
 
-	accountRepository := repositories.NewAccountRepository(
-		selectAccountByIdCommand,
-		selectAccountByEmailCommand,
-		selectAccountByLoginCommand,
-		updateAccountByIdCommand,
-		insertAccountCommand)
-	sessionRepository := repositories.NewSessionRepository(
-		selectSessionByIdCommand,
-		selectSessionByAccessTokenCommand,
-		selectSessionsByAccountIdCommand,
-		insertSessionCommand,
-		updateSessionByIdCommand)
-	verificationRepo := repositories.NewVerificationRepo(verificationDS)
+	accountRepository := factories.CreatePGAccountRepo(pgClient)
+	sessionRepository := factories.CreatePGSessionRepo(pgClient)
+	verificationRepo := factories.CreateRedisVerificationRepo(redisClient)
 
 	// UseCases
 

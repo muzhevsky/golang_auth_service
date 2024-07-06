@@ -43,8 +43,7 @@ type (
 	}
 
 	IVerificationRepository interface {
-		Create(context context.Context, verification *entities.Verification) (int, error)
-		FindById(context context.Context, id int) (*entities.Verification, error)
+		Create(context context.Context, verification *entities.Verification) error
 		FindByAccountId(context context.Context, userId int) ([]*entities.Verification, error)
 		Clear(context context.Context, userId int) error
 	}

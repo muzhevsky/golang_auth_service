@@ -26,11 +26,11 @@ func NewVerificationUseCase(userRepo internal.IAccountRepository, verificationRe
 //   - WrongVerificationCode error if code is wrong
 func (v *verificationUseCase) Verify(context context.Context, accountId int, code string) error {
 	verification := &entities.Verification{
-		UserId: accountId,
-		Code:   code,
+		AccountId: accountId,
+		Code:      code,
 	}
 
-	existingVerifications, err := v.verificationRepo.FindByAccountId(context, verification.UserId)
+	existingVerifications, err := v.verificationRepo.FindByAccountId(context, verification.AccountId)
 	if err != nil {
 		return err
 	}
