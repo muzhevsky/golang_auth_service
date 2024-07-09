@@ -1,8 +1,9 @@
 package datasources
 
 import (
-	"authorization/internal/entities"
 	"authorization/internal/entities/account"
+	"authorization/internal/entities/session"
+	"authorization/internal/entities/verification"
 	"context"
 )
 
@@ -25,29 +26,26 @@ type (
 )
 
 type (
-	ISelectSessionByIdCommand interface {
-		Execute(ctx context.Context, id int) (*entities.Session, error)
-	}
 	ISelectSessionByAccessTokenCommand interface {
-		Execute(ctx context.Context, token string) (*entities.Session, error)
+		Execute(ctx context.Context, token string) (*session.Session, error)
 	}
 	ISelectSessionsByAccountIdCommand interface {
-		Execute(ctx context.Context, id int) ([]*entities.Session, error)
+		Execute(ctx context.Context, id int) ([]*session.Session, error)
 	}
 	IInsertSessionCommand interface {
-		Execute(ctx context.Context, session *entities.Session) (int, error)
+		Execute(ctx context.Context, session *session.Session) error
 	}
-	IUpdateSessionByIdCommand interface {
-		Execute(ctx context.Context, session *entities.Session) error
+	IUpdateSessionByAccessTokenCommand interface {
+		Execute(ctx context.Context, accessToken string, newSession *session.Session) error
 	}
 )
 
 type (
 	ICreateVerificationCommand interface {
-		Execute(context context.Context, verification *entities.Verification) error
+		Execute(context context.Context, verification *verification.Verification) error
 	}
 	ISelectVerificationsByAccountIdCommand interface {
-		Execute(context context.Context, accountId int) ([]*entities.Verification, error)
+		Execute(context context.Context, accountId int) ([]*verification.Verification, error)
 	}
 	IDeleteVerificationsByAccountIdCommand interface {
 		Execute(context context.Context, accountId int) error

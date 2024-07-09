@@ -1,4 +1,4 @@
-package entities
+package session
 
 import (
 	"authorization/internal/errs"
@@ -22,7 +22,7 @@ func NewClaims(userId int, duration time.Duration, issuer string) *TokenClaims {
 	return &TokenClaims{UserId: userId, ExpiresAt: expiresAt, Issuer: issuer}
 }
 
-func NewClaimsFromMap(claimsMap map[string]interface{}) (*TokenClaims, error) {
+func NewClaimsFromMap(claimsMap map[string]any) (*TokenClaims, error) {
 	userId, exists := claimsMap[AccountIdClaimName].(float64)
 	if !exists {
 		return nil, errs.NotAValidAccessToken
@@ -42,7 +42,7 @@ func NewClaimsFromMap(claimsMap map[string]interface{}) (*TokenClaims, error) {
 		Issuer:    issuer}, nil
 }
 
-func (claims *TokenClaims) MapFromClaims() map[string]interface{} {
+func (claims *TokenClaims) MapFromClaims() map[string]any {
 	result := make(map[string]interface{})
 	result[AccountIdClaimName] = claims.UserId
 	result[ExpiresAt] = claims.ExpiresAt.Unix()

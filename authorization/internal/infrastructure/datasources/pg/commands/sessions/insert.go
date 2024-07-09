@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"authorization/internal/entities"
+	"authorization/internal/entities/session"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -16,13 +16,13 @@ func NewInsertSessionPGCommand(client *postgres.Client) datasources.IInsertSessi
 	return &insertSessionPGCommand{client: client}
 }
 
-func (c *insertSessionPGCommand) Execute(ctx context.Context, session *entities.Session) (int, error) {
+func (c *insertSessionPGCommand) Execute(ctx context.Context, session *session.Session) error {
 	sql, args, err := query_builders.NewInsertSessionQuery(&c.client.Builder, session)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	var id int
 	err = c.client.Pool.QueryRow(ctx, sql, args...).Scan(&id)
-	return id, err
+	return err
 }

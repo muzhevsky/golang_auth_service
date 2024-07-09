@@ -36,6 +36,15 @@ create table sessions
     expires_at       date         not null
 );
 
+create table devices
+(
+    id bigserial constraint devices_pk primary key,
+    identity varchar(256) not null unique,
+    name varchar(64) not null,
+    session_access_token varchar(128) not null,
+    session_creation_time timestamp
+);
+
 insert into accounts(id, login, nickname, password, email, registration_date, is_verified)
 values (1, 'admin', 'крутой_админ', '$2a$10$DNMPT2CvlYTS1/CRZnT7qO/jlWgA0v99EiIA5Fg.n2AM4H0Zm2Fnq', 'admin@ya.ru',
         current_date, true);

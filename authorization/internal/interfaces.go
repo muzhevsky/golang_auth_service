@@ -2,8 +2,9 @@ package internal
 
 import (
 	"authorization/controllers/requests"
-	"authorization/internal/entities"
 	"authorization/internal/entities/account"
+	"authorization/internal/entities/session"
+	"authorization/internal/entities/verification"
 	"context"
 )
 
@@ -43,14 +44,14 @@ type (
 	}
 
 	IVerificationRepository interface {
-		Create(context context.Context, verification *entities.Verification) error
-		FindByAccountId(context context.Context, userId int) ([]*entities.Verification, error)
+		Create(context context.Context, verification *verification.Verification) error
+		FindByAccountId(context context.Context, userId int) ([]*verification.Verification, error)
 		Clear(context context.Context, userId int) error
 	}
 
 	ISessionRepository interface {
-		Create(context context.Context, user *entities.Session) (int, error)
-		FindByAccessToken(context context.Context, token string) (*entities.Session, error)
-		Update(context context.Context, session *entities.Session, newSession *entities.Session) (*entities.Session, error)
+		Create(context context.Context, user *session.Session) error
+		FindByAccessToken(context context.Context, token string) (*session.Session, error)
+		Update(context context.Context, session *session.Session, newSession *session.Session) (*session.Session, error)
 	}
 )

@@ -16,6 +16,6 @@ func NewDeleteVerificationByAccountIdRedisCommand(client *redis.Client) datasour
 
 func (c *deleteVerificationByAccountIdRedisCommand) Execute(context context.Context, accountId int) error {
 	key := getKey(accountId)
-	_, err := c.client.Del(context, key).Result()
+	err := c.client.Del(context, key).Err()
 	return err
 }

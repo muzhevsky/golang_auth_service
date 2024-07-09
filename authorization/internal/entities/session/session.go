@@ -1,11 +1,10 @@
-package entities
+package session
 
 import (
 	"time"
 )
 
 type Session struct {
-	Id              int
 	AccountId       int
 	AccessToken     string
 	RefreshToken    string

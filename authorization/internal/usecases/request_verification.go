@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"authorization/internal"
-	"authorization/internal/entities"
+	"authorization/internal/entities/verification"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"context"
@@ -28,7 +28,7 @@ func (u *requestVerificationUseCase) RequestVerification(context context.Context
 		return "", errs.UserIsAlreadyVerified
 	}
 
-	verification := entities.GenerateVerification(userId)
+	verification := verification.GenerateVerification(userId)
 	err = u.verificationRepo.Create(context, verification)
 	if err != nil {
 		return "", err

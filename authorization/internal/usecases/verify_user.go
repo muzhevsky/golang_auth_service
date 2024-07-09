@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"authorization/internal"
-	"authorization/internal/entities"
+	"authorization/internal/entities/verification"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"context"
@@ -25,7 +25,7 @@ func NewVerificationUseCase(userRepo internal.IAccountRepository, verificationRe
 //   - ExpiredVerificationCode error if there are no active verification codes
 //   - WrongVerificationCode error if code is wrong
 func (v *verificationUseCase) Verify(context context.Context, accountId int, code string) error {
-	verification := &entities.Verification{
+	verification := &verification.Verification{
 		AccountId: accountId,
 		Code:      code,
 	}
@@ -35,7 +35,7 @@ func (v *verificationUseCase) Verify(context context.Context, accountId int, cod
 		return err
 	}
 
-	var existingVerification *entities.Verification
+	var existingVerification *verification.Verification
 	for _, verification := range existingVerifications {
 		if verification.Code == code {
 			existingVerification = verification

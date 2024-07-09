@@ -36,14 +36,12 @@ func CreatePGAccountRepo(client *postgres.Client) internal.IAccountRepository {
 }
 
 func CreatePGSessionRepo(client *postgres.Client) internal.ISessionRepository {
-	selectSessionByIdCommand := sessions.NewSelectSessionByIdPGCommand(client)
 	selectSessionByAccessTokenCommand := sessions.NewSelectSessionByAccessTokenPGCommand(client)
 	selectSessionsByAccountIdCommand := sessions.NewSelectSessionByAccountIdPGCommand(client)
 	insertSessionCommand := sessions.NewInsertSessionPGCommand(client)
 	updateSessionByIdCommand := sessions.NewUpdateSessionByIdPGCommand(client)
 
 	return repositories.NewSessionRepository(
-		selectSessionByIdCommand,
 		selectSessionByAccessTokenCommand,
 		selectSessionsByAccountIdCommand,
 		insertSessionCommand,

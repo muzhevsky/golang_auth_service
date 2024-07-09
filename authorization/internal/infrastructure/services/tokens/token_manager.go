@@ -2,8 +2,8 @@ package tokens
 
 import (
 	"authorization/config"
-	"authorization/internal/entities"
 	"authorization/internal/entities/account"
+	"authorization/internal/entities/session"
 	"time"
 )
 
@@ -20,10 +20,10 @@ func NewTokenManager(
 	return &tokenManager{config: config, access: access, refresh: refresh}
 }
 
-func (t *tokenManager) CreateSession(account *account.Account) (*entities.Session, error) {
+func (t *tokenManager) CreateSession(account *account.Account) (*session.Session, error) {
 	refreshExpiresAt := time.Now().Add(time.Duration(int64(time.Second) * t.config.RefreshTokenDuration))
 
-	claims := entities.NewClaims(account.Id, time.Duration(int64(time.Second)*t.config.AccessTokenDuration), t.config.Issuer)
+	claims := session.NewClaims(account.Id, time.Duration(int64(time.Second)*t.config.AccessTokenDuration), t.config.Issuer)
 
 	access, err := t.access.CreateToken(claims.MapFromClaims())
 	if err != nil {
@@ -35,7 +35,7 @@ func (t *tokenManager) CreateSession(account *account.Account) (*entities.Sessio
 		return nil, err
 	}
 
-	return &entities.Session{
+	return &session.Session{
 		AccountId:       account.Id,
 		AccessToken:     access,
 		AccessExpiresAt: claims.ExpiresAt,
@@ -44,12 +44,12 @@ func (t *tokenManager) CreateSession(account *account.Account) (*entities.Sessio
 	}, nil
 }
 
-func (t *tokenManager) ParseToken(token string) (*entities.TokenClaims, error) {
+func (t *tokenManager) ParseToken(token string) (*session.TokenClaims, error) {
 	dict, err := t.access.ParseToken(token)
 	if err != nil {
 		return nil, err
 	}
-	claims, err := entities.NewClaimsFromMap(dict)
+	claims, err := session.NewClaimsFromMap(dict)
 	if err != nil {
 		return nil, err
 	}

@@ -2,47 +2,42 @@ package repositories
 
 import (
 	"authorization/internal"
-	"authorization/internal/entities"
+	"authorization/internal/entities/session"
 	"authorization/internal/infrastructure/datasources"
 	"context"
-	"fmt"
 )
 
 type sessionRepository struct {
-	selectSessionByIdCommand          datasources.ISelectSessionByIdCommand
 	selectSessionByAccessTokenCommand datasources.ISelectSessionByAccessTokenCommand
 	selectSessionsByAccountIdCommand  datasources.ISelectSessionsByAccountIdCommand
 	insertSessionCommand              datasources.IInsertSessionCommand
-	updateSessionByIdCommand          datasources.IUpdateSessionByIdCommand
+	updateSessionByAccessTokenCommand datasources.IUpdateSessionByAccessTokenCommand
 }
 
 func NewSessionRepository(
-	selectSessionByIdCommand datasources.ISelectSessionByIdCommand,
 	selectSessionByAccessTokenCommand datasources.ISelectSessionByAccessTokenCommand,
 	selectSessionsByAccountIdCommand datasources.ISelectSessionsByAccountIdCommand,
 	insertSessionCommand datasources.IInsertSessionCommand,
-	updateSessionByIdCommand datasources.IUpdateSessionByIdCommand) internal.ISessionRepository {
-	return &sessionRepository{selectSessionByIdCommand: selectSessionByIdCommand, selectSessionByAccessTokenCommand: selectSessionByAccessTokenCommand, selectSessionsByAccountIdCommand: selectSessionsByAccountIdCommand, insertSessionCommand: insertSessionCommand, updateSessionByIdCommand: updateSessionByIdCommand}
+	updateSessionByAccessTokenCommand datasources.IUpdateSessionByAccessTokenCommand) internal.ISessionRepository {
+	return &sessionRepository{selectSessionByAccessTokenCommand: selectSessionByAccessTokenCommand, selectSessionsByAccountIdCommand: selectSessionsByAccountIdCommand, insertSessionCommand: insertSessionCommand, updateSessionByAccessTokenCommand: updateSessionByAccessTokenCommand}
 }
 
-func (s *sessionRepository) Create(context context.Context, session *entities.Session) (int, error) {
-	fmt.Println("a")
+func (s *sessionRepository) Create(context context.Context, session *session.Session) error {
 	return s.insertSessionCommand.Execute(context, session)
 }
 
-func (s *sessionRepository) FindByAccessToken(context context.Context, token string) (*entities.Session, error) {
+func (s *sessionRepository) FindByAccessToken(context context.Context, token string) (*session.Session, error) {
 	return s.selectSessionByAccessTokenCommand.Execute(context, token)
 }
 
-func (s *sessionRepository) Update(context context.Context, sessionToUpdate *entities.Session, newSession *entities.Session) (*entities.Session, error) {
-	cpy := entities.Session{
-		Id:           sessionToUpdate.Id,
+func (s *sessionRepository) Update(context context.Context, sessionToUpdate *session.Session, newSession *session.Session) (*session.Session, error) {
+	cpy := session.Session{
 		AccountId:    newSession.AccountId,
 		AccessToken:  newSession.AccessToken,
 		RefreshToken: newSession.RefreshToken,
 		ExpiresAt:    newSession.ExpiresAt,
 	}
-	err := s.updateSessionByIdCommand.Execute(context, &cpy)
+	err := s.updateSessionByAccessTokenCommand.Execute(context, sessionToUpdate.AccessToken, &cpy)
 
 	return sessionToUpdate, err
 }

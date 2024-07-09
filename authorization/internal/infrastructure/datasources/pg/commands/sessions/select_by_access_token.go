@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"authorization/internal/entities"
+	"authorization/internal/entities/session"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -18,17 +18,17 @@ func NewSelectSessionByAccessTokenPGCommand(client *postgres.Client) datasources
 	return &selectSessionByAccessTokenPGCommand{client: client}
 }
 
-func (s *selectSessionByAccessTokenPGCommand) Execute(ctx context.Context, token string) (*entities.Session, error) {
+func (s *selectSessionByAccessTokenPGCommand) Execute(ctx context.Context, token string) (*session.Session, error) {
 	sql, args, err := query_builders.NewSelectSessionByAccessTokenQuery(&s.client.Builder, token)
 
 	if err != nil {
 		return nil, err
 	}
 
-	result := &entities.Session{}
+	result := &session.Session{}
 	err = s.client.Pool.
 		QueryRow(ctx, sql, args...).
-		Scan(&result.Id, &result.AccessToken, &result.RefreshToken, &result.AccountId, &result.ExpiresAt)
+		Scan(&result.AccessToken, &result.RefreshToken, &result.AccountId, &result.ExpiresAt)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
