@@ -38,6 +38,9 @@ type (
 	IUpdateSessionByAccessTokenCommand interface {
 		Execute(ctx context.Context, accessToken string, newSession *session.Session) error
 	}
+	IDeleteSessionByAccessTokenCommand interface {
+		Execute(ctx context.Context, accessToken string) error
+	}
 )
 
 type (
@@ -49,5 +52,26 @@ type (
 	}
 	IDeleteVerificationsByAccountIdCommand interface {
 		Execute(context context.Context, accountId int) error
+	}
+)
+
+type (
+	IInsertDeviceCommand interface {
+		Execute(context context.Context, device *session.Device) error
+	}
+	ISelectDeviceByIdCommand interface {
+		Execute(context context.Context, id int) (*session.Device, error)
+	}
+	ISelectDeviceByAccessTokenCommand interface {
+		Execute(context context.Context, accessToken string) (*session.Device, error)
+	}
+	ISelectDevicesByAccountIdCommand interface {
+		Execute(context context.Context, accountId int) ([]*session.Device, error)
+	}
+	IDeleteDeviceByIdCommand interface {
+		Execute(context context.Context, id int) error
+	}
+	IUpdateDeviceByAccessTokenCommand interface {
+		Execute(context context.Context, token string, newDevice *session.Device) error
 	}
 )

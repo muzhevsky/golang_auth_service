@@ -47,11 +47,11 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 		return nil, err
 	}
 
-	_, err = s.sessionRepo.Update(context, storedSession, newSession)
-
+	_, err = s.sessionRepo.UpdateByAccessToken(context, storedSession.AccessToken, newSession)
 	if err != nil {
 		return nil, err
 	}
+
 	return &requests.RefreshSessionResponse{
 		AccessToken:  newSession.AccessToken,
 		RefreshToken: newSession.RefreshToken,

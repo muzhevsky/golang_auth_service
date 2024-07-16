@@ -50,7 +50,7 @@ func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.Si
 		return nil, err
 	}
 
-	_, err = u.sessionRepo.Create(context, session)
+	err = u.sessionRepo.CreateWithDevice(context, userRequest.DeviceName, session)
 	if err != nil {
 		return nil, err
 	}

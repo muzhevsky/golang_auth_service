@@ -5,13 +5,11 @@ import (
 	"testing"
 )
 
-type testEmailEntity struct {
-	email account.Email
-	valid bool
-}
-
 func TestEmail(t *testing.T) {
-	testCases := []testEmailEntity{
+	testCases := []struct {
+		email account.Email
+		valid bool
+	}{
 		{account.Email("toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong@mail.ru"), false},
 		{account.Email("a@a.a"), false},
 		{account.Email("okmail@mail.ru"), true},

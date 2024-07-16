@@ -93,7 +93,7 @@ func (u *userUseCase) CreateAccount(context context.Context, request *requests.S
 		return nil, err
 	}
 
-	_, err = u.sessionRepo.Create(context, session)
+	err = u.sessionRepo.CreateWithDevice(context, request.DeviceName, session)
 	if err != nil {
 		return nil, err
 	}

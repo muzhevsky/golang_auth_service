@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"authorization/internal/infrastructure/datasources"
 	"context"
 	"github.com/redis/go-redis/v9"
 )
@@ -9,7 +10,7 @@ type deleteSessionByAccessTokenCommand struct {
 	client *redis.Client
 }
 
-func NewDeleteSessionByAccessTokenCommand(client *redis.Client) *deleteSessionByAccessTokenCommand {
+func NewDeleteSessionByAccessTokenCommand(client *redis.Client) datasources.IDeleteSessionByAccessTokenCommand {
 	return &deleteSessionByAccessTokenCommand{client: client}
 }
 

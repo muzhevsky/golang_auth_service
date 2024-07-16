@@ -8,7 +8,7 @@ import (
 const (
 	devicesTableName            = "devices"
 	deviceIdFieldName           = "id"
-	deviceIdentityFieldName     = "identity"
+	deviceAccountIdFieldName    = "account_id"
 	deviceNameFieldName         = "name"
 	deviceAccessTokenFieldName  = "session_access_token"
 	deviceCreationDateFieldName = "session_creation_date"
@@ -20,32 +20,50 @@ func NewSelectDeviceByIdQuery(builder *sq.StatementBuilderType, id int) (string,
 		ToSql()
 }
 
-func NewSelectDeviceByIdentityQuery(builder *sq.StatementBuilderType, identity string) (string, []any, error) {
+func NewSelectDeviceByAccessTokenQuery(builder *sq.StatementBuilderType, accessToken string) (string, []any, error) {
 	return selectStarDevice(builder).
-		Where(sq.Eq{deviceIdentityFieldName: identity}).
+		Where(sq.Eq{deviceAccessTokenFieldName: accessToken}).
 		ToSql()
 }
 
-func NewCreateDeviceQuery(builder *sq.StatementBuilderType, device *session.Device) (string, []any, error) {
+func NewSelectDeviceByAccountIdQuery(builder *sq.StatementBuilderType, accountId int) (string, []any, error) {
+	return selectStarDevice(builder).
+		Where(sq.Eq{deviceAccountIdFieldName: accountId}).
+		ToSql()
+}
+
+func NewInsertDeviceQuery(builder *sq.StatementBuilderType, device *session.Device) (string, []any, error) {
 	return builder.
 		Insert(devicesTableName).
-		Columns(deviceIdentityFieldName, deviceNameFieldName, deviceAccessTokenFieldName, deviceCreationDateFieldName).
-		Values(device.Identity, device.Name, device.SessionAccessToken, device.SessionCreationTime).
+		Columns(deviceAccountIdFieldName, deviceNameFieldName, deviceAccessTokenFieldName, deviceCreationDateFieldName).
+		Values(device.AccountId, device.Name, device.SessionAccessToken, device.SessionCreationTime).
 		ToSql()
 }
 
-func NewUpdateDeviceByIdQuery(builder *sq.StatementBuilderType, id int, newDevice *session.Device) (string, []any, error) {
+func NewUpdateDeviceByAccessTokenQuery(builder *sq.StatementBuilderType, accessToken string, newDevice *session.Device) (string, []any, error) {
 	return builder.
 		Update(devicesTableName).
-		Set(deviceIdentityFieldName, newDevice.Identity).
+		Set(deviceAccountIdFieldName, newDevice.AccountId).
 		Set(deviceNameFieldName, newDevice.Name).
 		Set(deviceAccessTokenFieldName, newDevice.SessionAccessToken).
 		Set(deviceCreationDateFieldName, newDevice.SessionCreationTime).
+		Where(sq.Eq{deviceAccessTokenFieldName: accessToken}).
+		ToSql()
+}
+
+func NewDeleteDeviceByIdQuery(builder *sq.StatementBuilderType, id int) (string, []any, error) {
+	return builder.
+		Delete(devicesTableName).
 		Where(sq.Eq{deviceIdFieldName: id}).
 		ToSql()
 }
 
 func selectStarDevice(builder *sq.StatementBuilderType) sq.SelectBuilder {
-	return builder.Select(deviceIdFieldName, deviceIdentityFieldName, deviceNameFieldName, deviceAccessTokenFieldName, deviceCreationDateFieldName).
+	return builder.Select(
+		deviceIdFieldName,
+		deviceAccountIdFieldName,
+		deviceNameFieldName,
+		deviceAccessTokenFieldName,
+		deviceCreationDateFieldName).
 		From(devicesTableName)
 }

@@ -13,6 +13,10 @@ type (
 		CreateAccount(context context.Context, request *requests.SignUpRequest) (*requests.SignUpResponse, error)
 	}
 
+	IGetAccountDevicesUseCase interface {
+		GetAccountDevices(context context.Context, accountId int) (*requests.AccountDevicesResponse, error)
+	}
+
 	ISignInUseCase interface {
 		SignIn(context context.Context, user *requests.SignInRequest) (*requests.SignInResponse, error)
 	}
@@ -50,8 +54,13 @@ type (
 	}
 
 	ISessionRepository interface {
-		Create(context context.Context, user *session.Session) error
+		CreateWithDevice(context context.Context, deviceName string, user *session.Session) error
 		FindByAccessToken(context context.Context, token string) (*session.Session, error)
-		Update(context context.Context, session *session.Session, newSession *session.Session) (*session.Session, error)
+		UpdateByAccessToken(context context.Context, token string, newSession *session.Session) (*session.Session, error)
+	}
+
+	IDeviceRepository interface {
+		SelectDevicesByAccountId(context context.Context, accountId int) ([]*session.Device, error)
+		DeleteDeviceById(context context.Context, deviceId int) error
 	}
 )

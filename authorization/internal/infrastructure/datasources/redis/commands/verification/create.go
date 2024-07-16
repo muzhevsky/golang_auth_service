@@ -1,7 +1,7 @@
 package verification
 
 import (
-	"authorization/internal/entities/verification"
+	verificationpkg "authorization/internal/entities/verification"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/redis/commands"
 	"context"
@@ -17,16 +17,16 @@ func NewCreateVerificationRedisCommand(client *redis.Client) datasources.ICreate
 	return &createVerificationRedisCommand{client: client}
 }
 
-func (c *createVerificationRedisCommand) Execute(context context.Context, verification *verification.Verification) error {
+func (c *createVerificationRedisCommand) Execute(context context.Context, verification *verificationpkg.Verification) error {
 	key := getKey(verification.AccountId)
-	verificationsPtr, err := commands.GetValueOrNil[[]*verification.Verification](context, c.client, key)
+	verificationsPtr, err := commands.GetValueOrNil[[]*verificationpkg.Verification](context, c.client, key)
 	if err != nil {
 		return err
 	}
 
-	var verifications []*verification.Verification
+	var verifications []*verificationpkg.Verification
 	if verificationsPtr == nil {
-		verifications = make([]*verification.Verification, 0)
+		verifications = make([]*verificationpkg.Verification, 0)
 	} else {
 		verifications = *verificationsPtr
 	}

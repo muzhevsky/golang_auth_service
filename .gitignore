@@ -30,3 +30,5 @@ config/*.cfg
 config/*.ini
 config/*.txt
 *.conf
+
+vendor

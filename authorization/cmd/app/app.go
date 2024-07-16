@@ -58,8 +58,9 @@ func Run() {
 	// Repository
 
 	accountRepository := factories.CreatePGAccountRepo(pgClient)
-	sessionRepository := factories.CreatePGSessionRepo(pgClient)
+	sessionRepository := factories.CreateSessionRepo(pgClient, redisClient)
 	verificationRepo := factories.CreateRedisVerificationRepo(redisClient)
+	deviceRepository := factories.CreateDeviceRepo(pgClient, redisClient)
 
 	// UseCases
 
@@ -96,8 +97,9 @@ func Run() {
 		verificationMailer,
 	)
 
-	checkVerificationUseCase := usecases.NewCheckVerificationUsecase(
-		accountRepository)
+	checkVerificationUseCase := usecases.NewCheckVerificationUsecase(accountRepository)
+
+	getAccountDevicesUseCase := usecases.NewGetAccountDevicesUseCase(deviceRepository)
 	// Controllers
 
 	router := gin.New()
@@ -112,6 +114,7 @@ func Run() {
 	v1.NewRefreshSessionController(router, refreshSessionUseCase, logger)
 	v1.NewRequestVerificationController(router, createUserUseCase, requestVerificationUseCase, logger)
 	v1.NewCheckVerificationController(router, checkVerificationUseCase)
+	v1.NewGetAccountDevices(router, getAccountDevicesUseCase)
 
 	http.Start(router, cfg.HTTP)
 }

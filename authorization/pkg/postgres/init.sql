@@ -39,10 +39,10 @@ create table sessions
 create table devices
 (
     id bigserial constraint devices_pk primary key,
-    identity varchar(256) not null unique,
+    account_id int not null references accounts(id),
     name varchar(64) not null,
-    session_access_token varchar(128) not null,
-    session_creation_time timestamp
+    session_access_token varchar(256) not null,
+    session_creation_date timestamp
 );
 
 insert into accounts(id, login, nickname, password, email, registration_date, is_verified)

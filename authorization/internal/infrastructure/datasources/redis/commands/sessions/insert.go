@@ -17,8 +17,8 @@ func NewInsertSessionRedisCommand(client *redis.Client) datasources.IInsertSessi
 	return &insertSessionRedisCommand{client: client}
 }
 
-func (c *insertSessionRedisCommand) Execute(ctx context.Context, session *session.Session) error {
-	key := getKey(session.AccessToken)
+func (c *insertSessionRedisCommand) Execute(ctx context.Context, s *session.Session) error {
+	key := getKey(s.AccessToken)
 	sessionPtr, err := commands.GetValueOrNil[session.Session](ctx, c.client, key)
 	if err != nil {
 		return err
@@ -27,6 +27,6 @@ func (c *insertSessionRedisCommand) Execute(ctx context.Context, session *sessio
 		return err // TODO
 	}
 
-	err = commands.SetValue(ctx, c.client, key, session, session.ExpiresAt.Sub(time.Now()))
+	err = commands.SetValue(ctx, c.client, key, s, s.ExpiresAt.Sub(time.Now()))
 	return err
 }

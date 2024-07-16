@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"authorization/internal/entities/session"
+	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/redis/commands"
 	"context"
 	"github.com/redis/go-redis/v9"
@@ -11,7 +12,7 @@ type selectSessionByAccessTokenRedisCommand struct {
 	client *redis.Client
 }
 
-func NewSelectSessionByAccessTokenRedisCommand(client *redis.Client) *selectSessionByAccessTokenRedisCommand {
+func NewSelectSessionByAccessTokenRedisCommand(client *redis.Client) datasources.ISelectSessionByAccessTokenCommand {
 	return &selectSessionByAccessTokenRedisCommand{client: client}
 }
 

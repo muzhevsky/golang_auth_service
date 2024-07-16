@@ -3,7 +3,8 @@ package factories
 import (
 	"authorization/internal"
 	"authorization/internal/infrastructure/datasources/pg/commands/accounts"
-	"authorization/internal/infrastructure/datasources/pg/commands/sessions"
+	"authorization/internal/infrastructure/datasources/pg/commands/devices"
+	sessions2 "authorization/internal/infrastructure/datasources/redis/commands/sessions"
 	"authorization/internal/infrastructure/datasources/redis/commands/verification"
 	"authorization/internal/repositories"
 	"authorization/pkg/postgres"
@@ -35,15 +36,34 @@ func CreatePGAccountRepo(client *postgres.Client) internal.IAccountRepository {
 		insertAccountCommand)
 }
 
-func CreatePGSessionRepo(client *postgres.Client) internal.ISessionRepository {
-	selectSessionByAccessTokenCommand := sessions.NewSelectSessionByAccessTokenPGCommand(client)
-	selectSessionsByAccountIdCommand := sessions.NewSelectSessionByAccountIdPGCommand(client)
-	insertSessionCommand := sessions.NewInsertSessionPGCommand(client)
-	updateSessionByIdCommand := sessions.NewUpdateSessionByIdPGCommand(client)
+func CreateSessionRepo(postgres *postgres.Client, redis *redis.Client) internal.ISessionRepository {
+	selectSessionByAccessTokenCommand := sessions2.NewSelectSessionByAccessTokenRedisCommand(redis)
+	updateSessionByAccessTokenCommand := sessions2.NewUpdateSessionByAccessTokenRedisCommand(redis)
+	insertSessionCommand := sessions2.NewInsertSessionRedisCommand(redis)
+
+	selectDeviceByAccessTokenCommand := devices.NewSelectDeviceByAccessTokenPGCommand(postgres)
+	updateDeviceByAccessTokenCommand := devices.NewUpdateDeviceByAccessTokenPGCommand(postgres)
+	insertDeviceCommand := devices.NewInsertDevicePGCommand(postgres)
 
 	return repositories.NewSessionRepository(
 		selectSessionByAccessTokenCommand,
-		selectSessionsByAccountIdCommand,
 		insertSessionCommand,
-		updateSessionByIdCommand)
+		updateSessionByAccessTokenCommand,
+		selectDeviceByAccessTokenCommand,
+		insertDeviceCommand,
+		updateDeviceByAccessTokenCommand)
+}
+
+func CreateDeviceRepo(postgres *postgres.Client, redis *redis.Client) internal.IDeviceRepository {
+	deleteSessionByAccessTokenCommand := sessions2.NewDeleteSessionByAccessTokenCommand(redis)
+
+	selectDeviceByIdCommand := devices.NewSelectDeviceByIdPGCommand(postgres)
+	selectDevicesByAccountIdCommand := devices.NewSelectDevicesByAccountIdPGCommand(postgres)
+	deleteDeviceByIdCommand := devices.NewDeleteDeviceByIdPGCommand(postgres)
+
+	return repositories.NewDeviceRepo(
+		selectDevicesByAccountIdCommand,
+		selectDeviceByIdCommand,
+		deleteDeviceByIdCommand,
+		deleteSessionByAccessTokenCommand)
 }

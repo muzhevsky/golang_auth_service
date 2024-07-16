@@ -20,7 +20,7 @@ func isDigit(symbol rune) bool {
 	return symbol >= '0' && symbol <= '9'
 }
 func isEmail(str string) bool {
-	m, err := regexp.Match("^[а-яА-Яa-zA-Z0-9.+]+@([a-zа-я-]+\\.)+[a-zа-я-]{2,4}$", []byte(str))
+	m, err := regexp.Match("^[а-яА-Яa-zA-Z0-9.+-]+@([a-zа-я-]+\\.)+[a-zа-я-]{2,4}$", []byte(str))
 	if err != nil {
 		return false
 	}

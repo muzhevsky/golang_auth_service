@@ -2,27 +2,28 @@ package sessions
 
 import (
 	"authorization/internal/entities/session"
+	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/redis/commands"
 	"context"
 	"github.com/redis/go-redis/v9"
 	"time"
 )
 
-type replaceSessionByAccessTokenRedisCommand struct {
+type updateSessionByAccessTokenRedisCommand struct {
 	client *redis.Client
 }
 
-func NewReplaceSessionByAccessTokenRedisCommand(client *redis.Client) *replaceSessionByAccessTokenRedisCommand {
-	return &replaceSessionByAccessTokenRedisCommand{client: client}
+func NewUpdateSessionByAccessTokenRedisCommand(client *redis.Client) datasources.IUpdateSessionByAccessTokenCommand {
+	return &updateSessionByAccessTokenRedisCommand{client: client}
 }
 
-func (c replaceSessionByAccessTokenRedisCommand) Execute(context context.Context, accessToken string, newSession *session.Session) error {
+func (c updateSessionByAccessTokenRedisCommand) Execute(context context.Context, accessToken string, newSession *session.Session) error {
 	oldKey := getKey(accessToken)
-	session, err := commands.GetValueOrNil[session.Session](context, c.client, oldKey)
+	s, err := commands.GetValueOrNil[session.Session](context, c.client, oldKey)
 	if err != nil {
 		return err
 	}
-	if session != nil {
+	if s != nil {
 		err = c.client.Del(context, oldKey).Err()
 		if err != nil {
 			return err
