@@ -2,7 +2,7 @@ package avatars
 
 import (
 	"context"
-	"smartri_app/internal/entities/user_data/avatar"
+	"smartri_app/internal/entities/avatar"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"

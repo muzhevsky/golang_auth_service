@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -18,7 +18,7 @@ func NewSelectSkillNormalizationBySkillIdPGCommand(client *postgres.Client) data
 	return &selectAllSkillNormalizationsBySkillIdPGCommand{client: client}
 }
 
-func (s *selectAllSkillNormalizationsBySkillIdPGCommand) Execute(context context.Context, skillId int) (*user_data.SkillNormalization, error) {
+func (s *selectAllSkillNormalizationsBySkillIdPGCommand) Execute(context context.Context, skillId int) (*skills.SkillNormalization, error) {
 	sql, i, err := query_builders.NewSelectSkillNormalizationsBySkillIdQuery(&s.client.Builder, skillId)
 
 	if err != nil {
@@ -26,7 +26,7 @@ func (s *selectAllSkillNormalizationsBySkillIdPGCommand) Execute(context context
 	}
 
 	row := s.client.Pool.QueryRow(context, sql, i...)
-	result := user_data.SkillNormalization{}
+	result := skills.SkillNormalization{}
 	err = row.Scan(&result.SkillId, &result.Min, &result.Max)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

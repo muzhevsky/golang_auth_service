@@ -36,34 +36,33 @@ func CreatePGAccountRepo(client *postgres.Client) internal.IAccountRepository {
 		insertAccountCommand)
 }
 
-func CreateSessionRepo(postgres *postgres.Client, redis *redis.Client) internal.ISessionRepository {
+func CreateSessionRepo(redis *redis.Client) internal.ISessionRepository {
 	selectSessionByAccessTokenCommand := sessions2.NewSelectSessionByAccessTokenRedisCommand(redis)
 	updateSessionByAccessTokenCommand := sessions2.NewUpdateSessionByAccessTokenRedisCommand(redis)
 	insertSessionCommand := sessions2.NewInsertSessionRedisCommand(redis)
-
-	selectDeviceByAccessTokenCommand := devices.NewSelectDeviceByAccessTokenPGCommand(postgres)
-	updateDeviceByAccessTokenCommand := devices.NewUpdateDeviceByAccessTokenPGCommand(postgres)
-	insertDeviceCommand := devices.NewInsertDevicePGCommand(postgres)
+	deleteSessionByAccessTokenCommand := sessions2.NewDeleteSessionByAccessTokenCommand(redis)
 
 	return repositories.NewSessionRepository(
 		selectSessionByAccessTokenCommand,
 		insertSessionCommand,
 		updateSessionByAccessTokenCommand,
-		selectDeviceByAccessTokenCommand,
-		insertDeviceCommand,
-		updateDeviceByAccessTokenCommand)
+		deleteSessionByAccessTokenCommand)
 }
 
-func CreateDeviceRepo(postgres *postgres.Client, redis *redis.Client) internal.IDeviceRepository {
-	deleteSessionByAccessTokenCommand := sessions2.NewDeleteSessionByAccessTokenCommand(redis)
-
+func CreateDeviceRepo(postgres *postgres.Client) internal.IDeviceRepository {
 	selectDeviceByIdCommand := devices.NewSelectDeviceByIdPGCommand(postgres)
 	selectDevicesByAccountIdCommand := devices.NewSelectDevicesByAccountIdPGCommand(postgres)
 	deleteDeviceByIdCommand := devices.NewDeleteDeviceByIdPGCommand(postgres)
 
+	selectDeviceByAccessTokenCommand := devices.NewSelectDeviceByAccessTokenPGCommand(postgres)
+	updateDeviceByAccessTokenCommand := devices.NewUpdateDeviceByAccessTokenPGCommand(postgres)
+	insertDeviceCommand := devices.NewInsertDevicePGCommand(postgres)
+
 	return repositories.NewDeviceRepo(
+		insertDeviceCommand,
 		selectDevicesByAccountIdCommand,
 		selectDeviceByIdCommand,
-		deleteDeviceByIdCommand,
-		deleteSessionByAccessTokenCommand)
+		selectDeviceByAccessTokenCommand,
+		updateDeviceByAccessTokenCommand,
+		deleteDeviceByIdCommand)
 }

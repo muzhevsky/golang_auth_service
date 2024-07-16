@@ -13,11 +13,11 @@ func NewSMTPVerificationMailer(mailer *smtp.SMTP) IVerificationMailer {
 	return &smtpVerificationMailer{mailer: mailer}
 }
 
-func (vm *smtpVerificationMailer) SendMail(email string, verificationCode string) {
-	vm.mailer.SendMail(email, "Код подтверждения", bodyFromTemplate(verificationCode))
+func (vm *smtpVerificationMailer) SendVerificationMail(email string, verificationCode string) error {
+	return vm.mailer.SendMail(email, "Код подтверждения", vm.bodyFromTemplate(verificationCode))
 }
 
-func bodyFromTemplate(verificationCode string) string {
+func (vm *smtpVerificationMailer) bodyFromTemplate(verificationCode string) string {
 	return fmt.Sprintf("here should be HTML-code to represent email properly, but who cares?\n"+
 		"here's the code: %v", verificationCode)
 }

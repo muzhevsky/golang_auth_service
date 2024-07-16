@@ -54,19 +54,20 @@ func Run() {
 
 	smtpClient := smtp.New(cfg.SMTP.Username, cfg.SMTP.Username, cfg.SMTP.Password, cfg.SMTP.Host, cfg.SMTP.Port)
 	verificationMailer := mailers2.NewSMTPVerificationMailer(smtpClient)
-
+	newSignInMailer := mailers2.NewSignInMailer(smtpClient)
 	// Repository
 
 	accountRepository := factories.CreatePGAccountRepo(pgClient)
-	sessionRepository := factories.CreateSessionRepo(pgClient, redisClient)
+	sessionRepository := factories.CreateSessionRepo(redisClient)
 	verificationRepo := factories.CreateRedisVerificationRepo(redisClient)
-	deviceRepository := factories.CreateDeviceRepo(pgClient, redisClient)
+	deviceRepository := factories.CreateDeviceRepo(pgClient)
 
 	// UseCases
 
-	createUserUseCase := usecases.NewCreateUserUseCase(
+	createUserUseCase := usecases.NewCreateAccountUseCase(
 		accountRepository,
 		sessionRepository,
+		deviceRepository,
 		sessionManager,
 		bcryptHashProvider,
 		verificationMailer,
@@ -81,13 +82,16 @@ func Run() {
 	signInUseCase := usecases.NewSignInUseCase(
 		accountRepository,
 		sessionRepository,
+		deviceRepository,
 		bcryptHashProvider,
 		sessionManager,
+		newSignInMailer,
 	)
 
 	refreshSessionUseCase := usecases.NewRefreshSessionUseCase(
 		accountRepository,
 		sessionRepository,
+		deviceRepository,
 		sessionManager,
 	)
 
@@ -97,9 +101,11 @@ func Run() {
 		verificationMailer,
 	)
 
-	checkVerificationUseCase := usecases.NewCheckVerificationUsecase(accountRepository)
+	checkVerificationUseCase := usecases.NewCheckVerificationUseCase(accountRepository)
 
 	getAccountDevicesUseCase := usecases.NewGetAccountDevicesUseCase(deviceRepository)
+
+	closeSessionsUseCase := usecases.NewCloseSessionsUseCase(deviceRepository, sessionRepository)
 	// Controllers
 
 	router := gin.New()
@@ -115,6 +121,7 @@ func Run() {
 	v1.NewRequestVerificationController(router, createUserUseCase, requestVerificationUseCase, logger)
 	v1.NewCheckVerificationController(router, checkVerificationUseCase)
 	v1.NewGetAccountDevices(router, getAccountDevicesUseCase)
+	v1.NewCloseSessionsController(router, closeSessionsUseCase)
 
 	http.Start(router, cfg.HTTP)
 }

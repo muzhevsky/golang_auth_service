@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	"smartri_app/internal"
-	"smartri_app/internal/entities/user_data/avatar"
+	"smartri_app/internal/entities/avatar"
 	"smartri_app/internal/infrastructure/datasources"
 )
 

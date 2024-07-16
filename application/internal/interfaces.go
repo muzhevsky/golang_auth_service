@@ -3,9 +3,10 @@ package internal
 import (
 	"context"
 	requests2 "smartri_app/controllers/requests"
+	"smartri_app/internal/entities/avatar"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/entities/test"
 	"smartri_app/internal/entities/user_data"
-	"smartri_app/internal/entities/user_data/avatar"
 )
 
 type (
@@ -14,13 +15,13 @@ type (
 		GetAnswersForQuestion(context context.Context, question *test.Question) ([]*test.Answer, error)
 		GetAnswerWithValues(context context.Context, answerId int) (*test.Answer, error)
 		GetAllQuestionsWithAnswers(context context.Context) ([]*test.Question, error)
-		AddUserAnswersWithSkillChanges(context context.Context, results *test.UserTestAnswers, skills []*user_data.SkillChange, userSkills *user_data.UserSkills, data *user_data.UserData) error
+		AddUserAnswersWithSkillChanges(context context.Context, results *test.UserTestAnswers, skills []*skills.SkillChange, userSkills *skills.UserSkills, data *user_data.UserData) error
 	}
 
 	ISkillRepository interface {
-		GetAllSkills(context context.Context) ([]*user_data.Skill, error)
-		GetSkillNormalizationBySkillId(context context.Context, skillId int) (*user_data.SkillNormalization, error)
-		GetSkillsByAccountId(context context.Context, accountId int) (*user_data.UserSkills, error)
+		GetAllSkills(context context.Context) ([]*skills.Skill, error)
+		GetSkillNormalizationBySkillId(context context.Context, skillId int) (*skills.SkillNormalization, error)
+		GetSkillsByAccountId(context context.Context, accountId int) (*skills.UserSkills, error)
 	}
 
 	IUserDataRepository interface {
@@ -30,7 +31,7 @@ type (
 	}
 
 	IUserSkillsRepository interface {
-		ApplySkillChangesByAccountId(context context.Context, userSkill *user_data.UserSkill, userData *user_data.UserData, change *user_data.SkillChange) error
+		ApplySkillChangesByAccountId(context context.Context, userSkill *skills.UserSkill, userData *user_data.UserData, change *skills.SkillChange) error
 	}
 
 	IUserAnswersRepository interface {
@@ -44,7 +45,7 @@ type (
 	}
 
 	IInitOrUpdateUserDataUseCase interface {
-		InitOrUpdate(context context.Context, data *requests2.AddUserDataRequest, accountId int) (*requests2.UserDataResponse, error)
+		InitOrUpdate(context context.Context, data *requests2.UserDataRequest, accountId int) (*requests2.UserDataResponse, error)
 	}
 
 	IAddUserTestAnswersUseCase interface {

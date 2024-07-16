@@ -30,8 +30,7 @@ func New(username, sender, password, host, port string, opts ...Option) *SMTP {
 	return s
 }
 
-func (s *SMTP) SendMail(to, subject, body string) {
-
+func (s *SMTP) SendMail(to, subject, body string) error {
 	msg := []byte("To: " + to + "\r\n" +
 		"Subject: " + subject + "\r\n" +
 		"From: " + s.sender + "\r\n" +
@@ -39,7 +38,6 @@ func (s *SMTP) SendMail(to, subject, body string) {
 	addr := s.host + ":" + s.port
 	err := smtp.SendMail(addr, s.auth, s.sender, []string{to}, msg)
 	log.Printf(to + " " + subject + " " + body + " " + s.username + " " + s.host + " " + s.port)
-	if err != nil {
-		log.Printf("smtp error")
-	}
+
+	return err
 }

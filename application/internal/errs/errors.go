@@ -5,6 +5,7 @@ import (
 )
 
 var SomeErrorToDo = errors.New("not implemented yet")
+var ValidationError = errors.New("validation error")
 var DataBindError = errors.New("wrong data format")
 var UnauthenticatedError = errors.New("authentication is necessary for this action")
 var UserDataNotFoundError = errors.New("user data should be sent first")

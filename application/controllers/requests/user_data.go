@@ -1,23 +1,29 @@
 package requests
 
 import (
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills"
 )
 
-type AddUserDataRequest struct {
-	Age    int    `json:"age" example:"11"`
-	Gender string `json:"gender" example:"m"`
+type UserDataRequest struct {
+	Nickname string `json:"nickname" example:"SlimShady123"`
+	Age      int    `json:"age" example:"11"`
+	Gender   string `json:"gender" example:"m"`
 }
 
 type UserDataResponse struct {
-	Age    int    `json:"age"`
-	Gender string `json:"gender"`
-	XP     int    `json:"xp"`
+	Nickname string `json:"nickname"`
+	Age      int    `json:"age"`
+	Gender   string `json:"gender"`
+	XP       int    `json:"xp"`
+}
+
+func NewUserDataResponse(nickname string, age int, gender string, xp int) *UserDataResponse {
+	return &UserDataResponse{Nickname: nickname, Age: age, Gender: gender, XP: xp}
 }
 
 type UserSkillResponse struct {
-	AccountId int                    `json:"accountId"`
-	Skills    []*user_data.UserSkill `json:"skills"`
+	AccountId int                 `json:"accountId"`
+	Skills    []*skills.UserSkill `json:"skills"`
 }
 
 type AddSkillChangeRequest struct {

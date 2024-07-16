@@ -2,9 +2,10 @@ package datasources
 
 import (
 	"context"
+	"smartri_app/internal/entities/avatar"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/entities/test"
 	"smartri_app/internal/entities/user_data"
-	"smartri_app/internal/entities/user_data/avatar"
 )
 
 type (
@@ -41,36 +42,36 @@ type (
 	}
 
 	ISelectSkillsByAccountIdCommand interface {
-		Execute(context context.Context, accountId int) (*user_data.UserSkills, error)
+		Execute(context context.Context, accountId int) (*skills.UserSkills, error)
 	}
 
 	IInsertUserTestResultsCommand interface {
 		Execute(
 			context context.Context,
 			answers *test.UserTestAnswers,
-			changes []*user_data.SkillChange,
-			userSkills *user_data.UserSkills,
+			changes []*skills.SkillChange,
+			userSkills *skills.UserSkills,
 			userData *user_data.UserData) error
 	}
 
 	ISelectAllSkillsCommand interface {
-		Execute(context context.Context) ([]*user_data.Skill, error)
+		Execute(context context.Context) ([]*skills.Skill, error)
 	}
 
 	ISelectAllSkillsNormalizationCommand interface {
-		Execute(context context.Context) ([]*user_data.SkillNormalization, error)
+		Execute(context context.Context) ([]*skills.SkillNormalization, error)
 	}
 
 	ISelectSkillNormalizationBySkillIdCommand interface {
-		Execute(context context.Context, skillId int) (*user_data.SkillNormalization, error)
+		Execute(context context.Context, skillId int) (*skills.SkillNormalization, error)
 	}
 
 	ISelectSkillChangesByAccountIdCommand interface {
-		Execute(context context.Context, id int) ([]*user_data.SkillChange, error)
+		Execute(context context.Context, id int) ([]*skills.SkillChange, error)
 	}
 
 	ISelectSkillChangesByAccountIdAndActionIdCommand interface {
-		Execute(context context.Context, accountId int, actionId int) ([]*user_data.SkillChange, error)
+		Execute(context context.Context, accountId int, actionId int) ([]*skills.SkillChange, error)
 	}
 
 	ISelectUserAnswersByAccountIdCommand interface {
@@ -82,7 +83,7 @@ type (
 	}
 
 	IApplySkillChangesByAccountIdCommand interface {
-		Execute(context context.Context, skills *user_data.UserSkill, userData *user_data.UserData, change *user_data.SkillChange) error
+		Execute(context context.Context, skills *skills.UserSkill, userData *user_data.UserData, change *skills.SkillChange) error
 	}
 
 	ISelectAvatarByAccountIdCommand interface {

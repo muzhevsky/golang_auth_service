@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -18,7 +18,7 @@ func NewSelectAllSkillsPGCommand(client *postgres.Client) datasources.ISelectAll
 	return &selectAllSkillsPGCommand{client: client}
 }
 
-func (s *selectAllSkillsPGCommand) Execute(context context.Context) ([]*user_data.Skill, error) {
+func (s *selectAllSkillsPGCommand) Execute(context context.Context) ([]*skills.Skill, error) {
 	sql, i, err := query_builders.NewSelectAllSkillsQuery(&s.client.Builder)
 
 	if err != nil {
@@ -30,14 +30,14 @@ func (s *selectAllSkillsPGCommand) Execute(context context.Context) ([]*user_dat
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []*user_data.Skill{}, nil
+			return []*skills.Skill{}, nil
 		}
 		return nil, err
 	}
-	skills := make([]*user_data.Skill, 0)
+	skills := make([]*skills.Skill, 0)
 
 	for rows.Next() {
-		newSkill := user_data.Skill{}
+		newSkill := skills.Skill{}
 		err = rows.Scan(&newSkill.Id, &newSkill.Title)
 		if err != nil {
 			return nil, err

@@ -1,8 +1,8 @@
-package account
+package user_data
 
 import (
-	"authorization/internal/errs"
 	"fmt"
+	"smartri_app/internal/errs"
 )
 
 type Nickname string
@@ -23,12 +23,12 @@ func (n Nickname) Validate() error {
 }
 
 func (n Nickname) validateNicknameLength() bool {
-	return runeLengthInRange([]rune(n), minNicknameLen, maxNicknameLen)
+	return RuneLengthInRange([]rune(n), minNicknameLen, maxNicknameLen)
 }
 
 func (n Nickname) validateProhibitedCharacters() bool {
 	for _, char := range n {
-		if !(isLatinLetter(char) || isDigit(char) || isCyrillicLetter(char) || char == '-' || char == '_') {
+		if !(IsLatinLetter(char) || IsDigit(char) || IsCyrillicLetter(char) || char == '-' || char == '_') {
 			return false
 		}
 	}

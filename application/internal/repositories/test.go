@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"smartri_app/internal"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/entities/test"
 	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
@@ -60,8 +61,8 @@ func (repo *testRepository) GetAllQuestionsWithAnswers(context context.Context) 
 func (repo *testRepository) AddUserAnswersWithSkillChanges(
 	context context.Context,
 	answers *test.UserTestAnswers,
-	changes []*user_data.SkillChange,
-	userSkills *user_data.UserSkills,
+	changes []*skills.SkillChange,
+	userSkills *skills.UserSkills,
 	data *user_data.UserData) error {
 	err := repo.insertUserAnswers.Execute(context, answers, changes, userSkills, data)
 	return err

@@ -2,6 +2,7 @@ package user_answers
 
 import (
 	"context"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/entities/test"
 	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/infrastructure/datasources"
@@ -21,8 +22,8 @@ func NewInsertUserTestResultsPGCommand(
 func (u *insertUserTestResultsPGCommand) Execute(
 	context context.Context,
 	answers *test.UserTestAnswers,
-	changes []*user_data.SkillChange,
-	userSkills *user_data.UserSkills,
+	changes []*skills.SkillChange,
+	userSkills *skills.UserSkills,
 	userData *user_data.UserData) error {
 	insertTestResultsSQL, args, err := query_builders.NewInsertUserTestResultsQuery(&u.client.Builder, answers)
 	if err != nil {

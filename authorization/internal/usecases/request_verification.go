@@ -14,7 +14,10 @@ type requestVerificationUseCase struct {
 	mailer           mailers.IVerificationMailer
 }
 
-func NewRequestVerificationUseCase(userRepo internal.IAccountRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) *requestVerificationUseCase {
+func NewRequestVerificationUseCase(
+	userRepo internal.IAccountRepository,
+	verificationRepo internal.IVerificationRepository,
+	mailer mailers.IVerificationMailer) internal.IRequestVerificationUseCase {
 	return &requestVerificationUseCase{userRepo: userRepo, verificationRepo: verificationRepo, mailer: mailer}
 }
 
@@ -34,7 +37,7 @@ func (u *requestVerificationUseCase) RequestVerification(context context.Context
 		return "", err
 	}
 
-	u.mailer.SendMail(string(user.Email), verification.Code)
+	go u.mailer.SendVerificationMail(string(user.Email), verification.Code)
 
 	return verification.Code, nil
 	return "", nil

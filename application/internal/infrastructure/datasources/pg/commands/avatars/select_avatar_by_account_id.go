@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities/user_data/avatar"
+	avatar2 "smartri_app/internal/entities/avatar"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -17,14 +17,14 @@ func NewSelectAvatarByAccountIdPGCommand(client *postgres.Client) *selectAvatarB
 	return &selectAvatarByAccountIdPGCommand{client: client}
 }
 
-func (c *selectAvatarByAccountIdPGCommand) Execute(context context.Context, accountId int) (*avatar.Avatar, error) {
+func (c *selectAvatarByAccountIdPGCommand) Execute(context context.Context, accountId int) (*avatar2.Avatar, error) {
 	sql, args, err := query_builders.NewSelectAvatarByAccountIdQuery(&c.client.Builder, accountId)
 	if err != nil {
 		return nil, err
 	}
 
 	row := c.client.Pool.QueryRow(context, sql, args...)
-	result := avatar.Avatar{AccountId: accountId}
+	result := avatar2.Avatar{AccountId: accountId}
 	hairColorInt := int32(0)
 	eyesColorInt := int32(0)
 	skinColorInt := int32(0)
@@ -36,9 +36,9 @@ func (c *selectAvatarByAccountIdPGCommand) Execute(context context.Context, acco
 		return nil, err
 	}
 
-	result.HairColor = avatar.NewColorRGBAFromInt32(hairColorInt)
-	result.EyesColor = avatar.NewColorRGBAFromInt32(eyesColorInt)
-	result.SkinColor = avatar.NewColorRGBAFromInt32(skinColorInt)
+	result.HairColor = avatar2.NewColorRGBAFromInt32(hairColorInt)
+	result.EyesColor = avatar2.NewColorRGBAFromInt32(eyesColorInt)
+	result.SkinColor = avatar2.NewColorRGBAFromInt32(skinColorInt)
 
 	return &result, nil
 }

@@ -4,20 +4,38 @@ import (
 	"authorization/controllers/requests"
 	"authorization/internal"
 	"authorization/internal/entities/account"
+	session2 "authorization/internal/entities/session"
 	errors2 "authorization/internal/errs"
+	"authorization/internal/infrastructure/services/mailers"
 	tokens2 "authorization/internal/infrastructure/services/tokens"
 	"context"
+	"time"
 )
 
 type signInUseCase struct {
-	userRepo       internal.IAccountRepository
-	sessionRepo    internal.ISessionRepository
-	hashProvider   tokens2.IHashProvider
-	sessionManager tokens2.ISessionManager
+	userRepo        internal.IAccountRepository
+	sessionRepo     internal.ISessionRepository
+	deviceRepo      internal.IDeviceRepository
+	newSignInMailer mailers.INewSignInMailer
+	hashProvider    tokens2.IHashProvider
+	sessionManager  tokens2.ISessionManager
 }
 
-func NewSignInUseCase(userRepo internal.IAccountRepository, sessionRepo internal.ISessionRepository, hashProvider tokens2.IHashProvider, sessionManager tokens2.ISessionManager) *signInUseCase {
-	return &signInUseCase{userRepo: userRepo, sessionRepo: sessionRepo, hashProvider: hashProvider, sessionManager: sessionManager}
+func NewSignInUseCase(
+	userRepo internal.IAccountRepository,
+	sessionRepo internal.ISessionRepository,
+	deviceRepo internal.IDeviceRepository,
+	hashProvider tokens2.IHashProvider,
+	sessionManager tokens2.ISessionManager,
+	newSignInMailer mailers.INewSignInMailer) internal.ISignInUseCase {
+	return &signInUseCase{
+		userRepo:        userRepo,
+		sessionRepo:     sessionRepo,
+		deviceRepo:      deviceRepo,
+		hashProvider:    hashProvider,
+		sessionManager:  sessionManager,
+		newSignInMailer: newSignInMailer,
+	}
 }
 
 func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.SignInRequest) (*requests.SignInResponse, error) {
@@ -50,7 +68,18 @@ func (u *signInUseCase) SignIn(context context.Context, userRequest *requests.Si
 		return nil, err
 	}
 
-	err = u.sessionRepo.CreateWithDevice(context, userRequest.DeviceName, session)
+	device := &session2.Device{
+		AccountId:           accountRecord.Id,
+		Name:                userRequest.DeviceName,
+		SessionAccessToken:  session.AccessToken,
+		SessionCreationTime: time.Now(),
+	}
+
+	go u.newSignInMailer.SendNewSignInMail(string(accountRecord.Email), device) // todo
+
+	err = u.deviceRepo.Create(context, device)
+
+	err = u.sessionRepo.Create(context, session)
 	if err != nil {
 		return nil, err
 	}

@@ -26,7 +26,7 @@ func (u *selectUserDataByAccountIdPGCommand) Execute(context context.Context, ac
 
 	row := u.client.Pool.QueryRow(context, sql, args...)
 	var result user_data.UserData
-	err = row.Scan(&result.Age, &result.Gender, &result.XP, &result.AccountId)
+	err = row.Scan(&result.Nickname, &result.Age, &result.Gender, &result.XP, &result.AccountId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

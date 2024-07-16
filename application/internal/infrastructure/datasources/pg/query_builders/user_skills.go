@@ -2,7 +2,7 @@ package query_builders
 
 import (
 	"github.com/Masterminds/squirrel"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills"
 )
 
 const userSkillsTableName = "user_skills"
@@ -17,10 +17,24 @@ func NewSelectUserSkillsByAccountIdQuery(builder *squirrel.StatementBuilderType,
 		ToSql()
 }
 
-func NewUpdateUserSkillsByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int, skill *user_data.UserSkill) (string, []any, error) {
+func NewUpdateUserSkillsByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int, skill *skills.UserSkill) (string, []any, error) {
 	return builder.
 		Update(userSkillsTableName).
 		Set(userSkillXpFieldName, skill.Xp).
 		Where(squirrel.Eq{"account_id": accountId, userSkillSkillIdFieldName: skill.SkillId}).
+		ToSql()
+}
+
+func NewInsertUserSkillsQuery(builder *squirrel.StatementBuilderType, accountId int, userSkills *skills.UserSkill) (string, []any, error) {
+	return builder.Insert("user_skills").
+		Columns("account_id", "skill_id", "xp").
+		Values(accountId, userSkills.SkillId, userSkills.Xp).
+		ToSql()
+}
+
+func NewUpdateUserSkillsQuery(builder *squirrel.StatementBuilderType, accountId int, skills *skills.UserSkill) (string, []any, error) {
+	return builder.Update("user_skills").
+		Set("xp", skills.Xp).
+		Where(squirrel.Eq{"account_id": accountId, "skill_id": skills.SkillId}).
 		ToSql()
 }

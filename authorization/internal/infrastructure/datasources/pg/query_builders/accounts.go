@@ -11,7 +11,6 @@ const (
 	accountLoginFieldName            = "login"
 	accountEmailFieldName            = "email"
 	accountPasswordFieldName         = "password"
-	accountNicknameFieldName         = "nickname"
 	accountIsVerifiedFieldName       = "is_verified"
 	accountRegistrationDateFieldName = "registration_date"
 )
@@ -66,11 +65,10 @@ func NewInsertAccountQuery(builder *sq.StatementBuilderType, account *account.Ac
 		Columns(
 			accountLoginFieldName,
 			accountEmailFieldName,
-			accountNicknameFieldName,
 			accountPasswordFieldName,
 			accountRegistrationDateFieldName,
 			accountIsVerifiedFieldName).
-		Values(account.Login, account.Email, account.Nickname, account.Password, account.RegistrationDate, account.IsVerified).
+		Values(account.Login, account.Email, account.Password, account.RegistrationDate, account.IsVerified).
 		Suffix("RETURNING " + accountIdFieldName).
 		ToSql()
 }
@@ -79,7 +77,6 @@ func NewUpdateAccountByIdQuery(builder *sq.StatementBuilderType, id int, newAcco
 	return builder.Update(accountTableName).
 		Set(accountLoginFieldName, newAccount.Login).
 		Set(accountEmailFieldName, newAccount.Email).
-		Set(accountNicknameFieldName, newAccount.Nickname).
 		Set(accountPasswordFieldName, newAccount.Password).
 		Set(accountRegistrationDateFieldName, newAccount.RegistrationDate).
 		Set(accountIsVerifiedFieldName, newAccount.IsVerified).
@@ -93,7 +90,6 @@ func selectStarAccounts(builder *sq.StatementBuilderType) sq.SelectBuilder {
 			accountIdFieldName,
 			accountLoginFieldName,
 			accountPasswordFieldName,
-			accountNicknameFieldName,
 			accountEmailFieldName,
 			accountRegistrationDateFieldName,
 			accountIsVerifiedFieldName).

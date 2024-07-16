@@ -6,15 +6,15 @@ import (
 	"context"
 )
 
-type checkVerificationUsecase struct {
+type checkVerificationUseCase struct {
 	accountRepository internal.IAccountRepository
 }
 
-func NewCheckVerificationUsecase(accountRepository internal.IAccountRepository) internal.ICheckVerificationUseCase {
-	return &checkVerificationUsecase{accountRepository: accountRepository}
+func NewCheckVerificationUseCase(accountRepository internal.IAccountRepository) internal.ICheckVerificationUseCase {
+	return &checkVerificationUseCase{accountRepository: accountRepository}
 }
 
-func (uc *checkVerificationUsecase) CheckVerification(context context.Context, accountId int) (bool, error) {
+func (uc *checkVerificationUseCase) CheckVerification(context context.Context, accountId int) (bool, error) {
 	account, err := uc.accountRepository.FindById(context, accountId)
 	if err != nil {
 		return false, err

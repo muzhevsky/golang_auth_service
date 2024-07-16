@@ -4,7 +4,6 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
-	"smartri_app/internal/entities/user_data"
 	"time"
 )
 
@@ -36,7 +35,7 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 		return nil, err
 	}
 
-	var skill *user_data.UserSkill
+	var skill *skills.UserSkill
 	for i := range skills.Skills {
 		s := skills.Skills[i]
 		if s.SkillId == request.SkillId {
@@ -51,7 +50,7 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 		}
 	}
 
-	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &user_data.SkillChange{
+	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &skills.SkillChange{
 		AccountId: accountId,
 		SkillId:   skill.SkillId,
 		ActionId:  1, // todo а надо ли?

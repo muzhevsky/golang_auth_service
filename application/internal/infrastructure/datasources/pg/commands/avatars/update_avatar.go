@@ -2,7 +2,7 @@ package avatars
 
 import (
 	"context"
-	avatar_pkg "smartri_app/internal/entities/user_data/avatar"
+	avatar_pkg "smartri_app/internal/entities/avatar"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -27,7 +27,7 @@ func (c *updateAvatarByAccountIdPGCommand) Execute(context context.Context, acco
 		return nil, err
 	}
 
-	result := &avatar_pkg.Avatar{
+	result := &avatar.Avatar{
 		AccountId:    accountId,
 		HairId:       avatar.HairId,
 		HairColor:    avatar.HairColor,

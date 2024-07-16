@@ -1,7 +1,13 @@
 package mailers
 
+import "authorization/internal/entities/session"
+
 type (
 	IVerificationMailer interface {
-		SendMail(email string, verificationCode string)
+		SendVerificationMail(email string, verificationCode string) error
+	}
+
+	INewSignInMailer interface {
+		SendNewSignInMail(email string, device *session.Device) error
 	}
 )

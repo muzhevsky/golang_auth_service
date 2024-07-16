@@ -4,7 +4,7 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
-	avatarpkg "smartri_app/internal/entities/user_data/avatar"
+	avatar2 "smartri_app/internal/entities/avatar"
 )
 
 type updateAvatarUseCase struct {
@@ -26,7 +26,7 @@ func (uc *updateAvatarUseCase) InitOrUpdate(context context.Context, accountId i
 	eyeColor := uc.getEyeColor(request)
 	skinColor := uc.getSkinColor(request)
 
-	newAvatar := &avatarpkg.Avatar{
+	newAvatar := &avatar2.Avatar{
 		AccountId:    accountId,
 		HairId:       request.HairId,
 		HairColor:    hairColor,
@@ -49,24 +49,24 @@ func (uc *updateAvatarUseCase) InitOrUpdate(context context.Context, accountId i
 	return err
 }
 
-func (uc *updateAvatarUseCase) getHairColor(request *requests.AvatarRequest) *avatarpkg.ColorRGBA {
-	return avatarpkg.NewColorRGBA(
+func (uc *updateAvatarUseCase) getHairColor(request *requests.AvatarRequest) *avatar2.ColorRGBA {
+	return avatar2.NewColorRGBA(
 		request.HairColor.R,
 		request.HairColor.G,
 		request.HairColor.B,
 		request.HairColor.A)
 }
 
-func (uc *updateAvatarUseCase) getEyeColor(request *requests.AvatarRequest) *avatarpkg.ColorRGBA {
-	return avatarpkg.NewColorRGBA(
+func (uc *updateAvatarUseCase) getEyeColor(request *requests.AvatarRequest) *avatar2.ColorRGBA {
+	return avatar2.NewColorRGBA(
 		request.EyesColor.R,
 		request.EyesColor.G,
 		request.EyesColor.B,
 		request.EyesColor.A)
 }
 
-func (uc *updateAvatarUseCase) getSkinColor(request *requests.AvatarRequest) *avatarpkg.ColorRGBA {
-	return avatarpkg.NewColorRGBA(
+func (uc *updateAvatarUseCase) getSkinColor(request *requests.AvatarRequest) *avatar2.ColorRGBA {
+	return avatar2.NewColorRGBA(
 		request.SkinColor.R,
 		request.SkinColor.G,
 		request.SkinColor.B,

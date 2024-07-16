@@ -5,46 +5,29 @@ import (
 	"authorization/internal/entities/session"
 	"authorization/internal/infrastructure/datasources"
 	"context"
-	"time"
 )
 
 type sessionRepository struct {
 	selectSessionByAccessTokenCommand datasources.ISelectSessionByAccessTokenCommand
 	insertSessionCommand              datasources.IInsertSessionCommand
 	updateSessionByAccessTokenCommand datasources.IUpdateSessionByAccessTokenCommand
-	selectDeviceByAccessTokenCommand  datasources.ISelectDeviceByAccessTokenCommand
-	insertDeviceCommand               datasources.IInsertDeviceCommand
-	updateDeviceByAccessTokenCommand  datasources.IUpdateDeviceByAccessTokenCommand
+	deleteSessionByAccessTokenCommand datasources.IDeleteSessionByAccessTokenCommand
 }
 
 func NewSessionRepository(
 	selectSessionByAccessTokenCommand datasources.ISelectSessionByAccessTokenCommand,
 	insertSessionCommand datasources.IInsertSessionCommand,
 	updateSessionByAccessTokenCommand datasources.IUpdateSessionByAccessTokenCommand,
-	selectDeviceByAccessTokenCommand datasources.ISelectDeviceByAccessTokenCommand,
-	insertDeviceCommand datasources.IInsertDeviceCommand,
-	updateDeviceByAccessTokenCommand datasources.IUpdateDeviceByAccessTokenCommand) internal.ISessionRepository {
+	deleteSessionByAccessTokenCommand datasources.IDeleteSessionByAccessTokenCommand) internal.ISessionRepository {
 
 	return &sessionRepository{
 		selectSessionByAccessTokenCommand: selectSessionByAccessTokenCommand,
 		insertSessionCommand:              insertSessionCommand,
 		updateSessionByAccessTokenCommand: updateSessionByAccessTokenCommand,
-		selectDeviceByAccessTokenCommand:  selectDeviceByAccessTokenCommand,
-		insertDeviceCommand:               insertDeviceCommand,
-		updateDeviceByAccessTokenCommand:  updateDeviceByAccessTokenCommand}
+		deleteSessionByAccessTokenCommand: deleteSessionByAccessTokenCommand}
 }
 
-func (s *sessionRepository) CreateWithDevice(context context.Context, deviceName string, se *session.Session) error {
-	device := session.Device{
-		AccountId:           se.AccountId,
-		Name:                deviceName,
-		SessionAccessToken:  se.AccessToken,
-		SessionCreationTime: time.Now(),
-	}
-	err := s.insertDeviceCommand.Execute(context, &device)
-	if err != nil {
-		return err
-	}
+func (s *sessionRepository) Create(context context.Context, se *session.Session) error {
 	return s.insertSessionCommand.Execute(context, se)
 }
 
@@ -60,21 +43,14 @@ func (s *sessionRepository) UpdateByAccessToken(context context.Context, token s
 		ExpiresAt:    newSession.ExpiresAt,
 	}
 
-	device, err := s.selectDeviceByAccessTokenCommand.Execute(context, token)
-	if err != nil {
-		return nil, err
-	}
-
-	device.SessionAccessToken = cpy.AccessToken
-	err = s.updateDeviceByAccessTokenCommand.Execute(context, token, device)
-	if err != nil {
-		return nil, err
-	}
-
-	err = s.updateSessionByAccessTokenCommand.Execute(context, token, &cpy)
+	err := s.updateSessionByAccessTokenCommand.Execute(context, token, &cpy)
 	if err != nil {
 		return nil, err
 	}
 
 	return newSession, err
+}
+
+func (s *sessionRepository) DeleteByAccessToken(context context.Context, token string) error {
+	return s.deleteSessionByAccessTokenCommand.Execute(context, token)
 }

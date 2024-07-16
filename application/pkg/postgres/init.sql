@@ -8,6 +8,7 @@ create table user_data
     id      serial
         constraint user_data_pk
             primary key,
+    nickname varchar(128) not null,
     account_id integer not null,
     age     integer not null,
     xp      integer not null,
@@ -868,8 +869,8 @@ values(1, -21, 42),
 insert into "test_actions"(title)
 values('init_test');
 
-insert into user_data(account_id, age, xp, gender)
-values(1, 1337, 0, 'm');
+insert into user_data(nickname, account_id, age, xp, gender)
+values('АДмин', 1, 1337, 0, 'm');
 
 insert into user_answers(account_id, question_id, answer_id)
 values (1, 6, 1);

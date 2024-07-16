@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"smartri_app/controllers/http/middleware"
 	"smartri_app/controllers/requests"
@@ -23,7 +24,7 @@ func NewAddUserDataController(useCase internal.IInitOrUpdateUserDataUseCase) *ad
 // @Description  добавление данных пользователя из теста (первые несколько никому не нужных вопросов)
 // @Accept       json
 // @Produce      json
-// @Param request body requests.AddUserDataRequest true "request format"
+// @Param request body requests.UserDataRequest true "request format"
 // @Param Authorization header string true "access token"
 // @Success      200  {object} requests.UserDataResponse
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
@@ -38,13 +39,14 @@ func (controller *addUserDataController) AddUserData(c *gin.Context) {
 		return
 	}
 
-	var details requests.AddUserDataRequest
+	var details requests.UserDataRequest
 	err = c.ShouldBindJSON(&details)
 	if err != nil {
 		middleware.AddGinError(c, errs.DataBindError)
 		return
 	}
 
+	fmt.Println(details.Nickname)
 	response, err := controller.useCase.InitOrUpdate(c, &details, id)
 	if err != nil {
 		middleware.AddGinError(c, err)

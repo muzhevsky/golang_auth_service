@@ -38,7 +38,7 @@ func (u *insertUserDataPGCommand) Execute(context context.Context, userData *use
 	skills, err := u.selectAllSkillsCommand.Execute(context)
 
 	for _, skill := range skills {
-		sql, args, err = query_builders.NewInsertUserSkillsQuery(&u.client.Builder, userData.AccountId, &user_data.UserSkill{
+		sql, args, err = query_builders.NewInsertUserSkillsQuery(&u.client.Builder, userData.AccountId, &skills.UserSkill{
 			SkillId: skill.Id,
 			Xp:      0,
 		})

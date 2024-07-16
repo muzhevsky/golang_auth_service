@@ -6,6 +6,8 @@ import (
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
 	"context"
+	"errors"
+	"github.com/jackc/pgx/v5"
 )
 
 type selectDeviceByIdPGCommand struct {
@@ -26,6 +28,9 @@ func (c *selectDeviceByIdPGCommand) Execute(context context.Context, id int) (*s
 	device := session.Device{}
 	err = row.Scan(&device.Id, &device.AccountId, &device.Name, &device.SessionAccessToken, &device.SessionCreationTime)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
 

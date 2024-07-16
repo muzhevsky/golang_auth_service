@@ -2,7 +2,7 @@ package query_builders
 
 import (
 	"github.com/Masterminds/squirrel"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills"
 )
 
 func NewSelectSkillChangesByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int) (string, []any, error) {
@@ -21,7 +21,7 @@ func NewSelectSkillChangesByAccountIdAndActionIdQuery(builder *squirrel.Statemen
 		ToSql()
 }
 
-func NewInsertSkillChangesQuery(builder *squirrel.StatementBuilderType, change *user_data.SkillChange) (string, []any, error) {
+func NewInsertSkillChangesQuery(builder *squirrel.StatementBuilderType, change *skills.SkillChange) (string, []any, error) {
 	return builder.
 		Insert("skill_changes").
 		Columns("account_id", "skill_id", "date", "action_id", "points").

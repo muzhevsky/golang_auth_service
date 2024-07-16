@@ -9,7 +9,6 @@ type Account struct {
 	Login            Login
 	Password         Password
 	Email            Email
-	Nickname         Nickname
 	IsVerified       bool
 	RegistrationDate time.Time
 }
@@ -43,10 +42,6 @@ func (a *Account) Validate() error {
 		return err
 	}
 	err = a.Password.Validate()
-	if err != nil {
-		return err
-	}
-	err = a.Nickname.Validate()
 	if err != nil {
 		return err
 	}

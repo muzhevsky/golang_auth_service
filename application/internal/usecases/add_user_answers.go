@@ -4,8 +4,8 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/entities/test"
-	"smartri_app/internal/entities/user_data"
 	"smartri_app/internal/errs"
 	"time"
 )
@@ -96,8 +96,8 @@ func (a *addUserAnswers) getEntityAnswers(accountId int, answers *requests.UserA
 	return result
 }
 
-func (a *addUserAnswers) getNormalizationMap(context context.Context, skills []*user_data.Skill, accountId int) (map[int]*user_data.SkillNormalization, error) {
-	result := make(map[int]*user_data.SkillNormalization)
+func (a *addUserAnswers) getNormalizationMap(context context.Context, skills []*skills.Skill, accountId int) (map[int]*skills.SkillNormalization, error) {
+	result := make(map[int]*skills.SkillNormalization)
 	for i := range skills {
 		r, err := a.skillRepo.GetSkillNormalizationBySkillId(context, skills[i].Id)
 		result[i] = r
@@ -133,9 +133,9 @@ func (a *addUserAnswers) getSkillIdPointsMap(answersWithValues []*test.Answer) m
 	return result
 }
 
-func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, normalizationMap map[int]*user_data.SkillNormalization, accountId int) (*user_data.UserSkills, []*user_data.SkillChange) {
-	skills := make([]*user_data.UserSkill, 0)
-	skillChanges := make([]*user_data.SkillChange, 0)
+func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, normalizationMap map[int]*skills.SkillNormalization, accountId int) (*skills.UserSkills, []*skills.SkillChange) {
+	skills := make([]*skills.UserSkill, 0)
+	skillChanges := make([]*skills.SkillChange, 0)
 	for k, v := range skillsMap {
 		normalization, exists := normalizationMap[k]
 		if !exists {
@@ -143,12 +143,12 @@ func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, nor
 		}
 
 		points := int(float32(v-normalization.Min) / float32(normalization.Max-normalization.Min) * maxPoints)
-		skills = append(skills, &user_data.UserSkill{
+		skills = append(skills, &skills.UserSkill{
 			SkillId: k,
 			Xp:      points,
 		})
 
-		skillChanges = append(skillChanges, &user_data.SkillChange{
+		skillChanges = append(skillChanges, &skills.SkillChange{
 			AccountId: accountId,
 			SkillId:   k,
 			ActionId:  1, // todo сделать нормально (нужен ли action вообще?)
@@ -157,14 +157,14 @@ func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, nor
 		})
 	}
 
-	userSkills := user_data.UserSkills{
+	userSkills := skills.UserSkills{
 		AccountId: accountId,
 		Skills:    skills,
 	}
 	return &userSkills, skillChanges
 }
 
-func (a *addUserAnswers) getNewUserXpValue(userSkills *user_data.UserSkills) int {
+func (a *addUserAnswers) getNewUserXpValue(userSkills *skills.UserSkills) int {
 	result := 0
 	for i := range userSkills.Skills {
 		result += userSkills.Skills[i].Xp

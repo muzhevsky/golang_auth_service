@@ -2,7 +2,7 @@ package user_skills
 
 import (
 	"context"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -15,7 +15,7 @@ func NewSelectSkillsByAccountIdPGCommand(client *postgres.Client) *selectSkillsB
 	return &selectSkillsByAccountIdPGCommand{client: client}
 }
 
-func (c *selectSkillsByAccountIdPGCommand) Execute(context context.Context, accountId int) (*user_data.UserSkills, error) {
+func (c *selectSkillsByAccountIdPGCommand) Execute(context context.Context, accountId int) (*skills.UserSkills, error) {
 	sql, args, err := query_builders.NewSelectUserSkillsByAccountIdQuery(&c.client.Builder, accountId)
 	if err != nil {
 		return nil, err
@@ -27,10 +27,10 @@ func (c *selectSkillsByAccountIdPGCommand) Execute(context context.Context, acco
 		return nil, err
 	}
 
-	result := user_data.UserSkills{AccountId: accountId}
-	skills := make([]*user_data.UserSkill, 0)
+	result := skills.UserSkills{AccountId: accountId}
+	skills := make([]*skills.UserSkill, 0)
 	for rows.Next() {
-		newUserSkill := user_data.UserSkill{}
+		newUserSkill := skills.UserSkill{}
 		err = rows.Scan(&newUserSkill.SkillId, &newUserSkill.Xp)
 		if err != nil {
 			return nil, err

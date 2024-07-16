@@ -11,11 +11,16 @@ import (
 type refreshSessionUseCase struct {
 	accountRepo  internal.IAccountRepository
 	sessionRepo  internal.ISessionRepository
+	deviceRepo   internal.IDeviceRepository
 	tokenManager tokens.ISessionManager
 }
 
-func NewRefreshSessionUseCase(accountRepo internal.IAccountRepository, sessionRepo internal.ISessionRepository, tokenManager tokens.ISessionManager) internal.IRefreshSessionUseCase {
-	return &refreshSessionUseCase{accountRepo: accountRepo, sessionRepo: sessionRepo, tokenManager: tokenManager}
+func NewRefreshSessionUseCase(
+	accountRepo internal.IAccountRepository,
+	sessionRepo internal.ISessionRepository,
+	deviceRepo internal.IDeviceRepository,
+	tokenManager tokens.ISessionManager) internal.IRefreshSessionUseCase {
+	return &refreshSessionUseCase{accountRepo: accountRepo, sessionRepo: sessionRepo, tokenManager: tokenManager, deviceRepo: deviceRepo}
 }
 
 func (s *refreshSessionUseCase) RefreshSession(context context.Context, request *requests.RefreshSessionRequest) (*requests.RefreshSessionResponse, error) {
@@ -43,6 +48,18 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 	}
 
 	newSession, err := s.tokenManager.CreateSession(user)
+	if err != nil {
+		return nil, err
+	}
+
+	storedDevice, err := s.deviceRepo.SelectByAccessToken(context, accessToken)
+	if err != nil {
+		return nil, err
+	}
+
+	storedDevice.SessionAccessToken = newSession.AccessToken
+
+	err = s.deviceRepo.UpdateByAccessToken(context, accessToken, storedDevice)
 	if err != nil {
 		return nil, err
 	}

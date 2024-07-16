@@ -97,6 +97,7 @@ func Run() {
 
 	addUserXpChangeController := v12.NewAddUserXpController(addUserXpChangeUseCase)
 	addUserDataController := v12.NewAddUserDataController(addUserDataUseCase)
+	getUserDataController := v12.NewGetUserDataController(userDataRepo)
 	addUserAnswersController := v12.NewAddUserAnswersController(addUserAnswersUseCase)
 	checkIfUserHasPassedTestYetController := v12.NewCheckIfUserHasPassedTestYetController(checkIfUserHasPassedTestYetUseCase)
 
@@ -112,6 +113,7 @@ func Run() {
 
 	router.GET("/user/skills", getUserSkillsController.GetUserSkills)
 	router.POST("/user/xp", addUserXpChangeController.AddUserXp)
+	router.GET("/user/data", getUserDataController.GetUserData)
 	router.POST("/user/data", addUserDataController.AddUserData)
 	router.POST("/user/test", addUserAnswersController.AddUserAnswers)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

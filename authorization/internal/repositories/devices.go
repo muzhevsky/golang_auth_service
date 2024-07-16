@@ -8,31 +8,64 @@ import (
 )
 
 type deviceRepo struct {
-	selectDevicesByAccountIdCommand datasources.ISelectDevicesByAccountIdCommand
-	selectDeviceByIdCommand         datasources.ISelectDeviceByIdCommand
-	deleteDeviceByIdCommand         datasources.IDeleteDeviceByIdCommand
-	deleteSessionByIdCommand        datasources.IDeleteSessionByAccessTokenCommand
+	insertDeviceCommand              datasources.IInsertDeviceCommand
+	selectDevicesByAccountIdCommand  datasources.ISelectDevicesByAccountIdCommand
+	selectDeviceByAccessTokenCommand datasources.ISelectDeviceByAccessTokenCommand
+	selectDeviceByIdCommand          datasources.ISelectDeviceByIdCommand
+	updateDeviceByIdCommand          datasources.IUpdateDeviceByAccessTokenCommand
+	deleteDeviceByIdCommand          datasources.IDeleteDeviceByIdCommand
 }
 
 func NewDeviceRepo(
+	insertDeviceCommand datasources.IInsertDeviceCommand,
 	selectDevicesByAccountIdCommand datasources.ISelectDevicesByAccountIdCommand,
 	selectDeviceByIdCommand datasources.ISelectDeviceByIdCommand,
-	deleteDeviceByIdCommand datasources.IDeleteDeviceByIdCommand,
-	deleteSessionByIdCommand datasources.IDeleteSessionByAccessTokenCommand) internal.IDeviceRepository {
-	return &deviceRepo{selectDevicesByAccountIdCommand: selectDevicesByAccountIdCommand, selectDeviceByIdCommand: selectDeviceByIdCommand, deleteDeviceByIdCommand: deleteDeviceByIdCommand, deleteSessionByIdCommand: deleteSessionByIdCommand}
+	selectDeviceByAccessTokenCommand datasources.ISelectDeviceByAccessTokenCommand,
+	updateDeviceByIdCommand datasources.IUpdateDeviceByAccessTokenCommand,
+	deleteDeviceByIdCommand datasources.IDeleteDeviceByIdCommand) internal.IDeviceRepository {
+	return &deviceRepo{
+		insertDeviceCommand:              insertDeviceCommand,
+		selectDevicesByAccountIdCommand:  selectDevicesByAccountIdCommand,
+		selectDeviceByIdCommand:          selectDeviceByIdCommand,
+		selectDeviceByAccessTokenCommand: selectDeviceByAccessTokenCommand,
+		updateDeviceByIdCommand:          updateDeviceByIdCommand,
+		deleteDeviceByIdCommand:          deleteDeviceByIdCommand}
 }
 
-func (repo *deviceRepo) SelectDevicesByAccountId(context context.Context, accountId int) ([]*session.Device, error) {
+func (repo *deviceRepo) Create(context context.Context, device *session.Device) error {
+	return repo.insertDeviceCommand.Execute(context, device)
+}
+
+func (repo *deviceRepo) SelectByAccountId(context context.Context, accountId int) ([]*session.Device, error) {
 	return repo.selectDevicesByAccountIdCommand.Execute(context, accountId)
 }
 
-func (repo *deviceRepo) DeleteDeviceById(context context.Context, deviceId int) error {
-	device, err := repo.selectDeviceByIdCommand.Execute(context, deviceId)
+func (repo *deviceRepo) DeleteById(context context.Context, deviceId int) error {
+	return repo.deleteDeviceByIdCommand.Execute(context, deviceId)
+}
+
+func (repo *deviceRepo) SelectByAccessToken(context context.Context, accessToken string) (*session.Device, error) {
+	return repo.selectDeviceByAccessTokenCommand.Execute(context, accessToken)
+}
+
+func (repo *deviceRepo) SelectById(context context.Context, id int) (*session.Device, error) {
+	return repo.selectDeviceByIdCommand.Execute(context, id)
+}
+
+func (repo *deviceRepo) UpdateByAccessToken(context context.Context, accessToken string, device *session.Device) error {
+	device, err := repo.selectDeviceByAccessTokenCommand.Execute(context, accessToken)
 	if err != nil {
 		return err
 	}
 
-	repo.deleteSessionByIdCommand.Execute(context, device.SessionAccessToken)
+	cpy := session.Device{
+		Id:                  device.Id,
+		AccountId:           device.AccountId,
+		Name:                device.Name,
+		SessionAccessToken:  device.SessionAccessToken,
+		SessionCreationTime: device.SessionCreationTime,
+	}
 
-	return repo.DeleteDeviceById(context, deviceId)
+	err = repo.updateDeviceByIdCommand.Execute(context, accessToken, &cpy)
+	return err
 }

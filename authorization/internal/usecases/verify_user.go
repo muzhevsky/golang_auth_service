@@ -16,7 +16,10 @@ type verificationUseCase struct {
 	mailer           mailers.IVerificationMailer
 }
 
-func NewVerificationUseCase(userRepo internal.IAccountRepository, verificationRepo internal.IVerificationRepository, mailer mailers.IVerificationMailer) internal.IVerifyUserUseCase {
+func NewVerificationUseCase(
+	userRepo internal.IAccountRepository,
+	verificationRepo internal.IVerificationRepository,
+	mailer mailers.IVerificationMailer) internal.IVerifyUserUseCase {
 	return &verificationUseCase{userRepo, verificationRepo, mailer}
 }
 
@@ -37,9 +40,10 @@ func (v *verificationUseCase) Verify(context context.Context, accountId int, cod
 	}
 
 	var existingVerification *verificationpkg.Verification
-	for _, verification := range existingVerifications {
-		if verification.Code == code {
-			existingVerification = verification
+	for i := 0; i < len(existingVerifications); i++ {
+		if existingVerifications[i].Code == code {
+			existingVerification = existingVerifications[i]
+			break
 		}
 	}
 

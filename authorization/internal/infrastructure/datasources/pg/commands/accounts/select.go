@@ -11,7 +11,7 @@ import (
 func selectAccount(context context.Context, client *postgres.Client, sql string, args []any) (*account.Account, error) {
 	result := &account.Account{}
 	row := client.Pool.QueryRow(context, sql, args...)
-	err := row.Scan(&result.Id, &result.Login, &result.Password, &result.Nickname, &result.Email, &result.RegistrationDate, &result.IsVerified)
+	err := row.Scan(&result.Id, &result.Login, &result.Password, &result.Email, &result.RegistrationDate, &result.IsVerified)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

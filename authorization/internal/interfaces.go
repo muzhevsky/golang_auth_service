@@ -17,6 +17,10 @@ type (
 		GetAccountDevices(context context.Context, accountId int) (*requests.AccountDevicesResponse, error)
 	}
 
+	ICloseSessionsByIdsUseCase interface {
+		CloseSessionsByIds(context context.Context, accountId int, request *requests.CloseSessionsRequest) error
+	}
+
 	ISignInUseCase interface {
 		SignIn(context context.Context, user *requests.SignInRequest) (*requests.SignInResponse, error)
 	}
@@ -54,13 +58,18 @@ type (
 	}
 
 	ISessionRepository interface {
-		CreateWithDevice(context context.Context, deviceName string, user *session.Session) error
+		Create(context context.Context, user *session.Session) error
 		FindByAccessToken(context context.Context, token string) (*session.Session, error)
 		UpdateByAccessToken(context context.Context, token string, newSession *session.Session) (*session.Session, error)
+		DeleteByAccessToken(context context.Context, token string) error
 	}
 
 	IDeviceRepository interface {
-		SelectDevicesByAccountId(context context.Context, accountId int) ([]*session.Device, error)
-		DeleteDeviceById(context context.Context, deviceId int) error
+		Create(context context.Context, device *session.Device) error
+		SelectByAccountId(context context.Context, accountId int) ([]*session.Device, error)
+		SelectByAccessToken(context context.Context, token string) (*session.Device, error)
+		SelectById(context context.Context, id int) (*session.Device, error)
+		DeleteById(context context.Context, deviceId int) error
+		UpdateByAccessToken(context context.Context, accessToken string, device *session.Device) error
 	}
 )

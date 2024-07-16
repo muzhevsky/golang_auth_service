@@ -1,4 +1,4 @@
-package user_data
+package skills
 
 type UserSkill struct {
 	SkillId int `json:"skill_id"`

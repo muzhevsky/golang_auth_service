@@ -2,7 +2,7 @@ package query_builders
 
 import (
 	"github.com/Masterminds/squirrel"
-	"smartri_app/internal/entities/user_data/avatar"
+	"smartri_app/internal/entities/avatar"
 )
 
 const avatarsTableName = "avatars"
