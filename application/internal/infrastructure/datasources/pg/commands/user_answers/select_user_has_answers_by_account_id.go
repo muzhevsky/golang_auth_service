@@ -2,6 +2,7 @@ package user_answers
 
 import (
 	"context"
+	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -10,7 +11,7 @@ type selectUserHasAnswersByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectUserHasAnswersByAccountIdPGCommand(client *postgres.Client) *selectUserHasAnswersByAccountIdPGCommand {
+func NewSelectUserHasAnswersByAccountIdPGCommand(client *postgres.Client) datasources.ICheckIfUserHasAnswersByAccountIdCommand {
 	return &selectUserHasAnswersByAccountIdPGCommand{client: client}
 }
 

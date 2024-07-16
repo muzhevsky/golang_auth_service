@@ -27,8 +27,7 @@ func (s *selectAnswerByIdPGCommand) Execute(context context.Context, id int) (*t
 	row := s.client.Pool.QueryRow(context, sql, args...)
 	var answer test_entities.Answer
 
-	answer.Id = id
-	err = row.Scan(&answer.Text, &answer.QuestionId)
+	err = row.Scan(&answer.Id, &answer.Text, &answer.QuestionId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

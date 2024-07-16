@@ -25,27 +25,9 @@ func (uc *getUserAvatarUseCase) GetAvatar(context context.Context, accountId int
 		return nil, errs.UserDoesntHaveAnAvatarYetError
 	}
 
-	return &requests.AvatarRequest{
-		HairId: result.HairId,
-		HairColor: requests.ColorRequest{
-			R: result.HairColor.R,
-			G: result.HairColor.G,
-			B: result.HairColor.B,
-			A: result.HairColor.A,
-		},
-		EyesId: result.EyesId,
-		EyesColor: requests.ColorRequest{
-			R: result.EyesColor.R,
-			G: result.EyesColor.G,
-			B: result.EyesColor.B,
-			A: result.EyesColor.A,
-		},
-		ClothesId:    result.ClothesId,
-		ExpressionId: result.ExpressionId,
-		SkinColor: requests.ColorRequest{
-			R: result.SkinColor.R,
-			G: result.SkinColor.G,
-			B: result.SkinColor.B,
-			A: result.SkinColor.A,
-		}}, nil
+	hairColorResponse := requests.NewColorRequest(result.HairColor.R, result.HairColor.G, result.HairColor.B, result.HairColor.A)
+	eyesColorResponse := requests.NewColorRequest(result.EyesColor.R, result.EyesColor.G, result.EyesColor.B, result.EyesColor.A)
+	skinColorResponse := requests.NewColorRequest(result.SkinColor.R, result.SkinColor.G, result.SkinColor.B, result.SkinColor.A)
+
+	return requests.NewAvatarRequest(result.HairId, hairColorResponse, result.EyesId, eyesColorResponse, result.ClothesId, result.ExpressionId, skinColorResponse), nil
 }

@@ -38,8 +38,8 @@ func (s *selectSkillChangesByAccountIdAndActionIdPGCommand) Execute(context cont
 	result := make([]*skills_entities.SkillChange, 0)
 
 	for rows.Next() {
-		change := skills_entities.SkillChange{AccountId: accountId, ActionId: actionId}
-		err = rows.Scan(&change.Id, &change.SkillId, change.Date, &change.Points)
+		change := skills_entities.SkillChange{}
+		err = rows.Scan(&change.Id, &change.AccountId, &change.SkillId, &change.Date, &change.ActionId, &change.Points)
 		if err != nil {
 			return nil, err
 		}

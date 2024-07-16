@@ -6,6 +6,7 @@ import (
 	"smartri_app/internal/entities/test_entities"
 	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/infrastructure/datasources"
+	"smartri_app/internal/infrastructure/datasources/pg"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -32,47 +33,40 @@ func (u *insertUserTestResultsPGCommand) Execute(
 
 	tx, err := u.client.Pool.Begin(context)
 
-	if err != nil {
-		tx.Rollback(context)
+	if pg.WrapError(context, err, tx) != nil {
 		return err
 	}
 
 	_, err = tx.Exec(context, insertTestResultsSQL, args...)
-	if err != nil {
-		tx.Rollback(context)
+	if pg.WrapError(context, err, tx) != nil {
 		return err
 	}
 
 	for _, skill := range changes {
 		insertSkillChangesSQL, args, err := query_builders.NewInsertSkillChangesQuery(&u.client.Builder, skill)
-		if err != nil {
-			tx.Rollback(context)
+		if pg.WrapError(context, err, tx) != nil {
 			return err
 		}
 
 		_, err = tx.Exec(context, insertSkillChangesSQL, args...)
-		if err != nil {
-			tx.Rollback(context)
+		if pg.WrapError(context, err, tx) != nil {
 			return err
 		}
 	}
 
 	updateUserXpSQL, args, err := query_builders.NewUpdateUserDataByAccountIdQuery(&u.client.Builder, userData)
-	if err != nil {
-		tx.Rollback(context)
+	if pg.WrapError(context, err, tx) != nil {
 		return err
 	}
 
 	_, err = tx.Exec(context, updateUserXpSQL, args...)
-	if err != nil {
-		tx.Rollback(context)
+	if pg.WrapError(context, err, tx) != nil {
 		return err
 	}
 
 	for i := range userSkills.Skills {
 		updateUserSkillsSQL, args, err := query_builders.NewUpdateUserSkillsByAccountIdQuery(&u.client.Builder, userData.AccountId, userSkills.Skills[i])
-		if err != nil {
-			tx.Rollback(context)
+		if pg.WrapError(context, err, tx) != nil {
 			return err
 		}
 
@@ -80,8 +74,7 @@ func (u *insertUserTestResultsPGCommand) Execute(
 	}
 
 	err = tx.Commit(context)
-	if err != nil {
-		tx.Rollback(context)
+	if pg.WrapError(context, err, tx) != nil {
 		return err
 	}
 

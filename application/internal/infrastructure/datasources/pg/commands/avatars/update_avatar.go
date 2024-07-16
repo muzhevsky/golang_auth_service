@@ -2,7 +2,7 @@ package avatars
 
 import (
 	"context"
-	avatar_pkg "smartri_app/internal/entities/avatar_entities"
+	avatarpkg "smartri_app/internal/entities/avatar_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -16,7 +16,7 @@ func NewUpdateAvatarByAccountIdPGCommand(client *postgres.Client) datasources.IU
 	return &updateAvatarByAccountIdPGCommand{client: client}
 }
 
-func (c *updateAvatarByAccountIdPGCommand) Execute(context context.Context, accountId int, avatar *avatar_pkg.Avatar) (*avatar_pkg.Avatar, error) {
+func (c *updateAvatarByAccountIdPGCommand) Execute(context context.Context, accountId int, avatar *avatarpkg.Avatar) (*avatarpkg.Avatar, error) {
 	sql, args, err := query_builders.NewUpdateAvatarByAccountIdQuery(&c.client.Builder, accountId, avatar)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (c *updateAvatarByAccountIdPGCommand) Execute(context context.Context, acco
 		return nil, err
 	}
 
-	result := &avatar_pkg.Avatar{
+	result := &avatarpkg.Avatar{
 		AccountId:    accountId,
 		HairId:       avatar.HairId,
 		HairColor:    avatar.HairColor,

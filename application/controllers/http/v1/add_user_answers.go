@@ -32,7 +32,7 @@ func NewAddUserAnswersController(useCase internal.IAddUserTestAnswersUseCase) *a
 // @Failure 404 {object} middleware.ErrorResponse "не найдены данные пользователя, сначала нужно отправить их /user/data [post]"
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже прошел тест ранее"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/test_entities [post]
+// @Router       /user/test [post]
 func (controller *addUserAnswersController) AddUserAnswers(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)

@@ -22,7 +22,7 @@ func NewGetTestController(repository internal.ITestRepository) *getTestControlle
 // @Produce      json
 // @Success      200  {object} []test_entities.Question
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /test_entities [get]
+// @Router       /test [get]
 func (controller *getTestController) GetQuestions(c *gin.Context) {
 	questions, err := controller.repository.GetAllQuestionsWithAnswers(c)
 	if err != nil {

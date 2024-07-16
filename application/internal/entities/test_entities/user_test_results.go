@@ -6,6 +6,8 @@ type UserTestAnswers struct {
 }
 
 type UserTestAnswer struct {
+	Id         int
+	AccountId  int
 	QuestionId int
 	AnswerId   int
 }

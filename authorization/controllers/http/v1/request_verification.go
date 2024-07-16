@@ -16,7 +16,7 @@ type requestVerificationController struct {
 func NewRequestVerificationController(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IRequestVerificationUseCase) {
 	u := &requestVerificationController{user, verification}
 
-	handler.POST("/verification_entities/request", u.requestVerification)
+	handler.POST("/verification/request", u.requestVerification)
 }
 
 // RequestVerification godoc
@@ -30,7 +30,7 @@ func NewRequestVerificationController(handler *gin.Engine, user internal.ICreate
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
 // @Failure 409 {object} middleware.ErrorResponse "пользователь уже верифицирован"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /verification_entities/request [post]
+// @Router       /verification/request [post]
 func (u *requestVerificationController) requestVerification(c *gin.Context) {
 	accountId, exists := c.Get("accountId")
 	if !exists {

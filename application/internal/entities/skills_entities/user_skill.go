@@ -7,5 +7,5 @@ type UserSkill struct {
 
 type UserSkills struct {
 	AccountId int          `json:"account_id"`
-	Skills    []*UserSkill `json:"skills_entities"`
+	Skills    []*UserSkill `json:"skills"`
 }

@@ -22,20 +22,11 @@ func (uc *updateAvatarUseCase) InitOrUpdate(context context.Context, accountId i
 		return err
 	}
 
-	hairColor := uc.getHairColor(request)
-	eyeColor := uc.getEyeColor(request)
-	skinColor := uc.getSkinColor(request)
+	hairColor := uc.getColor(request.HairColor)
+	eyesColor := uc.getColor(request.EyesColor)
+	skinColor := uc.getColor(request.SkinColor)
 
-	newAvatar := &avatar2.Avatar{
-		AccountId:    accountId,
-		HairId:       request.HairId,
-		HairColor:    hairColor,
-		EyesId:       request.EyesId,
-		EyesColor:    eyeColor,
-		ClothesId:    request.ClothesId,
-		ExpressionId: request.ExpressionId,
-		SkinColor:    skinColor,
-	}
+	newAvatar := avatar2.NewAvatar(accountId, request.HairId, hairColor, request.EyesId, eyesColor, request.ClothesId, request.ExpressionId, skinColor)
 
 	if avatar == nil {
 		err = uc.avatarRepo.Create(context, newAvatar)
@@ -49,26 +40,6 @@ func (uc *updateAvatarUseCase) InitOrUpdate(context context.Context, accountId i
 	return err
 }
 
-func (uc *updateAvatarUseCase) getHairColor(request *requests.AvatarRequest) *avatar2.ColorRGBA {
-	return avatar2.NewColorRGBA(
-		request.HairColor.R,
-		request.HairColor.G,
-		request.HairColor.B,
-		request.HairColor.A)
-}
-
-func (uc *updateAvatarUseCase) getEyeColor(request *requests.AvatarRequest) *avatar2.ColorRGBA {
-	return avatar2.NewColorRGBA(
-		request.EyesColor.R,
-		request.EyesColor.G,
-		request.EyesColor.B,
-		request.EyesColor.A)
-}
-
-func (uc *updateAvatarUseCase) getSkinColor(request *requests.AvatarRequest) *avatar2.ColorRGBA {
-	return avatar2.NewColorRGBA(
-		request.SkinColor.R,
-		request.SkinColor.G,
-		request.SkinColor.B,
-		request.SkinColor.A)
+func (uc *updateAvatarUseCase) getColor(request *requests.ColorRequest) *avatar2.ColorRGBA {
+	return avatar2.NewColorRGBA(request.R, request.G, request.B, request.A)
 }

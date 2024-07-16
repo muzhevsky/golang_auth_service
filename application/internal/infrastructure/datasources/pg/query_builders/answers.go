@@ -1,29 +1,28 @@
 package query_builders
 
-import (
-	"github.com/Masterminds/squirrel"
+import "github.com/Masterminds/squirrel"
+
+const (
+	answersTableName           = "test_answers"
+	answersIdFieldName         = "id"
+	answersTextFieldName       = "text"
+	answersQuestionIdFieldName = "question_id"
 )
 
-func NewSelectAnswerValuesByAnswerIdQuery(builder *squirrel.StatementBuilderType, answerId int) (string, []any, error) {
-	return builder.
-		Select("id", "skill_id", "points").
-		From("test_answers_values").
-		Where(squirrel.Eq{"answer_id": answerId}).
-		ToSql()
-}
-
 func NewSelectAnswersByQuestionIdQuery(builder *squirrel.StatementBuilderType, questionId int) (string, []any, error) {
-	return builder.
-		Select("id", "text", "question_id").
-		From("test_answers").
-		Where(squirrel.Eq{"question_id": questionId}).
+	return selectStartAnswer(builder).
+		Where(squirrel.Eq{answersQuestionIdFieldName: questionId}).
 		ToSql()
 }
 
 func NewSelectAnswerByIdQuery(builder *squirrel.StatementBuilderType, id int) (string, []any, error) {
-	return builder.
-		Select("text", "question_id").
-		From("test_answers").
-		Where(squirrel.Eq{"id": id}).
+	return selectStartAnswer(builder).
+		Where(squirrel.Eq{answersIdFieldName: id}).
 		ToSql()
+}
+
+func selectStartAnswer(builder *squirrel.StatementBuilderType) squirrel.SelectBuilder {
+	return builder.
+		Select(answersIdFieldName, answersTextFieldName, answersQuestionIdFieldName).
+		From(answersTableName)
 }

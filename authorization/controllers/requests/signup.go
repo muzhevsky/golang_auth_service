@@ -9,7 +9,7 @@ type SignUpRequest struct {
 
 type SignUpResponse struct {
 	Id      int                     `json:"id" example:"2"`
-	Session *RefreshSessionResponse `json:"session_entities"`
+	Session *RefreshSessionResponse `json:"session"`
 }
 
 func NewSignUpResponse(id int, session *RefreshSessionResponse) *SignUpResponse {

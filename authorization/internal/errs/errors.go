@@ -15,9 +15,9 @@ var RefreshTokenExpired = errors.New("refresh token is expired")
 var NotAValidAccessToken = errors.New("invalid access token")
 var NotAValidRefreshToken = errors.New("invalid refresh token")
 
-// verification_entities
-var ExpiredVerificationCode = errors.New("the verification_entities code is expired")
-var WrongVerificationCode = errors.New("the verification_entities code is wrong")
+// verification
+var ExpiredVerificationCode = errors.New("the verification code is expired")
+var WrongVerificationCode = errors.New("the verification code is wrong")
 var UserIsNotVerified = errors.New("the user is not verified")
 var UserIsAlreadyVerified = errors.New("the user is already verified")
 

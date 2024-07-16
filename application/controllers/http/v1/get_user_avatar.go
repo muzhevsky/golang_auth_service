@@ -28,7 +28,7 @@ func NewGetUserAvatarController(useCase internal.IGetUserAvatarUseCase) *getUser
 // @Failure 400 {object} middleware.ErrorResponse "ошибка формата отправленных клиентом данных"
 // @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/avatar_entities [get]
+// @Router       /user/avatar [get]
 func (controller *getUserAvatarController) GetUserAvatar(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)

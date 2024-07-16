@@ -5,6 +5,7 @@ import (
 	"smartri_app/internal/entities/skills_entities"
 	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/infrastructure/datasources"
+	"smartri_app/internal/infrastructure/datasources/pg"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -31,8 +32,7 @@ func (u *insertUserDataPGCommand) Execute(context context.Context, userData *use
 	}
 
 	_, err = tx.Exec(context, sql, args...)
-	if err != nil {
-		tx.Rollback(context)
+	if pg.WrapError(context, err, tx) != nil {
 		return err
 	}
 
@@ -44,18 +44,19 @@ func (u *insertUserDataPGCommand) Execute(context context.Context, userData *use
 			Xp:      0,
 		})
 
-		if err != nil {
-			tx.Rollback(context)
+		if pg.WrapError(context, err, tx) != nil {
 			return err
 		}
 
 		_, err = tx.Exec(context, sql, args...)
-		if err != nil {
-			tx.Rollback(context)
+		if pg.WrapError(context, err, tx) != nil {
 			return err
 		}
 	}
-	tx.Commit(context)
+	err = tx.Commit(context)
+	if pg.WrapError(context, err, tx) != nil {
+		return err
+	}
 
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v5"
 	avatar2 "smartri_app/internal/entities/avatar_entities"
+	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -13,7 +14,7 @@ type selectAvatarByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectAvatarByAccountIdPGCommand(client *postgres.Client) *selectAvatarByAccountIdPGCommand {
+func NewSelectAvatarByAccountIdPGCommand(client *postgres.Client) datasources.ISelectAvatarByAccountIdCommand {
 	return &selectAvatarByAccountIdPGCommand{client: client}
 }
 

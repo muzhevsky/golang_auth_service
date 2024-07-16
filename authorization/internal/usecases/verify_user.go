@@ -23,10 +23,10 @@ func NewVerificationUseCase(
 	return &verificationUseCase{userRepo, verificationRepo, mailer}
 }
 
-// Verify - serves verification_entities process, checking if there's any verification_entities records in repository by provided userId
-// within verification_entities object.
+// Verify - serves verification process, checking if there's any verification_entities records in repository by provided userId
+// within verification object.
 // returns:
-//   - ExpiredVerificationCode error if there are no active verification_entities codes
+//   - ExpiredVerificationCode error if there are no active verification codes
 //   - WrongVerificationCode error if code is wrong
 func (v *verificationUseCase) Verify(context context.Context, accountId int, code string) error {
 	verification := &verificationpkg.Verification{

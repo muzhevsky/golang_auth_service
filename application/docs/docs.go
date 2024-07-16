@@ -79,14 +79,14 @@ const docTemplate = `{
         },
         "/auth/token/update": {
             "post": {
-                "description": "refreshes current session_entities with token pair (access + refresh)",
+                "description": "refreshes current session with token pair (access + refresh)",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "refreshes session_entities",
+                "summary": "refreshes session",
                 "parameters": [
                     {
                         "description": "request format",

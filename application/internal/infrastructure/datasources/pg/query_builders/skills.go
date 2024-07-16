@@ -4,9 +4,15 @@ import (
 	"github.com/Masterminds/squirrel"
 )
 
+const (
+	skillsTableName      = "skills"
+	skillsIdFieldName    = "id"
+	skillsTitleFieldName = "title"
+)
+
 func NewSelectAllSkillsQuery(builder *squirrel.StatementBuilderType) (string, []any, error) {
 	return builder.
-		Select("id", "title").
-		From("skills_entities").
+		Select(skillsIdFieldName, skillsTitleFieldName).
+		From(skillsTableName).
 		ToSql()
 }

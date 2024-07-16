@@ -38,8 +38,8 @@ func (a *selectAnswerValuesByAnswerIdPGCommand) Execute(context context.Context,
 	result := make([]*test_entities.AnswerValue, 0)
 
 	for rows.Next() {
-		value := test_entities.AnswerValue{AnswerId: answerId}
-		err = rows.Scan(&value.Id, &value.SkillId, &value.Points)
+		value := test_entities.AnswerValue{}
+		err = rows.Scan(&value.Id, &value.AnswerId, &value.SkillId, &value.Points)
 		if err != nil {
 			return nil, err
 		}

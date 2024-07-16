@@ -5,27 +5,36 @@ import (
 	"smartri_app/internal/entities/user_data_entities"
 )
 
+const (
+	userDataTableName          = "user_data"
+	userDataNicknameFieldName  = "nickname"
+	userDataAgeFieldName       = "age"
+	userDataGenderFieldName    = "gender"
+	userDataXPFieldName        = "xp"
+	userDataAccountIdFieldName = "account_id"
+)
+
 func NewInsertUserDataQuery(builder *squirrel.StatementBuilderType, data *user_data_entities.UserData) (string, []any, error) {
 	return builder.
-		Insert("user_data_entities").
-		Columns("nickname", "age", "gender", "xp", "account_id").
+		Insert(userDataTableName).
+		Columns(userDataNicknameFieldName, userDataAgeFieldName, userDataGenderFieldName, userDataXPFieldName, userDataAccountIdFieldName).
 		Values(data.Nickname, data.Age, data.Gender, 0, data.AccountId).
 		ToSql()
 }
 
 func NewSelectUserDataByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int) (string, []any, error) {
 	return builder.
-		Select("nickname", "age", "gender", "XP", "account_id").
-		From("user_data_entities").
-		Where(squirrel.Eq{"account_id": accountId}).
+		Select(userDataNicknameFieldName, userDataAgeFieldName, userDataGenderFieldName, userDataXPFieldName, userDataAccountIdFieldName).
+		From(userDataTableName).
+		Where(squirrel.Eq{userDataAccountIdFieldName: accountId}).
 		ToSql()
 }
 
 func NewUpdateUserDataByAccountIdQuery(builder *squirrel.StatementBuilderType, data *user_data_entities.UserData) (string, []any, error) {
-	return builder.Update("user_data_entities").
-		Set("nickname", data.Nickname).
-		Set("xp", data.XP).
-		Set("age", data.Age).
-		Set("gender", data.Gender).
-		Where(squirrel.Eq{"account_id": data.AccountId}).ToSql()
+	return builder.Update(userDataTableName).
+		Set(userDataNicknameFieldName, data.Nickname).
+		Set(userDataAgeFieldName, data.Age).
+		Set(userDataGenderFieldName, data.Gender).
+		Set(userDataXPFieldName, data.XP).
+		Where(squirrel.Eq{userDataAccountIdFieldName: data.AccountId}).ToSql()
 }

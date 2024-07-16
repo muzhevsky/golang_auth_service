@@ -3,6 +3,7 @@ package questions
 import (
 	"context"
 	"smartri_app/internal/entities/test_entities"
+	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -11,7 +12,7 @@ type selectQuestionByIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectQuestionByIdPGCommand(client *postgres.Client) *selectQuestionByIdPGCommand {
+func NewSelectQuestionByIdPGCommand(client *postgres.Client) datasources.ISelectQuestionByIdCommand {
 	return &selectQuestionByIdPGCommand{client: client}
 }
 

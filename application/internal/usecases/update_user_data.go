@@ -17,7 +17,6 @@ func NewAddOrUpdateUserDataUseCase(repo internal.IUserDataRepository) internal.I
 
 func (u *createOrUpdateUserDataUseCase) InitOrUpdate(context context.Context, request *requests.UserDataRequest, accountId int) (*requests.UserDataResponse, error) {
 	existingUserData, err := u.repo.GetByAccountId(context, accountId)
-
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +24,6 @@ func (u *createOrUpdateUserDataUseCase) InitOrUpdate(context context.Context, re
 	if existingUserData == nil {
 		return u.create(context, request, accountId)
 	}
-
 	return u.update(context, request, existingUserData)
 
 }

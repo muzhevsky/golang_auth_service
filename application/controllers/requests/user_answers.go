@@ -13,6 +13,6 @@ type Answer struct {
 }
 type UserAnswersResponse struct {
 	AccountId int                          `json:"accountId"`
-	Skills    []*skills_entities.UserSkill `json:"skills_entities"`
+	Skills    []*skills_entities.UserSkill `json:"skills"`
 	TotalExp  int                          `json:"totalExp"`
 }

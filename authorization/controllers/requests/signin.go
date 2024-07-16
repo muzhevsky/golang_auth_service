@@ -8,7 +8,7 @@ type SignInRequest struct {
 
 type SignInResponse struct {
 	Id      int                     `json:"id" example:"2"`
-	Session *RefreshSessionResponse `json:"session_entities"`
+	Session *RefreshSessionResponse `json:"session"`
 }
 
 func NewSignInResponse(id int, session *RefreshSessionResponse) *SignInResponse {

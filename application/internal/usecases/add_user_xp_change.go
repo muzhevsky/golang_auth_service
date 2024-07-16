@@ -6,6 +6,7 @@ import (
 	"smartri_app/internal"
 	"smartri_app/internal/entities/skills_entities"
 	"smartri_app/internal/entities/user_data_entities"
+	"smartri_app/internal/errs"
 	"time"
 )
 
@@ -50,6 +51,10 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 			skill = s
 			break
 		}
+	}
+
+	if skill == nil {
+		return nil, errs.UnexpectedError
 	}
 
 	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &skills_entities.SkillChange{

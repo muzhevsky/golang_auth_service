@@ -86,7 +86,7 @@ func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnsw
 }
 
 func (a *addUserAnswers) getEntityAnswers(accountId int, answers *requests.UserAnswersRequest) *test_entities.UserTestAnswers {
-	result := &test_entities.UserTestAnswers{accountId, make([]test_entities.UserTestAnswer, 0)}
+	result := &test_entities.UserTestAnswers{AccountId: accountId, Answers: make([]test_entities.UserTestAnswer, 0)}
 	for i := range answers.Answers {
 		result.Answers = append(result.Answers, test_entities.UserTestAnswer{
 			QuestionId: answers.Answers[i].QuestionId,

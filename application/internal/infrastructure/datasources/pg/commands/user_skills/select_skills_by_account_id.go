@@ -3,6 +3,7 @@ package user_skills
 import (
 	"context"
 	"smartri_app/internal/entities/skills_entities"
+	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -11,7 +12,7 @@ type selectSkillsByAccountIdPGCommand struct {
 	client *postgres.Client
 }
 
-func NewSelectSkillsByAccountIdPGCommand(client *postgres.Client) *selectSkillsByAccountIdPGCommand {
+func NewSelectSkillsByAccountIdPGCommand(client *postgres.Client) datasources.ISelectSkillsByAccountIdCommand {
 	return &selectSkillsByAccountIdPGCommand{client: client}
 }
 

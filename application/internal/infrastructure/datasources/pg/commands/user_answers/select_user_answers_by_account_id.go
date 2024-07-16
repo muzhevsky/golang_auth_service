@@ -39,7 +39,7 @@ func (s *selectUserAnswersByAccountIdPGCommand) Execute(context context.Context,
 	}
 	for rows.Next() {
 		row := test_entities.UserTestAnswer{}
-		err = rows.Scan(&row.QuestionId, &row.AnswerId)
+		err = rows.Scan(&row.Id, &row.QuestionId, &row.AnswerId, &row.AccountId)
 		if err != nil {
 			return nil, err
 		}
