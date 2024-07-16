@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	"smartri_app/internal"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/infrastructure/datasources"
 )
 
@@ -20,11 +20,11 @@ func NewUserDataRepository(selectUserDataByAccountIdCommand datasources.ISelectU
 		insertUserDataCommand:            insertUserDataCommand}
 }
 
-func (u *userDataRepository) GetByAccountId(context context.Context, accountId int) (*user_data.UserData, error) {
+func (u *userDataRepository) GetByAccountId(context context.Context, accountId int) (*user_data_entities.UserData, error) {
 	return u.selectUserDataByAccountIdCommand.Execute(context, accountId)
 }
 
-func (u *userDataRepository) Update(context context.Context, details *user_data.UserData) (*user_data.UserData, error) {
+func (u *userDataRepository) Update(context context.Context, details *user_data_entities.UserData) (*user_data_entities.UserData, error) {
 	updated, err := u.updateUserDataCommand.Execute(context, details)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (u *userDataRepository) Update(context context.Context, details *user_data.
 	return updated, nil
 }
 
-func (u *userDataRepository) Create(context context.Context, details *user_data.UserData) error {
+func (u *userDataRepository) Create(context context.Context, details *user_data_entities.UserData) error {
 	err := u.insertUserDataCommand.Execute(context, details)
 	return err
 }

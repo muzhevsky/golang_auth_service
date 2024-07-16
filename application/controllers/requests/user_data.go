@@ -1,7 +1,7 @@
 package requests
 
 import (
-	"smartri_app/internal/entities/skills"
+	"smartri_app/internal/entities/skills_entities"
 )
 
 type UserDataRequest struct {
@@ -22,8 +22,8 @@ func NewUserDataResponse(nickname string, age int, gender string, xp int) *UserD
 }
 
 type UserSkillResponse struct {
-	AccountId int                 `json:"accountId"`
-	Skills    []*skills.UserSkill `json:"skills"`
+	AccountId int                          `json:"accountId"`
+	Skills    []*skills_entities.UserSkill `json:"skills_entities"`
 }
 
 type AddSkillChangeRequest struct {

@@ -1,7 +1,7 @@
 package devices
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -16,7 +16,7 @@ func NewInsertDevicePGCommand(client *postgres.Client) datasources.IInsertDevice
 	return &insertDevicePGCommand{client: client}
 }
 
-func (c *insertDevicePGCommand) Execute(context context.Context, device *session.Device) error {
+func (c *insertDevicePGCommand) Execute(context context.Context, device *session_entities.Device) error {
 	sql, args, err := query_builders.NewInsertDeviceQuery(&c.client.Builder, device)
 	if err != nil {
 		return err

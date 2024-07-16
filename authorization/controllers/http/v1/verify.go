@@ -6,18 +6,16 @@ import (
 	_ "authorization/docs"
 	"authorization/internal"
 	"authorization/internal/errs"
-	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type verificationController struct {
 	verification internal.IVerifyUserUseCase
-	logger       logger.ILogger
 }
 
-func NewVerificationController(handler *gin.Engine, verification internal.IVerifyUserUseCase, l logger.ILogger) {
-	u := &verificationController{verification, l}
+func NewVerificationController(handler *gin.Engine, verification internal.IVerifyUserUseCase) {
+	u := &verificationController{verification}
 
 	handler.POST("/user/verify", u.verifyUser)
 }

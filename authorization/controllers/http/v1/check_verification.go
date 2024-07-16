@@ -15,7 +15,7 @@ type checkVerificationController struct {
 func NewCheckVerificationController(handler *gin.Engine, useCase internal.ICheckVerificationUseCase) {
 	u := &checkVerificationController{useCase: useCase}
 
-	handler.GET("/user/verification", u.checkVerification)
+	handler.GET("/user/verification_entities", u.checkVerification)
 }
 
 // CheckVerification godoc
@@ -26,7 +26,7 @@ func NewCheckVerificationController(handler *gin.Engine, useCase internal.ICheck
 // @Success 200 {object} requests.CheckVerificationResponse
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/verification [get]
+// @Router       /user/verification_entities [get]
 func (v *checkVerificationController) checkVerification(c *gin.Context) {
 	accountId, exists := c.Get("accountId")
 	if !exists {

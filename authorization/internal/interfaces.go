@@ -2,9 +2,9 @@ package internal
 
 import (
 	"authorization/controllers/requests"
-	"authorization/internal/entities/account"
-	"authorization/internal/entities/session"
-	"authorization/internal/entities/verification"
+	"authorization/internal/entities/entities_account"
+	"authorization/internal/entities/session_entities"
+	"authorization/internal/entities/verification_entities"
 	"context"
 )
 
@@ -42,34 +42,34 @@ type (
 	}
 
 	IAccountRepository interface {
-		Create(context context.Context, user *account.Account) (int, error)
-		FindById(context context.Context, id int) (*account.Account, error)
-		FindByLogin(context context.Context, login account.Login) (*account.Account, error)
-		FindByEmail(context context.Context, email account.Email) (*account.Account, error)
-		CheckLoginExist(context context.Context, login account.Login) (bool, error)
-		CheckEmailExist(context context.Context, email account.Email) (bool, error)
-		UpdateById(context context.Context, id int, user *account.Account) error
+		Create(context context.Context, user *entities_account.Account) (int, error)
+		FindById(context context.Context, id int) (*entities_account.Account, error)
+		FindByLogin(context context.Context, login entities_account.Login) (*entities_account.Account, error)
+		FindByEmail(context context.Context, email entities_account.Email) (*entities_account.Account, error)
+		CheckLoginExist(context context.Context, login entities_account.Login) (bool, error)
+		CheckEmailExist(context context.Context, email entities_account.Email) (bool, error)
+		UpdateById(context context.Context, id int, user *entities_account.Account) error
 	}
 
 	IVerificationRepository interface {
-		Create(context context.Context, verification *verification.Verification) error
-		FindByAccountId(context context.Context, userId int) ([]*verification.Verification, error)
+		Create(context context.Context, verification *verification_entities.Verification) error
+		FindByAccountId(context context.Context, userId int) ([]*verification_entities.Verification, error)
 		Clear(context context.Context, userId int) error
 	}
 
 	ISessionRepository interface {
-		Create(context context.Context, user *session.Session) error
-		FindByAccessToken(context context.Context, token string) (*session.Session, error)
-		UpdateByAccessToken(context context.Context, token string, newSession *session.Session) (*session.Session, error)
+		Create(context context.Context, user *session_entities.Session) error
+		FindByAccessToken(context context.Context, token string) (*session_entities.Session, error)
+		UpdateByAccessToken(context context.Context, token string, newSession *session_entities.Session) (*session_entities.Session, error)
 		DeleteByAccessToken(context context.Context, token string) error
 	}
 
 	IDeviceRepository interface {
-		Create(context context.Context, device *session.Device) error
-		SelectByAccountId(context context.Context, accountId int) ([]*session.Device, error)
-		SelectByAccessToken(context context.Context, token string) (*session.Device, error)
-		SelectById(context context.Context, id int) (*session.Device, error)
+		Create(context context.Context, device *session_entities.Device) error
+		SelectByAccountId(context context.Context, accountId int) ([]*session_entities.Device, error)
+		SelectByAccessToken(context context.Context, token string) (*session_entities.Device, error)
+		SelectById(context context.Context, id int) (*session_entities.Device, error)
 		DeleteById(context context.Context, deviceId int) error
-		UpdateByAccessToken(context context.Context, accessToken string, device *session.Device) error
+		UpdateByAccessToken(context context.Context, accessToken string, device *session_entities.Device) error
 	}
 )

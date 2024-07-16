@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/redis/commands"
 	"context"
@@ -16,9 +16,9 @@ func NewSelectSessionByAccessTokenRedisCommand(client *redis.Client) datasources
 	return &selectSessionByAccessTokenRedisCommand{client: client}
 }
 
-func (c *selectSessionByAccessTokenRedisCommand) Execute(context context.Context, accessToken string) (*session.Session, error) {
+func (c *selectSessionByAccessTokenRedisCommand) Execute(context context.Context, accessToken string) (*session_entities.Session, error) {
 	key := getKey(accessToken)
-	value, err := commands.GetValueOrNil[session.Session](context, c.client, key)
+	value, err := commands.GetValueOrNil[session_entities.Session](context, c.client, key)
 	if err != nil {
 		return nil, err
 	}

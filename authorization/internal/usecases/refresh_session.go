@@ -69,11 +69,7 @@ func (s *refreshSessionUseCase) RefreshSession(context context.Context, request 
 		return nil, err
 	}
 
-	return &requests.RefreshSessionResponse{
-		AccessToken:  newSession.AccessToken,
-		RefreshToken: newSession.RefreshToken,
-		ExpiresAt:    newSession.ExpiresAt.Unix(),
-	}, nil
+	return requests.NewRefreshSessionResponse(newSession.AccessToken, newSession.RefreshToken, newSession.ExpiresAt.Unix()), nil
 }
 
 func (s *refreshSessionUseCase) verifyToken(token string) error {

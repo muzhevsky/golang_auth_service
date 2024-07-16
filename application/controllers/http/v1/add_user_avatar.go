@@ -30,7 +30,7 @@ func NewInitOrUpdateUserAvatarController(useCase internal.IInitOrUpdateAvatarUse
 // @Failure 400 {object} middleware.ErrorResponse "некорректный формат запроса"
 // @Failure 401 {object} middleware.ErrorResponse "ошибка аутентификации"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/avatar [post]
+// @Router       /user/avatar_entities [post]
 func (controller *initOrUpdateUserAvatarController) InitOrUpdateAvatar(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)

@@ -3,8 +3,8 @@ package repositories
 import (
 	"context"
 	"smartri_app/internal"
-	"smartri_app/internal/entities/skills"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills_entities"
+	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/infrastructure/datasources"
 )
 
@@ -16,6 +16,6 @@ func NewUserSkillRepository(applySkillChangesByAccountIdCommand datasources.IApp
 	return &userSkillRepository{applySkillChangesByAccountIdCommand: applySkillChangesByAccountIdCommand}
 }
 
-func (u *userSkillRepository) ApplySkillChangesByAccountId(context context.Context, userSkills *skills.UserSkill, userData *user_data.UserData, change *skills.SkillChange) error {
+func (u *userSkillRepository) ApplySkillChangesByAccountId(context context.Context, userSkills *skills_entities.UserSkill, userData *user_data_entities.UserData, change *skills_entities.SkillChange) error {
 	return u.applySkillChangesByAccountIdCommand.Execute(context, userSkills, userData, change)
 }

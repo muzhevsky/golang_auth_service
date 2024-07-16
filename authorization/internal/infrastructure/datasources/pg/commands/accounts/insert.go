@@ -1,7 +1,7 @@
 package accounts
 
 import (
-	"authorization/internal/entities/account"
+	"authorization/internal/entities/entities_account"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
 	"context"
@@ -15,7 +15,7 @@ func NewInsertAccountPGCommand(client *postgres.Client) *insertAccountPGCommand 
 	return &insertAccountPGCommand{client: client}
 }
 
-func (c *insertAccountPGCommand) Execute(context context.Context, account *account.Account) (int, error) {
+func (c *insertAccountPGCommand) Execute(context context.Context, account *entities_account.Account) (int, error) {
 	sql, args, err := query_builders.NewInsertAccountQuery(&c.client.Builder, account)
 	if err != nil {
 		return 0, err

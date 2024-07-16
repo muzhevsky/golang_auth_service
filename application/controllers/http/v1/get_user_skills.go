@@ -24,10 +24,10 @@ func NewGetSkillDataController(repository internal.ISkillRepository) *getUserSki
 // @Description  получает данные о скиллах пользователя используя access token
 // @Produce      json
 // @Param Authorization header string true "access token"
-// @Success      200  {object} []user_data.UserSkills
+// @Success      200  {object} []skills_entities.UserSkills
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/skills [get]
+// @Router       /user/skills_entities [get]
 func (controller *getUserSkillDataController) GetUserSkills(c *gin.Context) {
 	accountId := c.GetHeader("account_id")
 	id, err := strconv.Atoi(accountId)

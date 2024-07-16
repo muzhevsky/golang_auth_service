@@ -4,7 +4,7 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/user_data_entities"
 )
 
 type createOrUpdateUserDataUseCase struct {
@@ -44,10 +44,10 @@ func (u *createOrUpdateUserDataUseCase) create(context context.Context, request 
 	return requests.NewUserDataResponse(request.Nickname, request.Age, request.Gender, 0), nil
 }
 
-func (u *createOrUpdateUserDataUseCase) update(context context.Context, request *requests.UserDataRequest, user *user_data.UserData) (*requests.UserDataResponse, error) {
-	user.Nickname = user_data.Nickname(request.Nickname)
-	user.Age = user_data.Age(request.Age)
-	user.Gender = user_data.Gender(request.Gender)
+func (u *createOrUpdateUserDataUseCase) update(context context.Context, request *requests.UserDataRequest, user *user_data_entities.UserData) (*requests.UserDataResponse, error) {
+	user.Nickname = user_data_entities.Nickname(request.Nickname)
+	user.Age = user_data_entities.Age(request.Age)
+	user.Gender = user_data_entities.Gender(request.Gender)
 
 	err := user.Validate()
 	if err != nil {
@@ -63,11 +63,11 @@ func (u *createOrUpdateUserDataUseCase) update(context context.Context, request 
 	return response, nil
 }
 
-func (u *createOrUpdateUserDataUseCase) createUserData(data *requests.UserDataRequest, accountId int) (*user_data.UserData, error) {
-	return user_data.NewUserData(
-		user_data.Nickname(data.Nickname),
-		user_data.Age(data.Age),
-		user_data.Gender(data.Gender),
-		user_data.XP(0),
+func (u *createOrUpdateUserDataUseCase) createUserData(data *requests.UserDataRequest, accountId int) (*user_data_entities.UserData, error) {
+	return user_data_entities.NewUserData(
+		user_data_entities.Nickname(data.Nickname),
+		user_data_entities.Age(data.Age),
+		user_data_entities.Gender(data.Gender),
+		user_data_entities.XP(0),
 		accountId)
 }

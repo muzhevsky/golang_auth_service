@@ -1,7 +1,7 @@
 package query_builders
 
 import (
-	"authorization/internal/entities/account"
+	"authorization/internal/entities/entities_account"
 	sq "github.com/Masterminds/squirrel"
 )
 
@@ -60,7 +60,7 @@ func NewSelectAccountByEmailQuery(builder *sq.StatementBuilderType, email string
 		ToSql()
 }
 
-func NewInsertAccountQuery(builder *sq.StatementBuilderType, account *account.Account) (string, []any, error) {
+func NewInsertAccountQuery(builder *sq.StatementBuilderType, account *entities_account.Account) (string, []any, error) {
 	return builder.Insert(accountTableName).
 		Columns(
 			accountLoginFieldName,
@@ -73,7 +73,7 @@ func NewInsertAccountQuery(builder *sq.StatementBuilderType, account *account.Ac
 		ToSql()
 }
 
-func NewUpdateAccountByIdQuery(builder *sq.StatementBuilderType, id int, newAccount *account.Account) (string, []any, error) {
+func NewUpdateAccountByIdQuery(builder *sq.StatementBuilderType, id int, newAccount *entities_account.Account) (string, []any, error) {
 	return builder.Update(accountTableName).
 		Set(accountLoginFieldName, newAccount.Login).
 		Set(accountEmailFieldName, newAccount.Email).

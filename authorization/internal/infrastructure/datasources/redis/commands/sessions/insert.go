@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/redis/commands"
 	"context"
@@ -17,9 +17,9 @@ func NewInsertSessionRedisCommand(client *redis.Client) datasources.IInsertSessi
 	return &insertSessionRedisCommand{client: client}
 }
 
-func (c *insertSessionRedisCommand) Execute(ctx context.Context, s *session.Session) error {
+func (c *insertSessionRedisCommand) Execute(ctx context.Context, s *session_entities.Session) error {
 	key := getKey(s.AccessToken)
-	sessionPtr, err := commands.GetValueOrNil[session.Session](ctx, c.client, key)
+	sessionPtr, err := commands.GetValueOrNil[session_entities.Session](ctx, c.client, key)
 	if err != nil {
 		return err
 	}

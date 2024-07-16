@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities/test"
+	"smartri_app/internal/entities/test_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -18,12 +18,12 @@ func NewSelectAnswerValuesByAnswerIdPGCommand(client *postgres.Client) datasourc
 	return &selectAnswerValuesByAnswerIdPGCommand{client: client}
 }
 
-func (a *selectAnswerValuesByAnswerIdPGCommand) Execute(context context.Context, answerId int) ([]*test.AnswerValue, error) {
+func (a *selectAnswerValuesByAnswerIdPGCommand) Execute(context context.Context, answerId int) ([]*test_entities.AnswerValue, error) {
 	sql, args, err := query_builders.NewSelectAnswerValuesByAnswerIdQuery(&a.client.Builder, answerId)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []*test.AnswerValue{}, nil
+			return []*test_entities.AnswerValue{}, nil
 		}
 		return nil, nil
 	}
@@ -35,10 +35,10 @@ func (a *selectAnswerValuesByAnswerIdPGCommand) Execute(context context.Context,
 		return nil, err
 	}
 
-	result := make([]*test.AnswerValue, 0)
+	result := make([]*test_entities.AnswerValue, 0)
 
 	for rows.Next() {
-		value := test.AnswerValue{AnswerId: answerId}
+		value := test_entities.AnswerValue{AnswerId: answerId}
 		err = rows.Scan(&value.Id, &value.SkillId, &value.Points)
 		if err != nil {
 			return nil, err

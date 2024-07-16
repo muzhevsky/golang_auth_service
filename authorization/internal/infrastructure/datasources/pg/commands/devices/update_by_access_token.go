@@ -1,7 +1,7 @@
 package devices
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -16,7 +16,7 @@ func NewUpdateDeviceByAccessTokenPGCommand(client *postgres.Client) datasources.
 	return &updateDeviceByAccessTokenPGCommand{client: client}
 }
 
-func (c *updateDeviceByAccessTokenPGCommand) Execute(context context.Context, token string, newDevice *session.Device) error {
+func (c *updateDeviceByAccessTokenPGCommand) Execute(context context.Context, token string, newDevice *session_entities.Device) error {
 	sql, args, err := query_builders.NewUpdateDeviceByAccessTokenQuery(&c.client.Builder, token, newDevice)
 	if err != nil {
 		return err

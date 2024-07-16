@@ -6,7 +6,6 @@ import (
 	_ "authorization/docs"
 	"authorization/internal"
 	"authorization/internal/errs"
-	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,11 +13,10 @@ import (
 type signupController struct {
 	user         internal.ICreateAccountUseCase
 	verification internal.IVerifyUserUseCase
-	logger       logger.ILogger
 }
 
-func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IVerifyUserUseCase, logger logger.ILogger) {
-	u := &signupController{user, verification, logger}
+func NewSignUpController(handler *gin.Engine, user internal.ICreateAccountUseCase, verification internal.IVerifyUserUseCase) {
+	u := &signupController{user, verification}
 
 	handler.POST("/signup", u.signup)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	avatar2 "smartri_app/internal/entities/avatar"
+	avatar2 "smartri_app/internal/entities/avatar_entities"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )

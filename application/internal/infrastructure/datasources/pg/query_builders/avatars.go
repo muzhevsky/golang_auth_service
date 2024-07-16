@@ -2,7 +2,7 @@ package query_builders
 
 import (
 	"github.com/Masterminds/squirrel"
-	"smartri_app/internal/entities/avatar"
+	"smartri_app/internal/entities/avatar_entities"
 )
 
 const avatarsTableName = "avatars"
@@ -30,7 +30,7 @@ func NewSelectAvatarByAccountIdQuery(builder *squirrel.StatementBuilderType, acc
 		ToSql()
 }
 
-func NewInsertAvatarQuery(builder *squirrel.StatementBuilderType, avatar *avatar.Avatar) (string, []any, error) {
+func NewInsertAvatarQuery(builder *squirrel.StatementBuilderType, avatar *avatar_entities.Avatar) (string, []any, error) {
 	return builder.
 		Insert(avatarsTableName).
 		Columns(
@@ -54,7 +54,7 @@ func NewInsertAvatarQuery(builder *squirrel.StatementBuilderType, avatar *avatar
 		ToSql()
 }
 
-func NewUpdateAvatarByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int, avatar *avatar.Avatar) (string, []any, error) {
+func NewUpdateAvatarByAccountIdQuery(builder *squirrel.StatementBuilderType, accountId int, avatar *avatar_entities.Avatar) (string, []any, error) {
 	return builder.
 		Update(avatarsTableName).
 		Set(avatarsHairIdFieldName, avatar.HairId).

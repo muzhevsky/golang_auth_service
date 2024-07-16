@@ -1,7 +1,7 @@
 package requests
 
 import (
-	"smartri_app/internal/entities/skills"
+	"smartri_app/internal/entities/skills_entities"
 )
 
 type UserAnswersRequest struct {
@@ -12,7 +12,7 @@ type Answer struct {
 	AnswerId   int `json:"answerId"`
 }
 type UserAnswersResponse struct {
-	AccountId int                 `json:"accountId"`
-	Skills    []*skills.UserSkill `json:"skills"`
-	TotalExp  int                 `json:"totalExp"`
+	AccountId int                          `json:"accountId"`
+	Skills    []*skills_entities.UserSkill `json:"skills_entities"`
+	TotalExp  int                          `json:"totalExp"`
 }

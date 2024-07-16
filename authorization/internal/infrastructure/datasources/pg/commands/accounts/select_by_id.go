@@ -1,7 +1,7 @@
 package accounts
 
 import (
-	"authorization/internal/entities/account"
+	"authorization/internal/entities/entities_account"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
 	"context"
@@ -15,7 +15,7 @@ func NewSelectAccountByIdPGCommand(client *postgres.Client) *selectAccountByIdCo
 	return &selectAccountByIdCommand{client: client}
 }
 
-func (s *selectAccountByIdCommand) Execute(context context.Context, id int) (*account.Account, error) {
+func (s *selectAccountByIdCommand) Execute(context context.Context, id int) (*entities_account.Account, error) {
 	sql, args, err := query_builders.NewSelectAccountByIdQuery(&s.client.Builder, id)
 	if err != nil {
 		return nil, err

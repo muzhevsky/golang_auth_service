@@ -1,6 +1,6 @@
 package mailers
 
-import "authorization/internal/entities/session"
+import "authorization/internal/entities/session_entities"
 
 type (
 	IVerificationMailer interface {
@@ -8,6 +8,6 @@ type (
 	}
 
 	INewSignInMailer interface {
-		SendNewSignInMail(email string, device *session.Device) error
+		SendNewSignInMail(email string, device *session_entities.Device) error
 	}
 )

@@ -6,7 +6,12 @@ type SignUpRequest struct {
 	Email      string `json:"e-mail" binding:"required" example:"andrew123@qwerty.kom"`
 	DeviceName string `json:"device_name" binding:"required" example:"Google Pixel 8"`
 }
+
 type SignUpResponse struct {
-	Id      int                    `json:"id" example:"2"`
-	Session RefreshSessionResponse `json:"session"`
+	Id      int                     `json:"id" example:"2"`
+	Session *RefreshSessionResponse `json:"session_entities"`
+}
+
+func NewSignUpResponse(id int, session *RefreshSessionResponse) *SignUpResponse {
+	return &SignUpResponse{Id: id, Session: session}
 }

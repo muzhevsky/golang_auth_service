@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"authorization/internal"
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"context"
 )
@@ -27,16 +27,16 @@ func NewSessionRepository(
 		deleteSessionByAccessTokenCommand: deleteSessionByAccessTokenCommand}
 }
 
-func (s *sessionRepository) Create(context context.Context, se *session.Session) error {
+func (s *sessionRepository) Create(context context.Context, se *session_entities.Session) error {
 	return s.insertSessionCommand.Execute(context, se)
 }
 
-func (s *sessionRepository) FindByAccessToken(context context.Context, token string) (*session.Session, error) {
+func (s *sessionRepository) FindByAccessToken(context context.Context, token string) (*session_entities.Session, error) {
 	return s.selectSessionByAccessTokenCommand.Execute(context, token)
 }
 
-func (s *sessionRepository) UpdateByAccessToken(context context.Context, token string, newSession *session.Session) (*session.Session, error) {
-	cpy := session.Session{
+func (s *sessionRepository) UpdateByAccessToken(context context.Context, token string, newSession *session_entities.Session) (*session_entities.Session, error) {
+	cpy := session_entities.Session{
 		AccountId:    newSession.AccountId,
 		AccessToken:  newSession.AccessToken,
 		RefreshToken: newSession.RefreshToken,

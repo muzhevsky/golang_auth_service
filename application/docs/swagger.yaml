@@ -118,7 +118,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: refreshes current session with token pair (access + refresh)
+      description: refreshes current session_entities with token pair (access + refresh)
       parameters:
       - description: request format
         in: body
@@ -133,7 +133,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/requests.RefreshSessionResponse'
-      summary: refreshes session
+      summary: refreshes session_entities
   /user/verify:
     post:
       consumes:

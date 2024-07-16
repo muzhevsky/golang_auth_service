@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"authorization/internal"
-	"authorization/internal/entities/verification"
+	"authorization/internal/entities/verification_entities"
 	"authorization/internal/infrastructure/datasources"
 	"context"
 )
@@ -23,11 +23,11 @@ func NewVerificationRepo(
 		deleteVerificationsByAccountIdCommand}
 }
 
-func (repo *verificationRepo) Create(context context.Context, verification *verification.Verification) error {
+func (repo *verificationRepo) Create(context context.Context, verification *verification_entities.Verification) error {
 	return repo.create.Execute(context, verification)
 }
 
-func (repo *verificationRepo) FindByAccountId(context context.Context, userId int) ([]*verification.Verification, error) {
+func (repo *verificationRepo) FindByAccountId(context context.Context, userId int) ([]*verification_entities.Verification, error) {
 	return repo.selectByAccountId.Execute(context, userId)
 }
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
-	avatar2 "smartri_app/internal/entities/avatar"
+	avatar2 "smartri_app/internal/entities/avatar_entities"
 )
 
 type updateAvatarUseCase struct {

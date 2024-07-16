@@ -108,16 +108,16 @@ func Run() {
 	router.HandleMethodNotAllowed = true
 
 	http.InitServiceMiddleware(router, logger)
-	router.GET("/test", getTestController.GetQuestions)
-	router.GET("/test/passed", checkIfUserHasPassedTestYetController.CheckIfUserHasPassedTestYet)
+	router.GET("/test_entities", getTestController.GetQuestions)
+	router.GET("/test_entities/passed", checkIfUserHasPassedTestYetController.CheckIfUserHasPassedTestYet)
 
-	router.GET("/user/skills", getUserSkillsController.GetUserSkills)
+	router.GET("/user/skills_entities", getUserSkillsController.GetUserSkills)
 	router.POST("/user/xp", addUserXpChangeController.AddUserXp)
 	router.GET("/user/data", getUserDataController.GetUserData)
 	router.POST("/user/data", addUserDataController.AddUserData)
-	router.POST("/user/test", addUserAnswersController.AddUserAnswers)
+	router.POST("/user/test_entities", addUserAnswersController.AddUserAnswers)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.GET("/user/avatar", getUserAvatarController.GetUserAvatar)
-	router.POST("/user/avatar", initOrUpdateAvatarController.InitOrUpdateAvatar)
+	router.GET("/user/avatar_entities", getUserAvatarController.GetUserAvatar)
+	router.POST("/user/avatar_entities", initOrUpdateAvatarController.InitOrUpdateAvatar)
 	http2.Start(router, cfg.HTTP)
 }

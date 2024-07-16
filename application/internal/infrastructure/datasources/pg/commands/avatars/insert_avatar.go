@@ -2,7 +2,7 @@ package avatars
 
 import (
 	"context"
-	"smartri_app/internal/entities/avatar"
+	"smartri_app/internal/entities/avatar_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -16,7 +16,7 @@ func NewInsertAvatarPGCommand(client *postgres.Client) datasources.IInsertAvatar
 	return &insertAvatarPGCommand{client: client}
 }
 
-func (c *insertAvatarPGCommand) Execute(context context.Context, avatar *avatar.Avatar) error {
+func (c *insertAvatarPGCommand) Execute(context context.Context, avatar *avatar_entities.Avatar) error {
 	sql, args, err := query_builders.NewInsertAvatarQuery(&c.client.Builder, avatar)
 	if err != nil {
 		return err

@@ -2,7 +2,8 @@ package user_data
 
 import (
 	"context"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills_entities"
+	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -17,7 +18,7 @@ func NewInsertUserDataPGCommand(client *postgres.Client, selectAllSkillsCommand 
 	return &insertUserDataPGCommand{client: client, selectAllSkillsCommand: selectAllSkillsCommand}
 }
 
-func (u *insertUserDataPGCommand) Execute(context context.Context, userData *user_data.UserData) error {
+func (u *insertUserDataPGCommand) Execute(context context.Context, userData *user_data_entities.UserData) error {
 	sql, args, err := query_builders.NewInsertUserDataQuery(&u.client.Builder, userData)
 	if err != nil {
 		return err
@@ -38,7 +39,7 @@ func (u *insertUserDataPGCommand) Execute(context context.Context, userData *use
 	skills, err := u.selectAllSkillsCommand.Execute(context)
 
 	for _, skill := range skills {
-		sql, args, err = query_builders.NewInsertUserSkillsQuery(&u.client.Builder, userData.AccountId, &skills.UserSkill{
+		sql, args, err = query_builders.NewInsertUserSkillsQuery(&u.client.Builder, userData.AccountId, &skills_entities.UserSkill{
 			SkillId: skill.Id,
 			Xp:      0,
 		})

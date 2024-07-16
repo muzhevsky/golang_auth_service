@@ -7,6 +7,10 @@ type SignInRequest struct {
 }
 
 type SignInResponse struct {
-	Id      int                    `json:"id" example:"2"`
-	Session RefreshSessionResponse `json:"session"`
+	Id      int                     `json:"id" example:"2"`
+	Session *RefreshSessionResponse `json:"session_entities"`
+}
+
+func NewSignInResponse(id int, session *RefreshSessionResponse) *SignInResponse {
+	return &SignInResponse{Id: id, Session: session}
 }

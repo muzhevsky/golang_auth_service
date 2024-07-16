@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -16,7 +16,7 @@ func NewSelectSessionByAccountIdPGCommand(client *postgres.Client) datasources.I
 	return &selectSessionByAccountIdPGCommand{client: client}
 }
 
-func (s *selectSessionByAccountIdPGCommand) Execute(ctx context.Context, id int) ([]*session.Session, error) {
+func (s *selectSessionByAccountIdPGCommand) Execute(ctx context.Context, id int) ([]*session_entities.Session, error) {
 	sql, args, err := query_builders.NewSelectSessionsByAccountIdQuery(&s.client.Builder, id)
 
 	if err != nil {
@@ -29,10 +29,10 @@ func (s *selectSessionByAccountIdPGCommand) Execute(ctx context.Context, id int)
 		return nil, err
 	}
 
-	result := make([]*session.Session, 0)
+	result := make([]*session_entities.Session, 0)
 
 	for rows.Next() {
-		row := session.Session{}
+		row := session_entities.Session{}
 		err = rows.Scan(&row.AccessToken, &row.RefreshToken, &row.AccountId, &row.ExpiresAt)
 		if err != nil {
 			return nil, err

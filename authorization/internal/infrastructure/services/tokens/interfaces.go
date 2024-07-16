@@ -1,8 +1,8 @@
 package tokens
 
 import (
-	"authorization/internal/entities/account"
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/entities_account"
+	"authorization/internal/entities/session_entities"
 )
 
 type (
@@ -12,8 +12,8 @@ type (
 	}
 
 	ISessionManager interface {
-		CreateSession(user *account.Account) (*session.Session, error)
-		ParseToken(token string) (*session.TokenClaims, error)
+		CreateSession(user *entities_account.Account) (*session_entities.Session, error)
+		ParseToken(token string) (*session_entities.TokenClaims, error)
 	}
 
 	IAccessTokenManager interface {

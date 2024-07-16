@@ -1,7 +1,7 @@
 package accounts
 
 import (
-	"authorization/internal/entities/account"
+	"authorization/internal/entities/entities_account"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
 	"context"
@@ -15,7 +15,7 @@ func NewSelectAccountByEmailPGCommand(client *postgres.Client) *selectAccountByE
 	return &selectAccountByEmailCommand{client: client}
 }
 
-func (s *selectAccountByEmailCommand) Execute(context context.Context, email string) (*account.Account, error) {
+func (s *selectAccountByEmailCommand) Execute(context context.Context, email string) (*entities_account.Account, error) {
 	sql, args, err := query_builders.NewSelectAccountByEmailQuery(&s.client.Builder, email)
 	if err != nil {
 		return nil, err

@@ -4,8 +4,9 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
-	"smartri_app/internal/entities/skills"
-	"smartri_app/internal/entities/test"
+	"smartri_app/internal/entities/skills_entities"
+	"smartri_app/internal/entities/test_entities"
+	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/errs"
 	"time"
 )
@@ -49,7 +50,7 @@ func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnsw
 	if err != nil {
 		return nil, err
 	}
-	normalizationBySkillIdMap, err := a.getNormalizationMap(context, skills, accountId)
+	normalizationBySkillIdMap, err := a.getNormalizationMap(context, skills)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +64,7 @@ func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnsw
 
 	skillIdPointsMap := a.getSkillIdPointsMap(answersWithValues)
 	userSkills, skillChanges := a.getUserSkillsAndSkillChanges(skillIdPointsMap, normalizationBySkillIdMap, accountId)
-	userData.XP = a.getNewUserXpValue(userSkills)
+	userData.XP = user_data_entities.XP(a.getNewUserXpValue(userSkills))
 
 	err = a.testRepo.AddUserAnswersWithSkillChanges(context, entityUserAnswers, skillChanges, userSkills, userData)
 
@@ -80,14 +81,14 @@ func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnsw
 	return &requests.UserAnswersResponse{
 		AccountId: accountId,
 		Skills:    result.Skills,
-		TotalExp:  userData.XP,
+		TotalExp:  int(userData.XP),
 	}, nil
 }
 
-func (a *addUserAnswers) getEntityAnswers(accountId int, answers *requests.UserAnswersRequest) *test.UserTestAnswers {
-	result := &test.UserTestAnswers{accountId, make([]test.UserTestAnswer, 0)}
+func (a *addUserAnswers) getEntityAnswers(accountId int, answers *requests.UserAnswersRequest) *test_entities.UserTestAnswers {
+	result := &test_entities.UserTestAnswers{accountId, make([]test_entities.UserTestAnswer, 0)}
 	for i := range answers.Answers {
-		result.Answers = append(result.Answers, test.UserTestAnswer{
+		result.Answers = append(result.Answers, test_entities.UserTestAnswer{
 			QuestionId: answers.Answers[i].QuestionId,
 			AnswerId:   answers.Answers[i].AnswerId,
 		})
@@ -96,8 +97,8 @@ func (a *addUserAnswers) getEntityAnswers(accountId int, answers *requests.UserA
 	return result
 }
 
-func (a *addUserAnswers) getNormalizationMap(context context.Context, skills []*skills.Skill, accountId int) (map[int]*skills.SkillNormalization, error) {
-	result := make(map[int]*skills.SkillNormalization)
+func (a *addUserAnswers) getNormalizationMap(context context.Context, skills []*skills_entities.Skill) (map[int]*skills_entities.SkillNormalization, error) {
+	result := make(map[int]*skills_entities.SkillNormalization)
 	for i := range skills {
 		r, err := a.skillRepo.GetSkillNormalizationBySkillId(context, skills[i].Id)
 		result[i] = r
@@ -109,8 +110,8 @@ func (a *addUserAnswers) getNormalizationMap(context context.Context, skills []*
 	return result, nil
 }
 
-func (a *addUserAnswers) getAnswersWithValues(context context.Context, entityAnswers *test.UserTestAnswers) ([]*test.Answer, error) {
-	result := make([]*test.Answer, 0)
+func (a *addUserAnswers) getAnswersWithValues(context context.Context, entityAnswers *test_entities.UserTestAnswers) ([]*test_entities.Answer, error) {
+	result := make([]*test_entities.Answer, 0)
 	for i := 0; i < len(entityAnswers.Answers); i++ {
 		answer, err := a.testRepo.GetAnswerWithValues(context, entityAnswers.Answers[i].AnswerId)
 		if err != nil {
@@ -123,7 +124,7 @@ func (a *addUserAnswers) getAnswersWithValues(context context.Context, entityAns
 	return result, nil
 }
 
-func (a *addUserAnswers) getSkillIdPointsMap(answersWithValues []*test.Answer) map[int]int {
+func (a *addUserAnswers) getSkillIdPointsMap(answersWithValues []*test_entities.Answer) map[int]int {
 	result := make(map[int]int)
 	for i := range answersWithValues {
 		for j := range answersWithValues[i].Values {
@@ -133,9 +134,9 @@ func (a *addUserAnswers) getSkillIdPointsMap(answersWithValues []*test.Answer) m
 	return result
 }
 
-func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, normalizationMap map[int]*skills.SkillNormalization, accountId int) (*skills.UserSkills, []*skills.SkillChange) {
-	skills := make([]*skills.UserSkill, 0)
-	skillChanges := make([]*skills.SkillChange, 0)
+func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, normalizationMap map[int]*skills_entities.SkillNormalization, accountId int) (*skills_entities.UserSkills, []*skills_entities.SkillChange) {
+	skills := make([]*skills_entities.UserSkill, 0)
+	skillChanges := make([]*skills_entities.SkillChange, 0)
 	for k, v := range skillsMap {
 		normalization, exists := normalizationMap[k]
 		if !exists {
@@ -143,12 +144,12 @@ func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, nor
 		}
 
 		points := int(float32(v-normalization.Min) / float32(normalization.Max-normalization.Min) * maxPoints)
-		skills = append(skills, &skills.UserSkill{
+		skills = append(skills, &skills_entities.UserSkill{
 			SkillId: k,
 			Xp:      points,
 		})
 
-		skillChanges = append(skillChanges, &skills.SkillChange{
+		skillChanges = append(skillChanges, &skills_entities.SkillChange{
 			AccountId: accountId,
 			SkillId:   k,
 			ActionId:  1, // todo сделать нормально (нужен ли action вообще?)
@@ -157,14 +158,14 @@ func (a *addUserAnswers) getUserSkillsAndSkillChanges(skillsMap map[int]int, nor
 		})
 	}
 
-	userSkills := skills.UserSkills{
+	userSkills := skills_entities.UserSkills{
 		AccountId: accountId,
 		Skills:    skills,
 	}
 	return &userSkills, skillChanges
 }
 
-func (a *addUserAnswers) getNewUserXpValue(userSkills *skills.UserSkills) int {
+func (a *addUserAnswers) getNewUserXpValue(userSkills *skills_entities.UserSkills) int {
 	result := 0
 	for i := range userSkills.Skills {
 		result += userSkills.Skills[i].Xp

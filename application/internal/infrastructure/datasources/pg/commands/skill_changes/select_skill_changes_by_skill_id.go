@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities/skills"
+	"smartri_app/internal/entities/skills_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -18,7 +18,7 @@ func NewSelectSkillChangesByAccountIdAndActionIdPGCommand(client *postgres.Clien
 	return &selectSkillChangesByAccountIdAndActionIdPGCommand{client: client}
 }
 
-func (s *selectSkillChangesByAccountIdAndActionIdPGCommand) Execute(context context.Context, accountId int, actionId int) ([]*skills.SkillChange, error) {
+func (s *selectSkillChangesByAccountIdAndActionIdPGCommand) Execute(context context.Context, accountId int, actionId int) ([]*skills_entities.SkillChange, error) {
 	sql, args, err := query_builders.NewSelectSkillChangesByAccountIdAndActionIdQuery(&s.client.Builder, accountId, actionId)
 
 	if err != nil {
@@ -30,15 +30,15 @@ func (s *selectSkillChangesByAccountIdAndActionIdPGCommand) Execute(context cont
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return []*skills.SkillChange{}, nil
+			return []*skills_entities.SkillChange{}, nil
 		}
 		return nil, err
 	}
 
-	result := make([]*skills.SkillChange, 0)
+	result := make([]*skills_entities.SkillChange, 0)
 
 	for rows.Next() {
-		change := skills.SkillChange{AccountId: accountId, ActionId: actionId}
+		change := skills_entities.SkillChange{AccountId: accountId, ActionId: actionId}
 		err = rows.Scan(&change.Id, &change.SkillId, change.Date, &change.Points)
 		if err != nil {
 			return nil, err

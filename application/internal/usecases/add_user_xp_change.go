@@ -4,6 +4,8 @@ import (
 	"context"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
+	"smartri_app/internal/entities/skills_entities"
+	"smartri_app/internal/entities/user_data_entities"
 	"time"
 )
 
@@ -35,7 +37,7 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 		return nil, err
 	}
 
-	var skill *skills.UserSkill
+	var skill *skills_entities.UserSkill
 	for i := range skills.Skills {
 		s := skills.Skills[i]
 		if s.SkillId == request.SkillId {
@@ -44,13 +46,13 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 				request.Points = skill.Xp - maxPoints
 				skill.Xp = maxPoints
 			}
-			userData.XP += request.Points
+			userData.XP += user_data_entities.XP(request.Points)
 			skill = s
 			break
 		}
 	}
 
-	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &skills.SkillChange{
+	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &skills_entities.SkillChange{
 		AccountId: accountId,
 		SkillId:   skill.SkillId,
 		ActionId:  1, // todo а надо ли?
@@ -62,8 +64,8 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 	}
 
 	return &requests.UserDataResponse{
-		Age:    userData.Age,
-		Gender: userData.Gender,
-		XP:     userData.XP,
+		Age:    int(userData.Age),
+		Gender: string(userData.Gender),
+		XP:     int(userData.XP),
 	}, nil
 }

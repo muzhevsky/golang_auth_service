@@ -6,18 +6,16 @@ import (
 	_ "authorization/docs"
 	"authorization/internal"
 	"authorization/internal/errs"
-	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type signInController struct {
-	user   internal.ISignInUseCase
-	logger logger.ILogger
+	user internal.ISignInUseCase
 }
 
-func NewSignInController(handler *gin.Engine, useCase internal.ISignInUseCase, logger logger.ILogger) {
-	u := &signInController{useCase, logger}
+func NewSignInController(handler *gin.Engine, useCase internal.ISignInUseCase) {
+	u := &signInController{useCase}
 
 	handler.POST("/signin", u.signIn)
 }

@@ -1,7 +1,7 @@
 package query_builders
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	sq "github.com/Masterminds/squirrel"
 )
 
@@ -25,7 +25,7 @@ func NewSelectSessionsByAccountIdQuery(builder *sq.StatementBuilderType, account
 		ToSql()
 }
 
-func NewInsertSessionQuery(builder *sq.StatementBuilderType, session *session.Session) (string, []any, error) {
+func NewInsertSessionQuery(builder *sq.StatementBuilderType, session *session_entities.Session) (string, []any, error) {
 	return builder.
 		Insert(sessionsTableName).
 		Columns(
@@ -41,7 +41,7 @@ func NewInsertSessionQuery(builder *sq.StatementBuilderType, session *session.Se
 		ToSql()
 }
 
-func NewUpdateSessionQuery(builder *sq.StatementBuilderType, accessToken string, session *session.Session) (string, []any, error) {
+func NewUpdateSessionQuery(builder *sq.StatementBuilderType, accessToken string, session *session_entities.Session) (string, []any, error) {
 	return builder.Update(sessionsTableName).
 		Set(sessionsAccessTokenFieldName, session.AccessToken).
 		Set(sessionsRefreshTokenFieldName, session.RefreshToken).

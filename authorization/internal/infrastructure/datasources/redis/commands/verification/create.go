@@ -1,7 +1,7 @@
 package verification
 
 import (
-	verificationpkg "authorization/internal/entities/verification"
+	verificationpkg "authorization/internal/entities/verification_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/redis/commands"
 	"context"

@@ -1,7 +1,7 @@
 package devices
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -16,7 +16,7 @@ func NewSelectDevicesByAccountIdPGCommand(client *postgres.Client) datasources.I
 	return &selectDevicesByAccountIdPGCommand{client: client}
 }
 
-func (c *selectDevicesByAccountIdPGCommand) Execute(context context.Context, accountId int) ([]*session.Device, error) {
+func (c *selectDevicesByAccountIdPGCommand) Execute(context context.Context, accountId int) ([]*session_entities.Device, error) {
 	sql, args, err := query_builders.NewSelectDeviceByAccountIdQuery(&c.client.Builder, accountId)
 	if err != nil {
 		return nil, err
@@ -29,9 +29,9 @@ func (c *selectDevicesByAccountIdPGCommand) Execute(context context.Context, acc
 		return nil, err
 	}
 
-	result := make([]*session.Device, 0)
+	result := make([]*session_entities.Device, 0)
 	for rows.Next() {
-		curr := session.Device{}
+		curr := session_entities.Device{}
 		err = rows.Scan(&curr.Id, &curr.AccountId, &curr.Name, &curr.SessionAccessToken, &curr.SessionCreationTime)
 		if err != nil {
 			return nil, err

@@ -2,7 +2,7 @@ package answers
 
 import (
 	"context"
-	"smartri_app/internal/entities/test"
+	"smartri_app/internal/entities/test_entities"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
 )
@@ -15,7 +15,7 @@ func NewSelectAnswersByQuestionIdPGCommand(client *postgres.Client) *selectAnswe
 	return &selectAnswersByQuestionIdPGCommand{client: client}
 }
 
-func (q *selectAnswersByQuestionIdPGCommand) Execute(context context.Context, questionId int) ([]*test.Answer, error) {
+func (q *selectAnswersByQuestionIdPGCommand) Execute(context context.Context, questionId int) ([]*test_entities.Answer, error) {
 	sql, args, err := query_builders.NewSelectAnswersByQuestionIdQuery(&q.client.Builder, questionId)
 	if err != nil {
 		return nil, err
@@ -28,9 +28,9 @@ func (q *selectAnswersByQuestionIdPGCommand) Execute(context context.Context, qu
 		return nil, err
 	}
 
-	result := make([]*test.Answer, 0)
+	result := make([]*test_entities.Answer, 0)
 	for rows.Next() {
-		answer := test.Answer{}
+		answer := test_entities.Answer{}
 		err = rows.Scan(&answer.Id, &answer.Text, &answer.QuestionId)
 		if err != nil {
 			return nil, err

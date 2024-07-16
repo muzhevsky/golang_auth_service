@@ -6,20 +6,17 @@ import (
 	_ "authorization/docs"
 	"authorization/internal"
 	"authorization/internal/errs"
-	"authorization/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type refreshSessionController struct {
 	useCase internal.IRefreshSessionUseCase
-	logger  logger.ILogger
 }
 
-func NewRefreshSessionController(handler *gin.Engine, useCase internal.IRefreshSessionUseCase, logger logger.ILogger) {
+func NewRefreshSessionController(handler *gin.Engine, useCase internal.IRefreshSessionUseCase) {
 	u := &refreshSessionController{
 		useCase: useCase,
-		logger:  logger,
 	}
 
 	handler.POST("/token/update", u.refreshSession)

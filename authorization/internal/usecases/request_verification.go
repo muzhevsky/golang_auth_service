@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"authorization/internal"
-	verificationpkg "authorization/internal/entities/verification"
+	verificationpkg "authorization/internal/entities/verification_entities"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"context"
@@ -37,7 +37,7 @@ func (u *requestVerificationUseCase) RequestVerification(context context.Context
 		return "", err
 	}
 
-	go u.mailer.SendVerificationMail(string(user.Email), verification.Code)
+	go u.mailer.SendVerificationMail(string(user.Email), verification.Code) // todo
 
 	return verification.Code, nil
 	return "", nil

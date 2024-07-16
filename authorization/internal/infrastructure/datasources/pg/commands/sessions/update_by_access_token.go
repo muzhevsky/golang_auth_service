@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"authorization/internal/infrastructure/datasources"
 	"authorization/internal/infrastructure/datasources/pg/query_builders"
 	"authorization/pkg/postgres"
@@ -16,7 +16,7 @@ func NewUpdateSessionByIdPGCommand(client *postgres.Client) datasources.IUpdateS
 	return &updateSessionByAccessTokenPGCommand{client: client}
 }
 
-func (s *updateSessionByAccessTokenPGCommand) Execute(ctx context.Context, accessToken string, session *session.Session) error {
+func (s *updateSessionByAccessTokenPGCommand) Execute(ctx context.Context, accessToken string, session *session_entities.Session) error {
 	sql, args, err := query_builders.NewUpdateSessionQuery(&s.client.Builder, accessToken, session)
 	if err != nil {
 		return err

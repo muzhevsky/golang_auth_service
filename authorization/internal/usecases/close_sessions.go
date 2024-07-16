@@ -3,7 +3,7 @@ package usecases
 import (
 	"authorization/controllers/requests"
 	"authorization/internal"
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	"context"
 	"slices"
 )
@@ -18,15 +18,15 @@ func NewCloseSessionsUseCase(deviceRepo internal.IDeviceRepository, sessionRepo 
 }
 
 func (c *closeSessionsUseCase) CloseSessionsByIds(context context.Context, accountId int, request *requests.CloseSessionsRequest) error {
-	devicesToRemove := make([]*session.Device, 0)
+	devicesToRemove := make([]*session_entities.Device, 0)
 	ids := request.Ids
 	userDevices, err := c.deviceRepo.SelectByAccountId(context, accountId)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < len(ids); i++ {
-		index := slices.IndexFunc[[]*session.Device](userDevices, func(d *session.Device) bool {
+	for i := 0; i < len(ids); i++ { // todo maybe it worth it to move this loop to some entity
+		index := slices.IndexFunc[[]*session_entities.Device](userDevices, func(d *session_entities.Device) bool {
 			return d.Id == ids[i]
 		})
 
@@ -37,8 +37,12 @@ func (c *closeSessionsUseCase) CloseSessionsByIds(context context.Context, accou
 		devicesToRemove = append(devicesToRemove, dev)
 	}
 
+	return c.removeDevicesAndSessions(context, devicesToRemove)
+}
+
+func (c *closeSessionsUseCase) removeDevicesAndSessions(context context.Context, devicesToRemove []*session_entities.Device) error {
 	for i := 0; i < len(devicesToRemove); i++ {
-		err = c.sessionRepo.DeleteByAccessToken(context, devicesToRemove[i].SessionAccessToken)
+		err := c.sessionRepo.DeleteByAccessToken(context, devicesToRemove[i].SessionAccessToken)
 		if err != nil {
 			return err
 		}

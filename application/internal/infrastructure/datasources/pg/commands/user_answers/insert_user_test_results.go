@@ -2,9 +2,9 @@ package user_answers
 
 import (
 	"context"
-	"smartri_app/internal/entities/skills"
-	"smartri_app/internal/entities/test"
-	"smartri_app/internal/entities/user_data"
+	"smartri_app/internal/entities/skills_entities"
+	"smartri_app/internal/entities/test_entities"
+	"smartri_app/internal/entities/user_data_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -21,10 +21,10 @@ func NewInsertUserTestResultsPGCommand(
 
 func (u *insertUserTestResultsPGCommand) Execute(
 	context context.Context,
-	answers *test.UserTestAnswers,
-	changes []*skills.SkillChange,
-	userSkills *skills.UserSkills,
-	userData *user_data.UserData) error {
+	answers *test_entities.UserTestAnswers,
+	changes []*skills_entities.SkillChange,
+	userSkills *skills_entities.UserSkills,
+	userData *user_data_entities.UserData) error {
 	insertTestResultsSQL, args, err := query_builders.NewInsertUserTestResultsQuery(&u.client.Builder, answers)
 	if err != nil {
 		return err

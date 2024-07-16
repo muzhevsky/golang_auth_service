@@ -3,14 +3,13 @@ package usecases
 import (
 	"authorization/controllers/requests"
 	"authorization/internal"
-	accountpkg "authorization/internal/entities/account"
-	session2 "authorization/internal/entities/session"
+	accountpkg "authorization/internal/entities/entities_account"
+	session2 "authorization/internal/entities/session_entities"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"authorization/internal/infrastructure/services/tokens"
 	"context"
 	"fmt"
-	"time"
 )
 
 type createAccountUseCase struct {
@@ -39,7 +38,7 @@ func NewCreateAccountUseCase(
 	}
 }
 
-// CreateAccount creates new account if it satisfies the necessary conditions and stores it using IAccountRepository
+// CreateAccount creates new entities_account if it satisfies the necessary conditions and stores it using IAccountRepository
 //
 // Returns: requests.SignUpResponse
 //
@@ -48,8 +47,7 @@ func NewCreateAccountUseCase(
 //   - errs.RecordAlreadyExists if email or login are not unique
 //   - errors of infrastructure from sources like IHashProvider or IAccountRepository implementations
 func (u *createAccountUseCase) CreateAccount(context context.Context, request *requests.SignUpRequest) (*requests.SignUpResponse, error) {
-	account := u.createAccount(request)
-	err := account.Validate()
+	account, err := accountpkg.NewAccount(request.Login, request.Email, request.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +85,7 @@ func (u *createAccountUseCase) CreateAccount(context context.Context, request *r
 		return nil, err
 	}
 
-	device := u.createDevice(account, request, session)
+	device := session2.NewDevice(account.Id, request.DeviceName, session.AccessToken)
 	err = u.deviceRepo.Create(context, device)
 	if err != nil {
 		return nil, err
@@ -98,37 +96,8 @@ func (u *createAccountUseCase) CreateAccount(context context.Context, request *r
 		return nil, err
 	}
 
-	return u.createResponse(session, account), nil
-}
+	refreshSessionResponse :=
+		requests.NewRefreshSessionResponse(session.AccessToken, session.RefreshToken, session.AccessExpiresAt.Unix())
 
-func (u *createAccountUseCase) createAccount(request *requests.SignUpRequest) *accountpkg.Account {
-	login := accountpkg.Login(request.Login)
-	email := accountpkg.Email(request.Email)
-	password := accountpkg.Password(request.Password)
-
-	return &accountpkg.Account{
-		Login:    login,
-		Password: password,
-		Email:    email,
-	}
-}
-
-func (u *createAccountUseCase) createDevice(account *accountpkg.Account, request *requests.SignUpRequest, session *session2.Session) *session2.Device {
-	return &session2.Device{
-		AccountId:           account.Id,
-		Name:                request.DeviceName,
-		SessionAccessToken:  session.AccessToken,
-		SessionCreationTime: time.Now(),
-	}
-}
-
-func (u *createAccountUseCase) createResponse(session *session2.Session, account *accountpkg.Account) *requests.SignUpResponse {
-	return &requests.SignUpResponse{
-		Id: account.Id,
-		Session: requests.RefreshSessionResponse{
-			AccessToken:  session.AccessToken,
-			RefreshToken: session.RefreshToken,
-			ExpiresAt:    session.AccessExpiresAt.Unix(),
-		},
-	}
+	return requests.NewSignUpResponse(account.Id, refreshSessionResponse), nil
 }

@@ -1,7 +1,7 @@
 package query_builders
 
 import (
-	"authorization/internal/entities/session"
+	"authorization/internal/entities/session_entities"
 	sq "github.com/Masterminds/squirrel"
 )
 
@@ -32,7 +32,7 @@ func NewSelectDeviceByAccountIdQuery(builder *sq.StatementBuilderType, accountId
 		ToSql()
 }
 
-func NewInsertDeviceQuery(builder *sq.StatementBuilderType, device *session.Device) (string, []any, error) {
+func NewInsertDeviceQuery(builder *sq.StatementBuilderType, device *session_entities.Device) (string, []any, error) {
 	return builder.
 		Insert(devicesTableName).
 		Columns(deviceAccountIdFieldName, deviceNameFieldName, deviceAccessTokenFieldName, deviceCreationDateFieldName).
@@ -40,7 +40,7 @@ func NewInsertDeviceQuery(builder *sq.StatementBuilderType, device *session.Devi
 		ToSql()
 }
 
-func NewUpdateDeviceByAccessTokenQuery(builder *sq.StatementBuilderType, accessToken string, newDevice *session.Device) (string, []any, error) {
+func NewUpdateDeviceByAccessTokenQuery(builder *sq.StatementBuilderType, accessToken string, newDevice *session_entities.Device) (string, []any, error) {
 	return builder.
 		Update(devicesTableName).
 		Set(deviceAccountIdFieldName, newDevice.AccountId).

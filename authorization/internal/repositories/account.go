@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"authorization/internal"
-	"authorization/internal/entities/account"
+	"authorization/internal/entities/entities_account"
 	"authorization/internal/infrastructure/datasources"
 	"context"
 )
@@ -29,23 +29,23 @@ func NewAccountRepository(
 		insertAccountCommand:        insertAccountCommand}
 }
 
-func (u *accountRepo) Create(context context.Context, user *account.Account) (id int, err error) {
+func (u *accountRepo) Create(context context.Context, user *entities_account.Account) (id int, err error) {
 	return u.insertAccountCommand.Execute(context, user)
 }
 
-func (u *accountRepo) FindById(context context.Context, id int) (*account.Account, error) {
+func (u *accountRepo) FindById(context context.Context, id int) (*entities_account.Account, error) {
 	return u.selectAccountByIdCommand.Execute(context, id)
 }
 
-func (u *accountRepo) FindByLogin(context context.Context, login account.Login) (*account.Account, error) {
+func (u *accountRepo) FindByLogin(context context.Context, login entities_account.Login) (*entities_account.Account, error) {
 	return u.selectAccountByLoginCommand.Execute(context, string(login))
 }
 
-func (u *accountRepo) FindByEmail(context context.Context, email account.Email) (*account.Account, error) {
+func (u *accountRepo) FindByEmail(context context.Context, email entities_account.Email) (*entities_account.Account, error) {
 	return u.selectAccountByEmailCommand.Execute(context, string(email))
 }
 
-func (u *accountRepo) CheckLoginExist(context context.Context, login account.Login) (result bool, err error) {
+func (u *accountRepo) CheckLoginExist(context context.Context, login entities_account.Login) (result bool, err error) {
 	user, err := u.FindByLogin(context, login)
 
 	if err != nil {
@@ -55,7 +55,7 @@ func (u *accountRepo) CheckLoginExist(context context.Context, login account.Log
 	return user != nil, nil
 }
 
-func (u *accountRepo) CheckEmailExist(context context.Context, email account.Email) (bool, error) {
+func (u *accountRepo) CheckEmailExist(context context.Context, email entities_account.Email) (bool, error) {
 	user, err := u.FindByEmail(context, email)
 
 	if err != nil {
@@ -65,6 +65,6 @@ func (u *accountRepo) CheckEmailExist(context context.Context, email account.Ema
 	return user != nil, nil
 }
 
-func (u *accountRepo) UpdateById(context context.Context, id int, account *account.Account) error {
+func (u *accountRepo) UpdateById(context context.Context, id int, account *entities_account.Account) error {
 	return u.updateAccountByIdCommand.Execute(context, id, account)
 }

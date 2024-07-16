@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/jackc/pgx/v5"
-	"smartri_app/internal/entities/test"
+	"smartri_app/internal/entities/test_entities"
 	"smartri_app/internal/infrastructure/datasources"
 	"smartri_app/internal/infrastructure/datasources/pg/query_builders"
 	"smartri_app/pkg/postgres"
@@ -18,7 +18,7 @@ func NewSelectUserAnswersByAccountIdPGCommand(client *postgres.Client) datasourc
 	return &selectUserAnswersByAccountIdPGCommand{client: client}
 }
 
-func (s *selectUserAnswersByAccountIdPGCommand) Execute(context context.Context, accountId int) (*test.UserTestAnswers, error) {
+func (s *selectUserAnswersByAccountIdPGCommand) Execute(context context.Context, accountId int) (*test_entities.UserTestAnswers, error) {
 	sql, args, err := query_builders.NewSelectUserAnswersByAccountIdQuery(&s.client.Builder, accountId)
 	if err != nil {
 		return nil, err
@@ -34,11 +34,11 @@ func (s *selectUserAnswersByAccountIdPGCommand) Execute(context context.Context,
 		return nil, err
 	}
 
-	result := &test.UserTestAnswers{
+	result := &test_entities.UserTestAnswers{
 		AccountId: accountId,
 	}
 	for rows.Next() {
-		row := test.UserTestAnswer{}
+		row := test_entities.UserTestAnswer{}
 		err = rows.Scan(&row.QuestionId, &row.AnswerId)
 		if err != nil {
 			return nil, err

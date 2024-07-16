@@ -3,7 +3,7 @@ package usecases
 import (
 	"authorization/internal"
 
-	verificationpkg "authorization/internal/entities/verification"
+	verificationpkg "authorization/internal/entities/verification_entities"
 	"authorization/internal/errs"
 	"authorization/internal/infrastructure/services/mailers"
 	"context"
@@ -23,10 +23,10 @@ func NewVerificationUseCase(
 	return &verificationUseCase{userRepo, verificationRepo, mailer}
 }
 
-// Verify - serves verification process, checking if there's any verification records in repository by provided userId
-// within verification object.
+// Verify - serves verification_entities process, checking if there's any verification_entities records in repository by provided userId
+// within verification_entities object.
 // returns:
-//   - ExpiredVerificationCode error if there are no active verification codes
+//   - ExpiredVerificationCode error if there are no active verification_entities codes
 //   - WrongVerificationCode error if code is wrong
 func (v *verificationUseCase) Verify(context context.Context, accountId int, code string) error {
 	verification := &verificationpkg.Verification{
