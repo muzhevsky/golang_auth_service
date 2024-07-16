@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	answerValuesTableName         = "test_answers_values"
+	answerValuesTableName         = "test_answer_values"
 	answerValuesIdFieldName       = "id"
 	answerValuesAnswerIdFieldName = "answer_id"
 	answerValuesSkillIdFieldName  = "skill_id"

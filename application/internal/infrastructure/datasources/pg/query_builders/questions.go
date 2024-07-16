@@ -3,7 +3,7 @@ package query_builders
 import "github.com/Masterminds/squirrel"
 
 const (
-	questionsTableName     = "questions"
+	questionsTableName     = "test_questions"
 	questionsIdFieldName   = "id"
 	questionsTextFieldName = "text"
 )
