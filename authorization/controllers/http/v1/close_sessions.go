@@ -16,7 +16,7 @@ type closeSessionsController struct {
 func NewCloseSessionsController(handler *gin.Engine, useCase internal.ICloseSessionsByIdsUseCase) {
 	g := &closeSessionsController{useCase: useCase}
 
-	handler.DELETE("/user/sessions/close", g.CloseSessions)
+	handler.POST("/user/sessions/close", g.CloseSessions)
 }
 
 // CloseSessions godoc
@@ -28,7 +28,7 @@ func NewCloseSessionsController(handler *gin.Engine, useCase internal.ICloseSess
 // @Success 200 "ok"
 // @Failure 401 {object} middleware.ErrorResponse "некорректный access token"
 // @Failure 500 {object} middleware.ErrorResponse "внутренняя ошибка сервера"
-// @Router       /user/sessions/close [delete]
+// @Router       /user/sessions/close [post]
 func (con *closeSessionsController) CloseSessions(c *gin.Context) {
 	accountId, exists := c.Get("accountId")
 	if !exists {

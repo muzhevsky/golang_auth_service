@@ -9,11 +9,11 @@ import (
 )
 
 type getUserDataController struct {
-	repo internal.IUserDataRepository
+	useCase internal.IGetUserDataUseCase
 }
 
-func NewGetUserDataController(repo internal.IUserDataRepository) *getUserDataController {
-	return &getUserDataController{repo: repo}
+func NewGetUserDataController(useCase internal.IGetUserDataUseCase) *getUserDataController {
+	return &getUserDataController{useCase: useCase}
 }
 
 // GetUserData godoc
@@ -36,7 +36,7 @@ func (controller *getUserDataController) GetUserData(c *gin.Context) {
 		return
 	}
 
-	userData, err := controller.repo.GetByAccountId(c, id)
+	userData, err := controller.useCase.GetUserData(c, id)
 
 	if err != nil {
 		middleware.AddGinError(c, err)

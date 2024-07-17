@@ -86,6 +86,7 @@ func Run() {
 	addUserXpChangeUseCase := usecases.NewAddUserXpChange(skillRepo, userDataRepo, userSkillsRepo)
 
 	getUserAvatarUseCase := usecases.NewGetUserAvatarUseCase(avatarRepo)
+	getUserDataUseCase := usecases.NewGetUserDataUseCase(userDataRepo)
 	initOrUpdateAvatarUseCase := usecases.NewInitOrUpdateAvatarUseCase(avatarRepo)
 
 	checkIfUserHasPassedTestYetUseCase := usecases.NewCheckUserHasPassedTestYetUseCase(userAnswersRepo)
@@ -97,7 +98,7 @@ func Run() {
 
 	addUserXpChangeController := v12.NewAddUserXpController(addUserXpChangeUseCase)
 	addUserDataController := v12.NewAddUserDataController(addUserDataUseCase)
-	getUserDataController := v12.NewGetUserDataController(userDataRepo)
+	getUserDataController := v12.NewGetUserDataController(getUserDataUseCase)
 	addUserAnswersController := v12.NewAddUserAnswersController(addUserAnswersUseCase)
 	checkIfUserHasPassedTestYetController := v12.NewCheckIfUserHasPassedTestYetController(checkIfUserHasPassedTestYetUseCase)
 

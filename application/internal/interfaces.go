@@ -67,4 +67,8 @@ type (
 	IGetUserAvatarUseCase interface {
 		GetAvatar(context context.Context, accountId int) (*requests2.AvatarRequest, error)
 	}
+
+	IGetUserDataUseCase interface {
+		GetUserData(context context.Context, accountId int) (*requests2.UserDataResponse, error)
+	}
 )
