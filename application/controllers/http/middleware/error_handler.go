@@ -32,6 +32,9 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 			response(c, http.StatusUnauthorized, err.Error(), UnauthenticatedErrorCode)
 			return
 		}
+		if errors.Is(err, errs.ValidationError) {
+			response(c, http.StatusBadRequest, err.Error(), InvalidDataErrorCode)
+		}
 		///////////////////////////////////////////////////////////////////////////////////
 
 		if errors.Is(err, errs.UserDataNotFoundError) {

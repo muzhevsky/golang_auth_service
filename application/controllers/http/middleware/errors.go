@@ -5,6 +5,7 @@ import "github.com/gin-gonic/gin"
 const InternalServerErrorErrorCode = "Unexpected"
 
 const DataBindErrorCode = "Core-Client-001"
+const InvalidDataErrorCode = "Core-Client-002"
 
 const UserDataNotFoundErrorCode = "Core-User-001"
 const UserAvatarNotFoundErrorCode = "Core-User-002"
