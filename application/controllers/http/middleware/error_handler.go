@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"reflect"
 	"smartri_app/internal/errs"
 	"smartri_app/pkg/logger"
 )
@@ -37,7 +38,7 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 		}
 		///////////////////////////////////////////////////////////////////////////////////
 
-		if errors.Is(err, errs.UserDataNotFoundError) {
+		if errors.Is(err, errs.EntityNotFoundError) {
 			response(c, http.StatusNotFound, err.Error(), UserDataNotFoundErrorCode)
 			return
 		}
@@ -49,6 +50,8 @@ func (h *ErrorHandler) HandleError(c *gin.Context) {
 			response(c, http.StatusConflict, err.Error(), TestIsAlreadyPassedErrorCode)
 			return
 		}
+
+		h.logger.Error(reflect.TypeOf(err), err)
 		response(c, http.StatusInternalServerError, "Internal server error", InternalServerErrorErrorCode)
 	}
 }

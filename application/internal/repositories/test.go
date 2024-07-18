@@ -2,10 +2,12 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"smartri_app/internal"
 	"smartri_app/internal/entities/skills_entities"
 	"smartri_app/internal/entities/test_entities"
 	"smartri_app/internal/entities/user_data_entities"
+	"smartri_app/internal/errs"
 	"smartri_app/internal/infrastructure/datasources"
 )
 
@@ -77,6 +79,9 @@ func (repo *testRepository) GetAnswerWithValues(context context.Context, answerI
 	answer, err := repo.selectAnswerById.Execute(context, answerId)
 	if err != nil {
 		return nil, err
+	}
+	if answer == nil {
+		return nil, fmt.Errorf("%w. answer not found", errs.EntityNotFoundError)
 	}
 	answer.Values = values
 

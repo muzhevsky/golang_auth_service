@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
 	"smartri_app/internal/entities/skills_entities"
@@ -35,7 +36,7 @@ func (a *addUserAnswers) Add(context context.Context, answers *requests.UserAnsw
 		return nil, err
 	}
 	if userData == nil {
-		return nil, errs.UserDataNotFoundError
+		return nil, fmt.Errorf("%w. user not found", errs.EntityNotFoundError)
 	}
 	userHasAnswers, err := a.userAnswersRepo.CheckUserHasAnswers(context, accountId)
 

@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 	"smartri_app/controllers/requests"
 	"smartri_app/internal"
 	"smartri_app/internal/entities/skills_entities"
@@ -28,7 +29,7 @@ func NewAddUserXpChange(
 }
 
 func (uc *addUserXpChange) Add(context context.Context, accountId int, request *requests.AddSkillChangeRequest) (*requests.UserDataResponse, error) {
-	skills, err := uc.skillRepo.GetSkillsByAccountId(context, accountId)
+	skillsByAccount, err := uc.skillRepo.GetSkillsByAccountId(context, accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +40,14 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 	}
 
 	var skill *skills_entities.UserSkill
-	for i := range skills.Skills {
-		s := skills.Skills[i]
+	for i := range skillsByAccount.Skills {
+		s := skillsByAccount.Skills[i]
 		if s.SkillId == request.SkillId {
+			prev := s.Xp
 			s.Xp += request.Points
 			if s.Xp > maxPoints {
-				request.Points = skill.Xp - maxPoints
-				skill.Xp = maxPoints
+				request.Points = maxPoints - prev
+				s.Xp = maxPoints
 			}
 			userData.XP += user_data_entities.XP(request.Points)
 			skill = s
@@ -54,7 +56,7 @@ func (uc *addUserXpChange) Add(context context.Context, accountId int, request *
 	}
 
 	if skill == nil {
-		return nil, errs.UnexpectedError
+		return nil, fmt.Errorf("%w skill not found", errs.EntityNotFoundError)
 	}
 
 	err = uc.userSkillsRepo.ApplySkillChangesByAccountId(context, skill, userData, &skills_entities.SkillChange{
